@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="header_white">#C1ECFF</color>
+    <color name="fab">#97DFFF</color>
+    <color name="teal_200">#C5EDFF</color>
+    <color name="teal_700">#C5EDFF</color>
+    <color name="checkbox">#124861</color>
+    <color name="checkbox2">#DF124861</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources> <!--69B4BC-->
+
+<!--<color name="header_white">#C1ECFF</color>
+    <color name="fab">#A4E3FF</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#49FFFE</color>
+    <color name="checkbox">#006695</color>
+    <color name="checkbox2">#005278</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>-->
