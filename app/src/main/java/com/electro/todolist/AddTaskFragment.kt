@@ -1,7 +1,8 @@
 package com.electro.todolist
 
+import android.content.DialogInterface
 import android.os.Bundle
-import android.text.Editable
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +10,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import com.electro.todolist.ScrollingActivity
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
+import kotlin.random.Random
+import kotlin.random.Random.Default.nextInt
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,6 +35,8 @@ class AddTaskFragment : BottomSheetDialogFragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var taskTitleEditText: EditText
+    private lateinit var description: EditText
+    private val alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,77 +49,81 @@ class AddTaskFragment : BottomSheetDialogFragment() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
+    private fun saveTask() {
+        val title = taskTitleEditText.text.toString()
+        val descriptionText = description.text.toString()
 
-        taskTitleEditText.setText("")
+        taskTitleEditText.clearFocus()
+        description.clearFocus()
+        // Hide keyboard
+
+        if (title.isBlank()){
+            return
+        }
+
+        val id = generateId(5)
+        //Toast.makeText(requireContext(),"ID : $id", Toast.LENGTH_SHORT).show()
+        Log.e("ID", id)
+
+        val timeId = System.currentTimeMillis()
+        val taskObject = Task(title,descriptionText,timeId,false, id)
+        val taskToJson = Gson().toJson(taskObject)
+
+        val list1 = requireActivity().getSharedPreferences("list1", AppCompatActivity.MODE_PRIVATE)
+        list1.edit().putString(timeId.toString(), taskToJson).apply()
+
+        (activity as TasksActivity?)!!.addItem(taskObject)
+        description.text.clear()
+        taskTitleEditText.text.clear()
+
+        return
     }
 
+    private fun generateId(nbChars: Int = 5): String {
+        var id = ""
+
+        for (i in 1..nbChars) {
+            id+= alphabet[nextInt(0, alphabet.length-1)]
+        }
+        return id
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        //Toast.makeText(requireContext(),"BottomSheet dismissed",Toast.LENGTH_SHORT).show()
+        saveTask()
+
+        //HIDE KEYBOARD BEFORE
+        super.onDismiss(dialog)
+    }
+    
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
 
         val v = inflater.inflate(R.layout.fragment_add_task, container, false)
-        taskTitleEditText = v.findViewById<EditText>(R.id.title_edit_text)
-        taskTitleEditText.setText("")
+
+        taskTitleEditText = v.findViewById(R.id.title_edit_text)
+        taskTitleEditText.text.clear()
         taskTitleEditText.requestFocus()
+
+        description = v.findViewById(R.id.description)
+        description.text.clear()
 
         val saveTask = v.findViewById<Button>(R.id.save_task)
         val addDescription = v.findViewById<ImageButton>(R.id.showDescription)
-        val description = v.findViewById<EditText>(R.id.description)
-        //description.setText("")
-        description.text.clear()
-        //description.clearComposingText()
 
         addDescription.setOnClickListener {
             description.visibility = View.VISIBLE
-            //description.setText("")
-            //description.clearComposingText()
-            //description.text.clear()
             description.requestFocus()
         }
 
         saveTask.setOnClickListener {
-
-            // Get task attributes,
-            val title = taskTitleEditText.text.toString()
-
-            // MISSING : DESCRIPTION
-            val descriptionText = description.text.toString()
-
-            val list1 = requireActivity().getSharedPreferences("list1", AppCompatActivity.MODE_PRIVATE)
-
-            val timeId = System.currentTimeMillis()
-            val taskObject = Task(title,descriptionText,timeId,false)
-            val taskToJson = Gson().toJson(taskObject)
-
-            list1.edit().putString(timeId.toString(), taskToJson).apply()
-
-            (activity as ScrollingActivity?)!!.addItem(taskObject)
-
-
-
-
-            // Save task
-            // dismiss
-            // update recycler view
-
-            dismiss()
+            dismiss() // Task saved here
         }
 
         return v
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AddTaskFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+    companion object { // Params, unused for now
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
                 AddTaskFragment().apply {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.electro.todolist.TasksActivity">
+    <!--<item
+        android:id="@+id/menu"
+        android:title="Menu"
+        android:icon="@drawable/ic_menu_black_24dp"
+        app:showAsAction="always" />-->
+
+
+    <item
+        android:id="@+id/done"
+        android:title="Terminé"
+        app:iconTint="@color/iconTint"
+        android:icon="@drawable/ic_baseline_task_alt_24"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/delete"
+        android:title="Supprimer"
+        app:iconTint="@color/iconTint"
+        android:icon="@drawable/ic_baseline_delete_outline_24"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/favorite"
+        android:title="Important"
+        app:iconTint="@color/iconTint"
+        android:icon="@drawable/ic_more_vert_24px"
+        app:showAsAction="always" />
+</menu>

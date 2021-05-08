@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="floatingAddButton">#1A00A0</color>
+    <color name="addIconTint">#AAB8FF</color>
+    <color name="colorPrimary">@color/purpleDark</color>
+
+    <color name="textContent">@color/eyeWhite</color>
+
+    <color name="textContentPrimary">#BFFFFFFF</color>
+    <color name="textContentSecondary">#9AFFFFFF</color>
+
+    <color name="iconTint">#E6FFFFFF</color>
+
+    <color name="pureWhite">#FFFFFF</color>
+
+    <color name="fabText">@color/iconTint</color>
+
+    <color name="purpleLight">#9682FF</color>
+    <color name="purpleDark">#000C64</color>
+
+    <color name="separatorToolbar">#475DFF</color>
+
+    <color name="background">@color/eyeCustomGrey</color>
+
+    <color name="eyeCustomGrey">#1F1B24</color>
+
+    <color name="eyeWhite">#CCFFFFFF</color>
+
+</resources> <!--69B4BC-->
+
+<!--
+<color name="header_white">#80DEEA</color>
+    <color name="fab">#B2EBF2</color>
+    <color name="teal_200">#C5EDFF</color>
+    <color name="teal_700">#C5EDFF</color>
+    <color name="checkbox">#2C696F</color>
+    <color name="checkbox2">#2C696F</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="violet">#6200EA</color>
+
+<color name="header_white">#D9BDFF</color>
+    <color name="fab">#BFA2FF</color>
+    <color name="teal_200">#C5EDFF</color>
+    <color name="teal_700">#C5EDFF</color>
+    <color name="checkbox">#704EB9</color>
+    <color name="checkbox2">#704EB9</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="violet">#6200EA</color>
+
+<color name="header_white">#C1ECFF</color>
+    <color name="fab">#97DFFF</color>
+    <color name="teal_200">#C5EDFF</color>
+    <color name="teal_700">#C5EDFF</color>
+    <color name="checkbox">#124861</color>
+    <color name="checkbox2">#DF124861</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="violet">#49FFFE</color>
+
+
+<color name="header_white">#C1ECFF</color>
+    <color name="fab">#A4E3FF</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#49FFFE</color>
+    <color name="checkbox">#006695</color>
+    <color name="checkbox2">#005278</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>-->

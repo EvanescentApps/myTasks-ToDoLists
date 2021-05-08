@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020. Electro Inc.
+  ~ This project and all its code belong to and were created by Evan Cocain, as known as Electro Inc.
+  ~ You are not allowed to modify, share or re-use this.
+  -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+<item android:drawable="@color/background"/><!--"@color/colorSplash"-->
+
+    <item
+        android:left="120dp"
+        android:right="120dp"
+        android:bottom="50dp"
+        android:gravity="fill">
+        <bitmap
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:left="120dp"
+            android:alpha="0.9"
+            android:right="120dp"
+            android:src="@drawable/v3b3" />
+    </item>
+
+
+    <item
+        android:left="100dp"
+        android:right="100dp"
+        android:bottom="8dp"
+        android:gravity="fill">
+        <bitmap
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:left="100dp"
+            android:alpha="0.9"
+            android:right="100dp"
+            android:src="@drawable/v1air2" />
+    </item>
+    <!--<item
+        android:left="96dp"
+        android:right="102dp"
+        android:bottom="2dp"
+        android:gravity="fill">
+        <bitmap
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:left="100dp"
+            android:alpha="0.2"
+            android:right="100dp"
+            android:src="@drawable/lilv" />
+    </item>-->
+</layer-list>

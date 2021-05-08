@@ -7,6 +7,7 @@
     android:padding="12dp"
     android:orientation="vertical"
     android:clipToPadding="false"
+    android:clipChildren="false"
     tools:context=".AddTaskFragment">
 
 
@@ -20,12 +21,12 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapSentences"
+            android:inputType="textCapSentences|textMultiLine"
             android:layout_marginRight="4dp"
             android:layout_marginLeft="4dp"
             android:id="@+id/title_edit_text"
             android:hint="Ajouter une tâche"
-
+            android:maxHeight="150dp"
             android:textSize="22sp"
             android:autofillHints="" />
 
@@ -33,12 +34,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:inputType="textCapSentences"
+        android:inputType="textCapSentences|textMultiLine"
         android:layout_marginRight="4dp"
         android:layout_marginLeft="4dp"
         android:id="@+id/description"
+        android:maxHeight="150dp"
         android:hint="Ajouter une description"
-    android:alpha="0.8"
+        android:alpha="0.8"
         android:textSize="18sp"
         android:autofillHints="" />
 
@@ -49,6 +51,8 @@
         android:layout_marginTop="22dp"
         android:layout_marginRight="6dp"
         android:layout_marginEnd="6dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         android:orientation="horizontal">
 
         <ImageButton
@@ -57,6 +61,7 @@
             android:layout_height="40dp"
             android:layout_marginLeft="4dp"
             android:padding="4dp"
+            android:alpha="0.6"
             app:srcCompat="@drawable/ic_subject_24px"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="fitXY"

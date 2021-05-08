@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:fitsSystemWindows="true"
+    tools:context=".TasksActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:fitsSystemWindows="true"
+        android:theme="@style/Theme.Todolist.AppBarOverlay">
+        <!--@dimen/app_bar_height-->
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+             android:id="@+id/toolbar_layout"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/app_bar_height"
+             android:background="@color/colorPrimary"
+             android:fitsSystemWindows="true"
+             android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
+             app:contentScrim="@color/colorPrimary"
+             app:layout_scrollFlags="exitUntilCollapsed|scroll"
+             app:toolbarId="@+id/toolbar">
+
+        <!--scroll|exitUntilCollapsed-->
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:fontFamily="@font/lexend_semibold"
+            app:layout_collapseMode="pin"
+            app:popupTheme="@style/Theme.Todolist.PopupOverlay"
+            app:title="Mes tâches"
+            app:titleTextColor="@color/iconTint">
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/choiceList"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_gravity="bottom"
+            android:alpha="0.4"
+            android:background="@color/separatorToolbar"
+            app:layout_collapseMode="pin" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"> -->
+
+        <!--<include android:clipToPadding="false" layout="@layout/content_scrolling_2" />-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tasks_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+            android:paddingBottom="32dp"
+
+
+            tools:itemCount="4"
+            tools:listitem="@layout/item_task" />
+
+    <!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+
+    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="Ajouter une tâche"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|end"
+        app:maxImageSize="50dp"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="#003037" />-->
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:fabCradleRoundedCornerRadius="16dp"
+        app:fabCradleVerticalOffset="0dp"
+        app:hideOnScroll="true"
+        app:menu="@menu/bottom_app_bar"
+        app:navigationIcon="@drawable/ic_menu_black_24dp" />
+    <!-- app:backgroundTint="#85F1FF"-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/add_task_text"
+        app:backgroundTint="@color/floatingAddButton"
+        app:layout_anchor="@+id/bottomAppBar"
+        app:layout_anchorGravity="top|center"
+        app:maxImageSize="50dp"
+        app:srcCompat="@drawable/ic_add_black_48dp"
+        app:tint="@color/addIconTint" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

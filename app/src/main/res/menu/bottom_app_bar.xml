@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.electro.todolist.ScrollingActivity">
+    tools:context="com.electro.todolist.TasksActivity">
     <!--<item
         android:id="@+id/menu"
         android:title="Menu"
@@ -11,6 +11,7 @@
     <item
         android:id="@+id/context"
         android:title="Context Menu"
+        app:iconTint="@color/iconTint"
         android:icon="@drawable/ic_more_vert_24px"
         app:showAsAction="always" />
 </menu>

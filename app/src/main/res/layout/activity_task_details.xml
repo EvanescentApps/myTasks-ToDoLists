@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    tools:context=".TaskDetailsActivity">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fitsSystemWindows="true"
+        android:theme="@style/Theme.Todolist.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_collapseMode="pin"
+            app:menu="@menu/bottom_app_bar"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:popupTheme="@style/Theme.Todolist.PopupOverlay"
+            app:title="Modifier une tâche"
+            app:titleTextColor="@color/iconTint" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_gravity="bottom"
+            android:alpha="0.4"
+            android:background="@color/separatorToolbar"
+            android:visibility="visible" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/app_bar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="18dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/lexend_semibold"
+                android:textColor="@color/textContentPrimary"
+                android:hint="Titre de la tâche"
+                android:layout_marginTop="0dp"
+                android:inputType="textCapSentences|textMultiLine"
+                android:importantForAutofill="no"
+                android:textSize="26sp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/lexend_semibold"
+                android:inputType="textCapSentences|textMultiLine"
+                android:background="@android:color/transparent"
+                android:drawableStart="@drawable/ic_subject_24px"
+                android:drawableLeft="@drawable/ic_subject_24px"
+                android:drawablePadding="10dp"
+                android:gravity="top"
+                android:hint="Description de la tâche"
+                android:textColor="@color/textContentSecondary"
+                android:importantForAutofill="no"
+                android:textSize="16sp"
+                app:drawableTint="#7D7D7D" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/setDoneFab"
+        android:layout_width="wrap_content"
+        android:layout_height="52dp"
+        android:layout_margin="@dimen/fab_margin"
+        android:text="Tâche terminée"
+        android:fontFamily="@font/lexend_semibold"
+        android:textAllCaps="false"
+        android:textColor="@color/fabText"
+        android:textSize="17sp"
+        app:backgroundTint="@color/colorPrimary"
+        app:collapsedSize="55dp"
+        app:icon="@drawable/ic_baseline_task_alt_24"
+        app:iconPadding="8dp"
+        app:iconTint="#2A2B71"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:rippleColor="@color/purpleLight" />
+
+    <!--<LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimary"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </LinearLayout>-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="top"
+        android:alpha="0.4"
+        android:background="@color/separatorToolbar"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomAppBar"
+            style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:backgroundTint="@color/colorPrimary"
+
+            app:menu="@menu/bottom_tools_task"
+            app:navigationIcon="@drawable/ic_menu_black_24dp"
+             />
+
+        <!--app:navigationIcon="@drawable/ic_menu_black_24dp"-->
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

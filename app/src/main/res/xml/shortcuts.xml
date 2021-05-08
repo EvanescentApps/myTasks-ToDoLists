@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020. Electro Inc.
+  ~ This project and all its code belong to and were created by Evan Cocain, as know as Electro Inc.
+  ~ You are not allowed to modify, share or re-use this.
+  -->
+
+<shortcuts xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="add_task"
+        android:enabled="true"
+        android:icon="@drawable/mytasks6"
+        android:shortcutShortLabel="@string/shortcut_add"
+        android:shortcutLongLabel="@string/shortcut_add"
+        android:shortcutDisabledMessage="@string/unavailable"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.electro.todolist"
+            android:targetClass="com.electro.todolist.TasksActivity" >
+
+            <extra android:name="shortcut" android:value="add" />
+
+        </intent>
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <!--<categories android:name="android.shortcut.conversation" />-->
+    </shortcut>
+    <!--<shortcut
+        android:shortcutId="later"
+        android:enabled="true"
+        android:icon="@drawable/setg_ico2"
+        android:shortcutShortLabel="@string/shortcut_params"
+        android:shortcutLongLabel="@string/shortcut_params"
+        android:shortcutDisabledMessage="@string/error_shortcut"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="maths.multix"
+            android:targetClass="maths.multix.SettingsActivity" />
+        &lt;!&ndash; If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. &ndash;&gt;
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>-->
+</shortcuts>
