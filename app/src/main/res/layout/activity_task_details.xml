@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    tools:context=".TaskDetailsActivity">
+    tools:context=".ui.TaskDetailsActivity">
 
     <!-- TODO: Update blank fragment layout -->
 

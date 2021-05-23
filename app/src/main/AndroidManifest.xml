@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.electro.todolist">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher3"
@@ -10,14 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Todolist">
         <activity
-            android:name=".TaskDetailsActivity"
+            android:name=".ui.TaskDetailsActivity"
             android:theme="@style/Theme.Todolist.NoActionBar"
             android:windowSoftInputMode="adjustNothing"/>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".TasksActivity"
+            android:name=".ui.TasksActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Todolist.NoActionBar"
             android:windowBackground="@drawable/splash"

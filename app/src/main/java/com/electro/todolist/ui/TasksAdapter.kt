@@ -1,4 +1,4 @@
-package com.electro.todolist
+package com.electro.todolist.ui
 
 import android.app.Activity
 import android.content.Context
@@ -12,13 +12,18 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.electro.todolist.R
+import com.electro.todolist.data.Task
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
 
-class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Context) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
+class TasksAdapter(
+    private val mTasks: ArrayList<Task>,
+    private val context: Context
+) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
 
     private var mContext: Context = context
 
@@ -39,9 +44,9 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
     fun moveItem(from: Int, to: Int) {
 
         if (logEnabled) {
-            val titlesBefore= arrayListOf<String>()
+            val titlesBefore = arrayListOf<String>()
             mTasks.forEach { titlesBefore.add(it.title) }
-            Log.d("Adapter position","from: $from to: $to")
+            Log.d("Adapter position", "from: $from to: $to")
             Log.i("b4 mTs", Json.encodeToString(titlesBefore))
         }
 
@@ -50,7 +55,7 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
         notifyItemMoved(from, to)
 
         if (logEnabled) {
-            val titlesOnly= arrayListOf<String>()
+            val titlesOnly = arrayListOf<String>()
             mTasks.forEach { titlesOnly.add(it.title) }
             Log.i("mTasks", Json.encodeToString(titlesOnly))
         }
@@ -67,14 +72,20 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
         Log.e("Activity", "Remove item at $position")
         Log.e("tasks (activity)", "size after removed : ${mTasks.size}")
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            val newPosition = mTasks.size-1
-            mTasks.removeAt(position)
-            mTasks.add(mTasks.size,taskDone)
-            notifyItemMoved(position,newPosition)
-            notifyItemRangeChanged(position, newPosition+1)
+        Handler(Looper.getMainLooper()).postDelayed(
+            {
+                val newPosition = mTasks.size - 1
+                mTasks.removeAt(position)
+                mTasks.add(mTasks.size, taskDone)
+                //notifyItemMoved(position,newPosition)
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, newPosition + 1)
 
-            Snackbar.make((context as TasksActivity).findViewById(R.id.activity), "Tâche terminée", Snackbar.LENGTH_LONG)
+                Snackbar.make(
+                    (context as TasksActivity).findViewById(R.id.activity),
+                    "Tâche terminée",
+                    Snackbar.LENGTH_LONG
+                )
                     .setAnchorView(context.findViewById<FloatingActionButton>(R.id.fab))
                     .setAction("Annuler") {
                         Log.e("Action", "Suppression annulée")
@@ -82,14 +93,14 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
                         //listEdit.putString(taskDone.creationDate.toString(), Gson().toJson(taskDone)).apply()
 
                         mTasks.removeAt(newPosition)
-                        mTasks.add(position,taskDone)
+                        mTasks.add(position, taskDone)
 
-                        notifyItemMoved(newPosition,position)
+                        notifyItemMoved(newPosition, position)
 
-                        notifyItemRangeChanged(position,newPosition+1)
+                        notifyItemRangeChanged(position, newPosition + 1)
                     }.show()
 
-        }, 100 // value in milliseconds
+            }, 100 // value in milliseconds
         )
     }
 
@@ -99,7 +110,7 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
         mTasks.removeAt(position)
 
         notifyItemRemoved(position)
-        notifyItemRangeChanged(position,mTasks.size)
+        //notifyItemRangeChanged(position,mTasks.size)
     }
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
@@ -117,20 +128,25 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
         return ViewHolder(taskView)
     }
 
-    override fun onBindViewHolder(viewHolder: TasksAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
         val titleTasktextView2 = viewHolder.titleTextView
         val checkbox = viewHolder.checkbox
         val descriptionTaskTextView2 = viewHolder.descriptionTextView
 
-        viewHolder.itemView.setOnClickListener { Log.i("Adapter","Clicked item ${viewHolder.adapterPosition}") }
+        viewHolder.itemView.setOnClickListener {
+            Log.i(
+                "Adapter",
+                "Clicked item ${viewHolder.bindingAdapterPosition}"
+            )
+        }
 
-        val task : Task = mTasks[viewHolder.adapterPosition]
+        val task: Task = mTasks[viewHolder.bindingAdapterPosition]
         titleTasktextView2.text = task.title //set title to item
         //descriptionTaskTextView2.text = task.description
-        if (task.description.isNullOrBlank()){
+        if (task.description.isNullOrBlank()) {
             descriptionTaskTextView2.visibility = View.GONE
-            Log.i("Description","hidden for item ${viewHolder.adapterPosition}")
+            Log.i("Description", "hidden for item ${viewHolder.bindingAdapterPosition}")
         } else {
             descriptionTaskTextView2.visibility = View.VISIBLE
             descriptionTaskTextView2.text = task.description
@@ -148,10 +164,10 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
         checkbox.setOnClickListener {
 
             task.done = checkbox.isChecked
-            Log.i("Checked", "Checked item ${viewHolder.adapterPosition}")
-            if (checkbox.isChecked){
+            Log.i("Checked", "Checked item ${viewHolder.bindingAdapterPosition}")
+            if (checkbox.isChecked) {
 
-                onCheck(viewHolder.adapterPosition)
+                onCheck(viewHolder.bindingAdapterPosition)
                 //(context as ScrollingActivity).removeItem(viewHolder.adapterPosition) ///////*****
             }
             (context as TasksActivity).setTaskDone(task, checkbox.isChecked)
@@ -159,7 +175,7 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
 
         // Set onclick listener for the whole item, to show details fragment
         viewHolder.itemView.setOnClickListener {
-            val item = mTasks[viewHolder.adapterPosition]
+            val item = mTasks[viewHolder.bindingAdapterPosition]
             //Toast.makeText(context,"Item Cicked with id ${item.uid}",Toast.LENGTH_SHORT).show()
 
             // Here gather data and encode it to JSON with kotlinx serialization
@@ -170,10 +186,10 @@ class TasksAdapter(private val mTasks: ArrayList<Task>, private val context: Con
             //Json.encodeToString
             taskJson = Json.encodeToString(item)
 
-            Log.i("SERIALIZATION",taskJson)
+            Log.i("SERIALIZATION", taskJson)
 
-            intent.putExtra("currentTask",taskJson)
-            intent.putExtra("position",viewHolder.adapterPosition)
+            intent.putExtra("currentTask", taskJson)
+            intent.putExtra("position", viewHolder.bindingAdapterPosition)
 
             (mContext as Activity).startActivityForResult(intent, 500)
             (context as Activity).overridePendingTransition(R.anim.fade_in, R.anim.fade_out)

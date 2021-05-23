@@ -1,17 +1,15 @@
-package com.electro.todolist
+package com.electro.todolist.ui
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.Log
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.widget.addTextChangedListener
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.electro.todolist.R
+import com.electro.todolist.data.Task
+import com.electro.todolist.databinding.ActivityTaskDetailsBinding
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -19,48 +17,47 @@ import kotlinx.serialization.json.Json
 
 class TaskDetailsActivity : AppCompatActivity() {
 
-    private lateinit var titreEditText: EditText
-    private lateinit var descriptionEditText: AppCompatEditText
+    //private lateinit var titreEditText: EditText
+    //private lateinit var descriptionEditText: AppCompatEditText
     private lateinit var task: Task
     private lateinit var jsonTask: String
-    private lateinit var bottomAppBar: BottomAppBar
+    //private lateinit var bottomAppBar: BottomAppBar
     private var delete: Boolean = false
     private var position: Int = -1
+    private lateinit var b : ActivityTaskDetailsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_task_details)
+
+        // New : View Binding ! To get rid of the boilerplate code findViewById !
+        b = ActivityTaskDetailsBinding.inflate(layoutInflater)
+
+        setContentView(b.root) // r.layout.activity_task_details
+
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        val setDoneFAB = findViewById<ExtendedFloatingActionButton>(R.id.setDoneFab)
+        //val setDoneFAB = findViewById<ExtendedFloatingActionButton>(R.id.setDoneFab)
+        //titreEditText = findViewById(R.id.title)
+        //descriptionEditText = findViewById(R.id.description)
+        //bottomAppBar = findViewById(R.id.bottomAppBar)
 
-        bottomAppBar = findViewById(R.id.bottomAppBar)
         delete = false
-        
-        // GET BUNDLE AND EXTRACT TASK
         jsonTask = intent.getStringExtra("currentTask").toString()
 
         task = Json.decodeFromString(jsonTask)
 
-        titreEditText = findViewById(R.id.title)
-        descriptionEditText = findViewById(R.id.description)
+        //b.title.movementMethod = LinkMovementMethod.getInstance()
+        //b.description.movementMethod = LinkMovementMethod.getInstance()
 
+        b.title.setText(task.title)
+        b.description.setText(task.description)
+        b.description.linksClickable = true
+        b.description.autoLinkMask = Linkify.WEB_URLS
+        Linkify.addLinks(b.description,Linkify.WEB_URLS)
 
-
-        titreEditText.setText(task.title)
-
-
-        //titreEditText.movementMethod = LinkMovementMethod.getInstance()
-
-        descriptionEditText.setText(task.description)
-        //descriptionEditText.movementMethod = LinkMovementMethod.getInstance()
-        descriptionEditText.linksClickable = true
-        descriptionEditText.autoLinkMask = Linkify.WEB_URLS
-        Linkify.addLinks(descriptionEditText,Linkify.WEB_URLS)
-
-        descriptionEditText.addTextChangedListener(
+        b.description.addTextChangedListener(
             afterTextChanged = {
                 if (it != null) {
                     Linkify.addLinks(it, Linkify.WEB_URLS)
@@ -71,13 +68,13 @@ class TaskDetailsActivity : AppCompatActivity() {
         // HANDLE THE CASE WHEN TASK IS DONE
         // SHOW : SET UNDONE
 
-        setDoneFAB.setOnClickListener {
+        b.setDoneFab.setOnClickListener {
             task.done = true
             finish()
             // DON'T FORGET TO TOAST !
         }
 
-        bottomAppBar.setOnMenuItemClickListener {
+        b.bottomAppBar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.delete -> {
                     Log.e("Delete", "pressed")
@@ -117,11 +114,8 @@ class TaskDetailsActivity : AppCompatActivity() {
 
     private fun generateResult(): Intent {
 
-        val editedTitle = titreEditText.text.toString()
-        val editedDescription = descriptionEditText.text.toString()
-
-        task.title = editedTitle
-        task.description = editedDescription
+        task.title = b.title.text.toString()
+        task.description = b.description.text.toString()
 
         val returnTaskJson = Json.encodeToString(task)
         Log.e("DetailsAct", returnTaskJson)

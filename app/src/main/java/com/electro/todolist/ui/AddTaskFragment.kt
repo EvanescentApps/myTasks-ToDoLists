@@ -1,4 +1,4 @@
-package com.electro.todolist
+package com.electro.todolist.ui
 
 import android.content.DialogInterface
 import android.os.Bundle
@@ -10,12 +10,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import com.electro.todolist.R
+import com.electro.todolist.data.Task
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import kotlin.random.Random
 import kotlin.random.Random.Default.nextInt
 
 // TODO: Rename parameter arguments, choose names that match
@@ -45,7 +45,7 @@ class AddTaskFragment : BottomSheetDialogFragment() {
             param2 = it.getString(ARG_PARAM2)
         }
 
-        setStyle(DialogFragment.STYLE_NORMAL,R.style.BottomSheetStyle)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetStyle)
 
     }
 
@@ -73,6 +73,9 @@ class AddTaskFragment : BottomSheetDialogFragment() {
         list1.edit().putString(timeId.toString(), taskToJson).apply()
 
         (activity as TasksActivity?)!!.addItem(taskObject)
+        // OMG c'est quoi ce cast hyper risqué !!! Transmettre au viewModel
+
+
         description.text.clear()
         taskTitleEditText.text.clear()
 

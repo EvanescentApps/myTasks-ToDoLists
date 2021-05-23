@@ -5,9 +5,9 @@
     android:id="@+id/activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@color/background"
     android:fitsSystemWindows="true"
-    tools:context=".TasksActivity">
+    tools:context=".ui.TasksActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -18,7 +18,7 @@
         android:theme="@style/Theme.Todolist.AppBarOverlay">
         <!--@dimen/app_bar_height-->
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
+        <!--<com.google.android.material.appbar.CollapsingToolbarLayout
              android:id="@+id/toolbar_layout"
              android:layout_width="match_parent"
              android:layout_height="@dimen/app_bar_height"
@@ -27,7 +27,7 @@
              android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
              app:contentScrim="@color/colorPrimary"
              app:layout_scrollFlags="exitUntilCollapsed|scroll"
-             app:toolbarId="@+id/toolbar">
+             app:toolbarId="@+id/toolbar">-->
 
         <!--scroll|exitUntilCollapsed-->
 
@@ -56,7 +56,7 @@
             android:background="@color/separatorToolbar"
             app:layout_collapseMode="pin" />
 
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
+       <!-- </com.google.android.material.appbar.CollapsingToolbarLayout>-->
     </com.google.android.material.appbar.AppBarLayout>
 
     <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -65,20 +65,19 @@
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"> -->
 
-        <!--<include android:clipToPadding="false" layout="@layout/content_scrolling_2" />-->
+        <include android:id="@+id/includeRecycler" android:clipToPadding="false" layout="@layout/content_scrolling_2" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tasks_recyclerview"
+        <!--<androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tasksRecyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@color/background"
+            app:layout_anchorGravity="top"
+            android:layout_gravity="top"
+            android:paddingBottom="24dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-
-            android:paddingBottom="32dp"
-
-
             tools:itemCount="4"
-            tools:listitem="@layout/item_task" />
+            tools:listitem="@layout/item_task" />-->
 
     <!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 

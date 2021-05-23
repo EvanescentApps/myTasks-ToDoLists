@@ -6,13 +6,13 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.electro.todolist.ui.TasksAdapter
 
 
 //import androidx.test.runner.intent.IntentStubberRegistry.reset
@@ -28,7 +28,7 @@ interface ItemTouchHelperAdapter {
 }
 
 class ItemTouchHelperCallback: ItemTouchHelper.Callback {
-    private val mAdapter:TasksAdapter
+    private val mAdapter: TasksAdapter
 
     private var longPressDragEnabled = false
     private var itemViewSwipeEnabled = false
@@ -135,8 +135,8 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
         //mAdapter.onMove(viewHolder.adapterPosition, target.adapterPosition)
 
         val adapter = recyclerView.adapter as TasksAdapter
-        val from = viewHolder.adapterPosition
-        val to = target.adapterPosition
+        val from = viewHolder.bindingAdapterPosition
+        val to = target.bindingAdapterPosition
 
         adapter.moveItem(from, to)
 
@@ -145,7 +145,7 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
         return true
     }
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, i: Int) {
-        mAdapter.onSwipe(viewHolder.adapterPosition)
+        mAdapter.onSwipe(viewHolder.bindingAdapterPosition)
     }
 
     override fun onChildDraw(
