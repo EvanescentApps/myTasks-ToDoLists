@@ -40,7 +40,7 @@ class TasksActivity : AppCompatActivity() {
     private lateinit var tasks: ArrayList<Task>
     private lateinit var adapter: RecyclerView.Adapter<TasksAdapter.ViewHolder>
     private lateinit var selectedListContent: SharedPreferences
-    private lateinit var listEditor: SharedPreferences.Editor
+    private lateinit var selectedListEditor: SharedPreferences.Editor
 
     //private lateinit var tasksRecyclerView: RecyclerView
     //private lateinit var allLists: SharedPreferences
@@ -82,9 +82,7 @@ class TasksActivity : AppCompatActivity() {
     fun deleteItem(index: Int) { // Called onSwipe
         val taskToDelete = tasks[index] // Get the task to delete
 
-        //tasks.removeAt(index) // Supprimée de la liste de sync
-
-        listEditor.remove(taskToDelete.creationDate.toString()).apply() // Supprimée
+        selectedListEditor.remove(taskToDelete.creationDate.toString()).apply() // Supprimée
 
         Log.e("Activity", "Delete item at $index")
 
@@ -92,7 +90,7 @@ class TasksActivity : AppCompatActivity() {
             .setAnchorView(b.fab)
             .setAction("Annuler") {
                 // Suppression annulée : remettre la tâche
-                listEditor.putString(
+                selectedListEditor.putString(
                     taskToDelete.creationDate.toString(),
                     Json.encodeToString(taskToDelete)
                 ).apply()
@@ -105,31 +103,25 @@ class TasksActivity : AppCompatActivity() {
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
         Collections.swap(tasks, fromPosition, toPosition)
-
-        //val titlesOnly = arrayListOf<String>()
-        //tasks.forEach { titlesOnly.add(it.title) }
-        //Log.i("tasks ", Gson().toJson(titlesOnly))
-
         Log.i("Activity position", "from: $fromPosition to: $toPosition")
-
     }
 
-    fun removeItem(index: Int) {
+    /*fun removeItem(index: Int) {
         val taskDone = tasks[index] // We get the task
         taskDone.done = true
         val taskToJson = Json.encodeToString(taskDone) // Converted to Json for storage
-        listEditor.putString(taskDone.creationDate.toString(), taskToJson).apply()
+        selectedListEditor.putString(taskDone.creationDate.toString(), taskToJson).apply()
 
         //tasks.removeAt(index)
 
         Log.i("Activity", "Remove item at $index")
         Log.i("tasks (activity)", "size after removed : ${tasks.size}")
 
-    }
+    }*/
 
     fun setTaskDone(task: Task, done: Boolean) {
         task.done = done
-        listEditor.putString(task.creationDate.toString(), Json.encodeToString(task)).apply()
+        selectedListEditor.putString(task.creationDate.toString(), Json.encodeToString(task)).apply()
     }
 
     private suspend fun save(key: String, value: String) {
@@ -147,6 +139,39 @@ class TasksActivity : AppCompatActivity() {
             val currentCounterValue = settings[COUNTER] ?: 0
             settings[COUNTER] = currentCounterValue + 1
         }
+    }
+
+    fun changeList(newSelectedList : String) {
+
+
+        // Notify recyclerView to change dataset
+
+        //tasksRepository.currentListName = newSelectedList
+        Log.e("List changed","new list is ${tasksRepository.currentListName}")
+        selectedListContent = getSharedPreferences(tasksRepository.currentListName, MODE_PRIVATE)
+        selectedListEditor = selectedListContent.edit()
+
+        val getTasksList = ArrayList<Task>()
+        selectedListContent.all.map { it.key }.forEach { str ->
+            selectedListContent.getString(str, null)?.let {
+                getTasksList.add(Json.decodeFromString(it)) //Decode to task & add
+            }
+        }
+        getTasksList.sortWith { o1, o2 -> o1.position.compareTo(o2.position) }
+        getTasksList.sortWith { o1, o2 -> o1.done.compareTo(o2.done) }
+
+        // ArrayList<Task> created by the Object Class Task
+        //tasks = Task.createTasksList(getTasksList)
+
+        //adapter.notifyDataSetChanged()
+
+        // TODO : CREATING A NEW ADAPTER LEADS TO A BIG BUG : don't create a new one !!!
+        // Just replace the data
+        // Here we create the Adapter for the RecyclerView, with the tasks
+        //adapter = TasksAdapter(tasks, this, this)
+
+        //b.includeRecycler.tasksRecyclerview.adapter.notit
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -186,9 +211,6 @@ class TasksActivity : AppCompatActivity() {
 
         tasksRepository.getDefaultList()
 
-        //currentList = tasksRepository.currentListName
-        defaultListKey = tasksRepository.defaultListKey
-
         // Here sending all the lists to the spinner
         val listClean = tasksRepository.readOnlyUserLists //tasksRepository.list.toMutableList()
 
@@ -203,10 +225,11 @@ class TasksActivity : AppCompatActivity() {
         Toast.makeText(this, "currentlist is ${tasksRepository.currentListName}", Toast.LENGTH_SHORT).show()
         Log.e("Selected List", "${tasksRepository.currentListName} selected")
 
-        listEditor = selectedListContent.edit()
-
         // DO THIS WORK ASYNCHRONOUSLY: COROUTINE
         selectedListContent = getSharedPreferences(tasksRepository.currentListName, MODE_PRIVATE)
+
+        selectedListEditor = selectedListContent.edit()
+
         val allTasksList = ArrayList<Task>()
         selectedListContent.all.map { it.key }.forEach { str ->
             selectedListContent.getString(str, null)?.let {
@@ -220,10 +243,9 @@ class TasksActivity : AppCompatActivity() {
         tasks = Task.createTasksList(allTasksList)
 
         // Here we create the Adapter for the RecyclerView, with the tasks
-        adapter = TasksAdapter(tasks, this)
+        adapter = TasksAdapter(tasks, this, this)
 
-        b.includeRecycler.tasksRecyclerview.adapter =
-            adapter // Adapter assigned to the recyclerview
+        b.includeRecycler.tasksRecyclerview.adapter = adapter
         b.includeRecycler.tasksRecyclerview.layoutManager = LinearLayoutManager(this)
         ViewCompat.setNestedScrollingEnabled(b.includeRecycler.tasksRecyclerview, false)
 
@@ -234,7 +256,6 @@ class TasksActivity : AppCompatActivity() {
         val bottomDialog = AddTaskFragment()
         bottomDialog.isCancelable = true
 
-
         b.choiceList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -243,15 +264,16 @@ class TasksActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val pairSelected = tasksRepository.readOnlyUserLists.toList()[position]
-                Log.i("Lists", "Selected $pairSelected")
+                Log.i("Lists Spinner", "Selected $pairSelected")
                 val listSelected = pairSelected.first
                 tasksRepository.currentListName = listSelected
+                changeList(listSelected)
+
+                // TODO : HERE WE GOT A FUCK**G BUG : 2 ADAPTERS ARE CREATED
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                //Do nothing
             }
-
         }
 
         b.fab.setOnClickListener {
@@ -300,7 +322,7 @@ class TasksActivity : AppCompatActivity() {
             task.position = index
 
             val taskToJson = Json.encodeToString(task)
-            listEditor.putString(task.creationDate.toString(), taskToJson).apply()
+            selectedListEditor.putString(task.creationDate.toString(), taskToJson).apply()
         }
         Log.i("Order", "Saved data with position")
     }
@@ -350,7 +372,7 @@ class TasksActivity : AppCompatActivity() {
 
                     val task = Json.decodeFromString<Task>(taskJson)
 
-                    listEditor.putString(
+                    selectedListEditor.putString(
                         task.creationDate.toString(),
                         Json.encodeToString(task)
                     ).apply()
@@ -375,7 +397,7 @@ class TasksActivity : AppCompatActivity() {
                                 Log.e("Action", "Validation annulée")
                                 task.done = false
 
-                                listEditor.putString(
+                                selectedListEditor.putString(
                                     task.creationDate.toString(),
                                     Json.encodeToString(task)
                                 ).apply()

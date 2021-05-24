@@ -31,27 +31,36 @@ class TasksRepository(private val dataStore: DataStore<Preferences>,val activity
     val listsPrefs: SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
     val tasks = "e"
 
-    val readOnlyUserLists: MutableMap<String, *> = listsPrefs.all
+    var readOnlyUserLists: MutableMap<String, *> = listsPrefs.all
 
-    var defaultListKey = readOnlyUserLists.map { it.key }[0]
+    var defaultListKey = ""
 
-    val list = readOnlyUserLists.values.toList() //arrayListOf("List 1","List 2","List 3")
+    var list = readOnlyUserLists.values.toList() //arrayListOf("List 1","List 2","List 3")
 
     var currentListName = defaultListKey
 
     fun getDefaultList() {
 
-        Log.e("readOnlyUserLists",readOnlyUserLists.toString())
+        if(readOnlyUserLists.isNotEmpty()) {
+            Log.e("readOnlyUserLists",readOnlyUserLists.toString())
 
-        listsPrefs.getString("defaultList", null)?.let {
-            defaultListKey = it
-            Log.e("Default","shared is not null")
-        } ?: run {
-            defaultListKey = readOnlyUserLists.map { it.key }[0]
-            Log.e("Default","shared is null, taking first list")
+            listsPrefs.getString("defaultList", null)?.let {
+                defaultListKey = it
+                Log.e("Default","shared is not null")
+            } ?: run {
+                defaultListKey = readOnlyUserLists.map { it.key }[0]
+                Log.e("Default","shared is null, taking first list")
+            }
+
+            Log.e("defaultListKey","is $defaultListKey , but ${listsPrefs.getString("defaultList", null)}")
+        } else {
+            Log.e("Empty ListsPrefs","Creating -Mes Tâches- List")
+            listsPrefs.edit().putString("list1","Mes tâches").apply()
+            listsPrefs.edit().putString("defaultList","list1").apply()
+            defaultListKey = "list1"
+            readOnlyUserLists = listsPrefs.all
+            list = readOnlyUserLists.values.toList()
         }
-
-        Log.e("defaultListKey","is $defaultListKey , but ${listsPrefs.getString("defaultList", null)}")
 
         currentListName = defaultListKey
     }

@@ -62,6 +62,10 @@ class BottomFragment : BottomSheetDialogFragment() {
                     //(requireActivity() as TasksActivity?)!!.exportToJson()
                     tasksRepository.openFile()
                 },
+                ListAction("Créer une nouvelle liste") {
+                    //(requireActivity() as TasksActivity?)!!.exportToJson()
+                    tasksRepository.openFile()
+                },
                 ListAction("Paramètres") {
                     Toast.makeText(requireActivity(), "Paramètres", Toast.LENGTH_SHORT).show()
                 },

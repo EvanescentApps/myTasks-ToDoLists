@@ -21,8 +21,9 @@ import kotlinx.serialization.json.Json
 import java.util.*
 
 class TasksAdapter(
-    private val mTasks: ArrayList<Task>,
-    private val context: Context
+    val mTasks: ArrayList<Task>,
+    private val context: Context,
+    private val activity : Activity
 ) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
 
     private var mContext: Context = context
@@ -51,7 +52,7 @@ class TasksAdapter(
         }
 
         //Collections.swap(mTasks, from, to)
-        (context as TasksActivity).swapItems(from, to)
+        (activity as TasksActivity).swapItems(from, to)
         notifyItemMoved(from, to)
 
         if (logEnabled) {
@@ -106,7 +107,7 @@ class TasksAdapter(
 
     fun onSwipe(position: Int) {
 
-        (context as TasksActivity).deleteItem(position)
+        (activity as TasksActivity).deleteItem(position)
         mTasks.removeAt(position)
 
         notifyItemRemoved(position)
