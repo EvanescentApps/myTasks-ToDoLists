@@ -1,73 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_item"
     android:orientation="horizontal"
-    android:paddingLeft="14dp"
+    android:clipToPadding="false"
     android:paddingStart="14dp"
-    android:paddingRight="16dp"
-    android:paddingEnd="16dp"
-
     android:paddingTop="12dp"
+    android:paddingEnd="16dp"
     android:paddingBottom="12dp">
     <!--20 or 26 padingLeft / right ? -->
     <!--20 or 16 padding top and bottom ?-->
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/checkbox"
-        app:buttonTint="@color/checkbox"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="6dp"
-        android:layout_marginLeft="6dp"
-        android:gravity="center"
-        android:alpha="0.7"
-        android:scaleX="1.3"
-        android:scaleY="1.3"
-        android:theme="@style/checkbox"
 
-        />
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:alpha="0.7"
+            android:buttonTint="@color/checkbox"
+            android:gravity="center"
+            android:scaleX="1.3"
+            android:scaleY="1.3"
+            android:theme="@style/checkbox"
+            app:buttonTint="@color/checkbox" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_vertical"
-        android:paddingLeft="24dp"
-
-        android:paddingStart="24dp">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/title"
-
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:maxLines="3"
-            android:text="Préparer la version Release"
-            app:fontFamily="@font/lexend_semibold"
-            android:ellipsize="end"
-            android:textColor="@color/textContentPrimary"
-            android:textSize="18sp" />
+            android:clipToPadding="false"
+            android:orientation="vertical">
 
-        <!--android:alpha="0.6"-->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="2"
-            app:fontFamily="@font/lexend_semibold"
-            android:ellipsize="end"
-            android:textColor="@color/textContentSecondary"
-            android:text="Traquer les bugs, vérifier la compatibilité, et les fonctionnalités"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/title"
 
-    </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:alpha="0.8"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:text="Préparer la version Release"
+                android:textColor="?android:attr/textColor"
+                android:textSize="18sp"
+                app:fontFamily="@font/lexend_semibold" />
+
+            <!--android:alpha="0.6"-->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.6"
+                android:paddingBottom="0dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Traquer les bugs, vérifier la compatibilité, et les fonctionnalités"
+                android:textColor="?android:attr/textColor"
+                app:fontFamily="@font/lexend_semibold" />
 
 
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollbarSize="1dp">
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.chip.Chip
+
+                        android:id="@+id/date_chip"
+                        style="@style/Widget.MaterialComponents.Chip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_marginEnd="10dp"
+                        android:checkable="false"
+                        android:layout_marginTop="8dp"
+                        app:chipMinTouchTargetSize="30dp"
+                        android:clipToPadding="false"
+                        android:fontFamily="@font/lexend_semibold"
+                        android:text="Demain 21h14"
+                        android:textColor="?android:attr/textColor"
+                        android:visibility="gone"
+                        app:fontFamily="@font/lexend_semibold"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/priority_chip"
+                        android:layout_width="wrap_content"
+                        android:checkable="false"
+                        android:textColor="#DF1717"
+                        android:layout_height="30dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginTop="8dp"
+                        app:chipMinTouchTargetSize="30dp"
+                        android:clipToPadding="false"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:fontFamily="@font/lexend_semibold"
+                        android:fontFamily="@font/lexend_semibold"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        android:text="Très important" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/duration_chip"
+                        android:layout_width="wrap_content"
+                        android:checkable="false"
+                        android:textColor="?android:attr/textColor"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="8dp"
+                        app:chipMinTouchTargetSize="30dp"
+                        android:clipToPadding="false"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        app:fontFamily="@font/lexend_semibold"
+                        android:fontFamily="@font/lexend_semibold"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        android:text="15 min" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+        </LinearLayout>
 
 </LinearLayout>

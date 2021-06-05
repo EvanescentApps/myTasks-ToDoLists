@@ -22,10 +22,13 @@
     <color name="separatorToolbar">#475DFF</color>
 
     <color name="background">@color/eyeCustomGrey</color>
+    <color name="backgroundSelected">#2A2037</color>
 
     <color name="eyeCustomGrey">#1F1B24</color>
 
     <color name="eyeWhite">#CCFFFFFF</color>
+
+    <color name="checkbox">#E6FFFFFF</color>
 
 </resources> <!--69B4BC-->
 

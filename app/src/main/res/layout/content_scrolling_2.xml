@@ -23,21 +23,63 @@
     android:orientation="vertical"
     android:clipToPadding="false"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_tasks">
 
+    <LinearLayout
+        android:id="@+id/emptyTasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:layout_marginTop="18dp"
+        android:visibility="gone"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:elevation="6dp"
+            android:layout_height="190dp"
+            android:contentDescription="Ajoutez une tâche (illustration de deux personnes qui prennent en main leurs tâches)"
+            app:srcCompat="@drawable/ic_tasks_empty_state"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/textContentSecondary"
+            android:lineSpacingExtra="2dp"
+            android:text="Aucune tâche ajoutée, commencez à planifier\nvos projets ou votre journée !"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="Ajouter une tâche"
+            android:layout_marginTop="8dp"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            android:backgroundTint="@color/purpleLight2"
+            android:textColor="@color/textContentPrimary"/>
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
-
-
         android:id="@+id/tasksRecyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="0dp"
         android:clipToPadding="false"
         android:paddingBottom="100dp"
-        tools:itemCount="4"
+        android:backgroundTint="?attr/backgroundColor"
+        android:background="?attr/backgroundColor"
+        tools:itemCount="2"
         tools:listitem="@layout/item_task" />
-
 
 </LinearLayout>
 <!--</androidx.core.widget.NestedScrollView>-->

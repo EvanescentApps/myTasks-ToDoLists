@@ -5,7 +5,7 @@
     android:id="@+id/activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="?attr/backgroundColor"
     android:fitsSystemWindows="true"
     tools:context=".ui.TasksActivity">
 
@@ -13,21 +13,22 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:elevation="6dp"
         android:fitsSystemWindows="true"
         android:theme="@style/Theme.Todolist.AppBarOverlay">
         <!--@dimen/app_bar_height-->
 
-        <!--<com.google.android.material.appbar.CollapsingToolbarLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
              android:id="@+id/toolbar_layout"
              android:layout_width="match_parent"
              android:layout_height="@dimen/app_bar_height"
-             android:background="@color/colorPrimary"
+            android:background="?attr/colorPrimary"
              android:fitsSystemWindows="true"
              android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
              app:contentScrim="@color/colorPrimary"
+
              app:layout_scrollFlags="exitUntilCollapsed|scroll"
-             app:toolbarId="@+id/toolbar">-->
+             app:toolbarId="@+id/toolbar">
 
         <!--scroll|exitUntilCollapsed-->
 
@@ -35,7 +36,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
+
             android:fontFamily="@font/lexend_semibold"
             app:layout_collapseMode="pin"
             app:popupTheme="@style/Theme.Todolist.PopupOverlay"
@@ -45,7 +46,8 @@
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/choiceList"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
         </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
@@ -56,16 +58,18 @@
             android:background="@color/separatorToolbar"
             app:layout_collapseMode="pin" />
 
-       <!-- </com.google.android.material.appbar.CollapsingToolbarLayout>-->
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"> -->
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <include android:id="@+id/includeRecycler" android:clipToPadding="false" layout="@layout/content_scrolling_2" />
+        <include android:id="@+id/includeRecycler"
+            android:clipToPadding="false"
+            layout="@layout/content_scrolling_2" />
 
         <!--<androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tasksRecyclerview"
@@ -78,8 +82,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:itemCount="4"
             tools:listitem="@layout/item_task" />-->
-
-    <!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
@@ -98,6 +101,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="?attr/colorPrimary"
         app:fabCradleRoundedCornerRadius="16dp"
         app:fabCradleVerticalOffset="0dp"
         app:hideOnScroll="true"
@@ -113,6 +117,7 @@
         app:layout_anchor="@+id/bottomAppBar"
         app:layout_anchorGravity="top|center"
         app:maxImageSize="50dp"
+
         app:srcCompat="@drawable/ic_add_black_48dp"
         app:tint="@color/addIconTint" />
 

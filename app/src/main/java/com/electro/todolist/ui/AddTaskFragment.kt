@@ -36,7 +36,7 @@ class AddTaskFragment : BottomSheetDialogFragment() {
     private var param2: String? = null
     private lateinit var taskTitleEditText: EditText
     private lateinit var description: EditText
-    private val alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +49,7 @@ class AddTaskFragment : BottomSheetDialogFragment() {
 
     }
 
-    private fun saveTask() {
+    private fun saveTask(currentList: String = "list1") {
         val title = taskTitleEditText.text.toString()
         val descriptionText = description.text.toString()
 
@@ -61,7 +61,7 @@ class AddTaskFragment : BottomSheetDialogFragment() {
             return
         }
 
-        val id = generateId(5)
+        val id = Task.generateId(5)
         //Toast.makeText(requireContext(),"ID : $id", Toast.LENGTH_SHORT).show()
         Log.e("ID", id)
 
@@ -69,10 +69,10 @@ class AddTaskFragment : BottomSheetDialogFragment() {
         val taskObject = Task(title,descriptionText,timeId,false, id)
         val taskToJson = Gson().toJson(taskObject)
 
-        val list1 = requireActivity().getSharedPreferences("list1", AppCompatActivity.MODE_PRIVATE)
+        val list1 = requireActivity().getSharedPreferences(currentList, AppCompatActivity.MODE_PRIVATE)
         list1.edit().putString(timeId.toString(), taskToJson).apply()
 
-        (activity as TasksActivity?)!!.addItem(taskObject)
+        (requireActivity() as TasksActivity).addItem(taskObject)
         // OMG c'est quoi ce cast hyper risqué !!! Transmettre au viewModel
 
 
@@ -82,18 +82,15 @@ class AddTaskFragment : BottomSheetDialogFragment() {
         return
     }
 
-    private fun generateId(nbChars: Int = 5): String {
-        var id = ""
 
-        for (i in 1..nbChars) {
-            id+= alphabet[nextInt(0, alphabet.length-1)]
-        }
-        return id
-    }
 
     override fun onDismiss(dialog: DialogInterface) {
         //Toast.makeText(requireContext(),"BottomSheet dismissed",Toast.LENGTH_SHORT).show()
-        saveTask()
+        var currentList = "list1"
+        requireArguments().getString("currentList")?.let {
+            currentList = it
+        }
+        saveTask(currentList)
 
         //HIDE KEYBOARD BEFORE
         super.onDismiss(dialog)
@@ -128,11 +125,10 @@ class AddTaskFragment : BottomSheetDialogFragment() {
 
     companion object { // Params, unused for now
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(currentList: String) =
                 AddTaskFragment().apply {
                     arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
+                        putString("currentList", currentList)
                     }
                 }
     }

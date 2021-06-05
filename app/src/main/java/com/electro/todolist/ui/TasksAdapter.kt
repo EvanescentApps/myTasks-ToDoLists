@@ -3,6 +3,7 @@ package com.electro.todolist.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -11,14 +12,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.R
+import com.electro.todolist.data.Priority
 import com.electro.todolist.data.Task
+import com.electro.todolist.data.TasksRepository
+import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
+import kotlin.random.Random
 
 class TasksAdapter(
     val mTasks: ArrayList<Task>,
@@ -27,6 +33,8 @@ class TasksAdapter(
 ) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
 
     private var mContext: Context = context
+
+    private val tasksActivity = activity as TasksActivity
 
     /*fun reorderEach() {
         // Set position to mTasks
@@ -52,7 +60,7 @@ class TasksAdapter(
         }
 
         //Collections.swap(mTasks, from, to)
-        (activity as TasksActivity).swapItems(from, to)
+        tasksActivity.swapItems(from, to)
         notifyItemMoved(from, to)
 
         if (logEnabled) {
@@ -98,6 +106,9 @@ class TasksAdapter(
 
                         notifyItemMoved(newPosition, position)
 
+                        tasksActivity.scrollToTask(position)
+
+
                         notifyItemRangeChanged(position, newPosition + 1)
                     }.show()
 
@@ -105,13 +116,37 @@ class TasksAdapter(
         )
     }
 
-    fun onSwipe(position: Int) {
-
-        (activity as TasksActivity).deleteItem(position)
+    fun deleteItemOnAdapter(position: Int) {
+        tasksActivity.deleteItem(position)
         mTasks.removeAt(position)
 
-        notifyItemRemoved(position)
+        //notifyItemRemoved(position)
         //notifyItemRangeChanged(position,mTasks.size)
+    }
+
+    fun onSwipe(viewHolder: RecyclerView.ViewHolder, side: Int) {
+
+        if (side == ItemTouchHelper.LEFT) { //<<
+            Log.i("Swipe","DELETE")
+
+            tasksActivity.deleteItem(viewHolder.bindingAdapterPosition)
+            //mTasks.removeAt(viewHolder.bindingAdapterPosition)
+
+            //notifyItemRangeChanged(position,mTasks.size)
+        } else if (side == ItemTouchHelper.RIGHT) { // >>
+
+            Log.i("Swipe","Swipe SET DONE")
+            Log.i("task", "Checked item ${viewHolder.bindingAdapterPosition}")
+
+            val task: Task = mTasks[viewHolder.bindingAdapterPosition]
+            task.done = true
+
+            onCheck(viewHolder.bindingAdapterPosition)
+            tasksActivity.setTaskDone(task, true)
+
+        }
+
+
     }
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
@@ -119,6 +154,9 @@ class TasksAdapter(
         val titleTextView: TextView = itemView.findViewById(R.id.title)
         val descriptionTextView: TextView = itemView.findViewById(R.id.description)
         val checkbox: CheckBox = itemView.findViewById(R.id.checkbox)
+        val dateChip : Chip = itemView.findViewById(R.id.date_chip)
+        val priorityChip : Chip = itemView.findViewById(R.id.priority_chip)
+        val durationChip : Chip = itemView.findViewById(R.id.duration_chip)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -135,22 +173,14 @@ class TasksAdapter(
         val checkbox = viewHolder.checkbox
         val descriptionTaskTextView2 = viewHolder.descriptionTextView
 
-        viewHolder.itemView.setOnClickListener {
-            Log.i(
-                "Adapter",
-                "Clicked item ${viewHolder.bindingAdapterPosition}"
-            )
-        }
-
         val task: Task = mTasks[viewHolder.bindingAdapterPosition]
         titleTasktextView2.text = task.title //set title to item
         //descriptionTaskTextView2.text = task.description
         if (task.description.isNullOrBlank()) {
             descriptionTaskTextView2.visibility = View.GONE
-            Log.i("Description", "hidden for item ${viewHolder.bindingAdapterPosition}")
         } else {
-            descriptionTaskTextView2.visibility = View.VISIBLE
             descriptionTaskTextView2.text = task.description
+            descriptionTaskTextView2.visibility = View.VISIBLE
         }
 
         checkbox.isChecked = task.done
@@ -161,18 +191,63 @@ class TasksAdapter(
             notifyItemMoved(position,mTasks.size-1)
             notifyItemRangeChanged(position, mTasks.size)
         }*/
+        val timestamp = task.date
+        if (timestamp != null) {
+            viewHolder.dateChip.visibility = View.VISIBLE
+
+            val dateText = TasksRepository.getInstance(tasksActivity).parseTimestampToDate(timestamp)
+
+            if ( !dateText.isNullOrBlank()) {
+                viewHolder.dateChip.text = dateText
+            } else {
+                viewHolder.dateChip.visibility = View.GONE
+            }
+
+        } else {
+            viewHolder.dateChip.visibility = View.GONE
+        }
+
+        val durationTimestamp = task.duration
+        if (durationTimestamp != null) {
+            viewHolder.durationChip.visibility = View.VISIBLE
+
+            val durationText = TasksRepository.getInstance(tasksActivity).parseTimestampToDuration(durationTimestamp)
+
+            if ( !durationText.isNullOrBlank()) {
+                viewHolder.durationChip.text = durationText
+            } else {
+                viewHolder.durationChip.visibility = View.GONE
+            }
+
+        } else {
+            viewHolder.durationChip.visibility = View.GONE
+        }
+
+        if (false) {
+            viewHolder.priorityChip.text = Priority.VERY_HIGH.first
+            viewHolder.priorityChip.setTextColor(Color.parseColor(Priority.VERY_HIGH.second))
+            viewHolder.priorityChip.visibility = View.VISIBLE
+
+            viewHolder.dateChip.text = "Demain 14h"
+            // Si date passée afficher en rouge
+            //viewHolder.dateChip.setTextColor(Color.parseColor("#FF0000"))
+            viewHolder.dateChip.visibility = View.VISIBLE
+        }
+
+        //viewHolder.dateChip.
 
         checkbox.setOnClickListener {
 
             task.done = checkbox.isChecked
-            Log.i("Checked", "Checked item ${viewHolder.bindingAdapterPosition}")
+            Log.i("task", "Checked item ${viewHolder.bindingAdapterPosition}")
             if (checkbox.isChecked) {
 
                 onCheck(viewHolder.bindingAdapterPosition)
                 //(context as ScrollingActivity).removeItem(viewHolder.adapterPosition) ///////*****
             }
-            (context as TasksActivity).setTaskDone(task, checkbox.isChecked)
+            tasksActivity.setTaskDone(task, checkbox.isChecked)
         }
+
 
         // Set onclick listener for the whole item, to show details fragment
         viewHolder.itemView.setOnClickListener {
@@ -187,18 +262,22 @@ class TasksAdapter(
             //Json.encodeToString
             taskJson = Json.encodeToString(item)
 
-            Log.i("SERIALIZATION", taskJson)
+            Log.i("Item clicked", taskJson)
 
             intent.putExtra("currentTask", taskJson)
             intent.putExtra("position", viewHolder.bindingAdapterPosition)
 
-            (mContext as Activity).startActivityForResult(intent, 500)
-            (context as Activity).overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            tasksActivity.startActivityForResult(intent, 500)
+            tasksActivity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
     }
 
     override fun getItemCount(): Int {
         return mTasks.size
+    }
+
+    fun setSwipeRefresh(b: Boolean = true) {
+        tasksActivity.setSwipeRefreshEnabled(b)
     }
 
 }

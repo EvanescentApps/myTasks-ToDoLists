@@ -20,7 +20,7 @@
             android:left="120dp"
             android:alpha="0.9"
             android:right="120dp"
-            android:src="@drawable/v3b3" />
+            android:src="@drawable/rounded_app_icon" />
     </item>
 
 
@@ -35,7 +35,7 @@
             android:left="100dp"
             android:alpha="0.9"
             android:right="100dp"
-            android:src="@drawable/v1air2" />
+            android:src="@drawable/version_alpha" />
     </item>
     <!--<item
         android:left="96dp"

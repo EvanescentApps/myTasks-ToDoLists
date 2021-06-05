@@ -47,64 +47,214 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="500dp"
         app:layout_constraintTop_toBottomOf="@id/app_bar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="18dp"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/title"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="18dp"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_vertical"
+                    android:fontFamily="@font/lexend_semibold"
+                    android:textColor="@color/textContentPrimary"
+                    android:hint="Titre de la tâche"
+                    android:layout_marginTop="0dp"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:importantForAutofill="no"
+                    android:textSize="26sp" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="18dp"
+                    android:fontFamily="@font/lexend_semibold"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:background="@android:color/transparent"
+                    android:drawableStart="@drawable/ic_subject_24px"
+                    android:drawableLeft="@drawable/ic_subject_24px"
+                    android:drawablePadding="10dp"
+                    android:gravity="top"
+                    android:hint="Description de la tâche"
+                    android:textColor="@color/textContentSecondary"
+                    android:importantForAutofill="no"
+                    android:textSize="16sp"
+                    app:drawableTint="#7D7D7D" />
+
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="12dp"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/setTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:textSize="16sp"
+                            app:chipMinTouchTargetSize="30dp"
+                            android:fontFamily="@font/lexend_semibold"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="Ajouter date/heure"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/setDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:textSize="16sp"
+                            app:chipMinTouchTargetSize="30dp"
+                            android:fontFamily="@font/lexend_semibold"
+                            android:layout_marginEnd="12dp"
+                            android:text="Définir la durée"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/setPriority"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:textSize="16sp"
+
+                            android:layout_marginEnd="12dp"
+                            android:fontFamily="@font/lexend_semibold"
+                            app:chipMinTouchTargetSize="30dp"
+
+                            android:text="Définir la priorité"/>
+
+
+
+                    </LinearLayout>
+
+                   <!-- <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp">
+
+                    </LinearLayout>-->
+
+                </LinearLayout>
+
+
+
+            </HorizontalScrollView>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                android:gravity="center_vertical"
-                android:fontFamily="@font/lexend_semibold"
-                android:textColor="@color/textContentPrimary"
-                android:hint="Titre de la tâche"
-                android:layout_marginTop="0dp"
-                android:inputType="textCapSentences|textMultiLine"
-                android:importantForAutofill="no"
-                android:textSize="26sp" />
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginTop="18dp"
-                android:fontFamily="@font/lexend_semibold"
-                android:inputType="textCapSentences|textMultiLine"
-                android:background="@android:color/transparent"
-                android:drawableStart="@drawable/ic_subject_24px"
-                android:drawableLeft="@drawable/ic_subject_24px"
-                android:drawablePadding="10dp"
-                android:gravity="top"
-                android:hint="Description de la tâche"
-                android:textColor="@color/textContentSecondary"
-                android:importantForAutofill="no"
-                android:textSize="16sp"
-                app:drawableTint="#7D7D7D" />
 
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:layout_marginTop="28dp"
+                    android:alpha="0.8"
+                    app:srcCompat="@drawable/ic_undraw_working_late_pukg"/>
+                
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/launchFlow"
+                    android:layout_width="320dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="Démarrer un Flow !"
+                    android:textColor="#4942A8"
+                    android:textSize="20sp"
+                    app:backgroundTint="#DBDCFF"
+                    app:cornerRadius="12dp"
+                    app:elevation="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="2dp"
+                            android:foregroundGravity="center"
+                            app:tint="@color/textContent"
+                            android:alpha="0.8"
+                            app:srcCompat="@drawable/ic_lightbulb_black_24dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:textSize="16sp"
+                            android:alpha="0.9"
+                            android:text="Qu'est-ce-que le Flow sur myTasks ?"/>
+
+                    </LinearLayout>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.7"
+                        android:paddingTop="1dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="Le flow te permet de te lancer dans une tâche, de rester concentré et motivé, avec un compte à rebours que tu définis, et une récompense visuelle à la fin !"/>
+
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
-
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/setDoneFab"
         android:layout_width="wrap_content"
         android:layout_height="52dp"
         android:layout_margin="@dimen/fab_margin"
-        android:text="Tâche terminée"
+        android:text="J'ai terminé !"
         android:fontFamily="@font/lexend_semibold"
         android:textAllCaps="false"
         android:textColor="@color/fabText"
         android:textSize="17sp"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="#E2E3FF"
         app:collapsedSize="55dp"
         app:icon="@drawable/ic_baseline_task_alt_24"
         app:iconPadding="8dp"

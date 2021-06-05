@@ -5,15 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -22,6 +21,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.BottomFragment
+import com.electro.todolist.ChangeListFragment
 import com.electro.todolist.ItemTouchHelperCallback
 import com.electro.todolist.R
 import com.electro.todolist.data.Task
@@ -35,6 +35,7 @@ import kotlinx.serialization.json.Json
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 class TasksActivity : AppCompatActivity() {
 
     private lateinit var tasks: ArrayList<Task>
@@ -44,10 +45,16 @@ class TasksActivity : AppCompatActivity() {
 
     //private lateinit var tasksRecyclerView: RecyclerView
     //private lateinit var allLists: SharedPreferences
-    private lateinit var currentList: String
-    private lateinit var defaultListKey: String
+    //private lateinit var currentList: String
+    //private lateinit var defaultListKey: String
     private lateinit var b: ActivityTasksBinding
     private lateinit var tasksRepository: TasksRepository
+
+    private lateinit var itemTouchHelperCallback: ItemTouchHelperCallback
+    private lateinit var itemTouchHelper: ItemTouchHelper
+    val allTasksList = ArrayList<Task>()
+    //private lateinit var toolbar : Toolbar
+
     val Context.dataStore by preferencesDataStore(name = "settings")
     //private lateinit var bottomSheet: BottomSheetBehavior<View>
 
@@ -66,15 +73,14 @@ class TasksActivity : AppCompatActivity() {
 
         scrollToTask(0)
         adapter.notifyItemChanged(0)
+
+        setEmptyState(tasks.isEmpty())
         //adapter.notifyItemRangeChanged(0, tasks.size)
     }
 
-    private fun scrollToTask(position: Int) {
+    fun scrollToTask(position: Int) {
         Log.e("Scroll", "Scroll to position")
-        /*(tasksRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-            position,
-            50
-        )*/
+
         b.includeRecycler.tasksRecyclerview.smoothScrollToPosition(position)
         //tasksRecyclerView.scrollToPosition(position)
     }
@@ -83,6 +89,10 @@ class TasksActivity : AppCompatActivity() {
         val taskToDelete = tasks[index] // Get the task to delete
 
         selectedListEditor.remove(taskToDelete.creationDate.toString()).apply() // Supprimée
+
+        adapter.notifyItemRemoved(index)
+
+        tasks.removeAt(index)
 
         Log.e("Activity", "Delete item at $index")
 
@@ -97,8 +107,27 @@ class TasksActivity : AppCompatActivity() {
 
                 tasks.add(index, taskToDelete)
                 adapter.notifyItemInserted(index)
+
+                scrollToTask(index)
+                adapter.notifyItemChanged(index)
+
                 adapter.notifyItemRangeChanged(index, tasks.size)
             }.show()
+
+        checkEmptyState()
+    }
+
+    fun setEmptyState(enabled: Boolean) {
+        if (enabled) {
+            b.includeRecycler.emptyTasks.visibility = View.VISIBLE
+
+        } else {
+            b.includeRecycler.emptyTasks.visibility = View.GONE
+        }
+    }
+    
+    fun checkEmptyState() {
+        setEmptyState(tasks.isEmpty())
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
@@ -141,12 +170,25 @@ class TasksActivity : AppCompatActivity() {
         }
     }
 
+    fun setSwipeRefreshEnabled(isEnabled : Boolean = true) {
+        b.swipeRefresh.isEnabled = isEnabled
+    }
+
+    fun updateListName(newName : String) {
+        b.toolbarLayout.title = newName
+    }
+
     fun changeList(newSelectedList : String) {
 
 
         // Notify recyclerView to change dataset
 
-        //tasksRepository.currentListName = newSelectedList
+        tasksRepository.currentListName = newSelectedList
+
+        //toolbar.title = tasksRepository.readOnlyUserLists[newSelectedList].toString()
+        b.toolbarLayout.title = tasksRepository.readOnlyUserLists[newSelectedList].toString()
+
+        //Toast.makeText(this, "List selected title is ${tasksRepository.readOnlyUserLists[newSelectedList].toString()}", Toast.LENGTH_SHORT).show()
         Log.e("List changed","new list is ${tasksRepository.currentListName}")
         selectedListContent = getSharedPreferences(tasksRepository.currentListName, MODE_PRIVATE)
         selectedListEditor = selectedListContent.edit()
@@ -154,60 +196,56 @@ class TasksActivity : AppCompatActivity() {
         val getTasksList = ArrayList<Task>()
         selectedListContent.all.map { it.key }.forEach { str ->
             selectedListContent.getString(str, null)?.let {
-                getTasksList.add(Json.decodeFromString(it)) //Decode to task & add
+                getTasksList.add(Json { ignoreUnknownKeys = true}.decodeFromString(Task.serializer(),it) ) //Decode to task & add
             }
         }
         getTasksList.sortWith { o1, o2 -> o1.position.compareTo(o2.position) }
         getTasksList.sortWith { o1, o2 -> o1.done.compareTo(o2.done) }
 
         // ArrayList<Task> created by the Object Class Task
-        //tasks = Task.createTasksList(getTasksList)
+        tasks = getTasksList
 
+        setEmptyState(tasks.isEmpty())
+
+        if (tasks.isNullOrEmpty()) {
+            Log.i("TaskList!!","isNull or Empty : $tasks")
+            tasks = Task.emptyState()
+            setEmptyState(true)
+           /* tasks.forEach { task ->
+                val taskToJson = Json.encodeToString(task)
+                selectedListEditor.putString(task.uid, taskToJson).apply()
+            }*/
+        }
+        //setEmptyState(tasks.isEmpty())
+        //adapter.
         //adapter.notifyDataSetChanged()
 
         // TODO : CREATING A NEW ADAPTER LEADS TO A BIG BUG : don't create a new one !!!
         // Just replace the data
         // Here we create the Adapter for the RecyclerView, with the tasks
-        //adapter = TasksAdapter(tasks, this, this)
+        adapter = TasksAdapter(tasks, this, this)
+        b.includeRecycler.tasksRecyclerview.swapAdapter(adapter, true)
 
-        //b.includeRecycler.tasksRecyclerview.adapter.notit
-
+        //b.includeRecycler.tasksRecyclerview.
+        itemTouchHelper.attachToRecyclerView(null)
+        itemTouchHelperCallback = ItemTouchHelperCallback(adapter as TasksAdapter, this)
+        itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
+        //b.includeRecycler.tasksRecyclerview.
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //application.setTheme(R.style.Theme_TodolistViolet)
-
+        //setTheme(R.style.glow)
         super.onCreate(savedInstanceState)
 
         b = ActivityTasksBinding.inflate(layoutInflater)
-
         setContentView(b.root)
 
         // TODO : create viewmodel instance and pass repository
 
         // TODO : SYNC ALL TASKS (GET) WITH CLOUD FIRESTORE
 
-        /*mSwipeRefreshLayout.isEnabled = false
-
-        mSwipeRefreshLayout.setOnRefreshListener {
-            // HERE what to do onRefresh
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                //Toast.makeText(this,"Refresh cancelled",Toast.LENGTH_SHORT).show()
-
-                mSwipeRefreshLayout.isRefreshing = false
-
-            }, 1500)
-        }
-
-        tasksRecyclerView.isNestedScrollingEnabled = false
-        val nestedScrollView = findViewById<NestedScrollView>(R.id.nestedScrollView)
-        nestedScrollView.isNestedScrollingEnabled = false
-        nestedScrollView.requestDisallowInterceptTouchEvent(true)*/
-
-        b.toolbar.title = ""
-
-        tasksRepository = TasksRepository(dataStore, this)
+        tasksRepository = TasksRepository(this)
 
         tasksRepository.getDefaultList()
 
@@ -215,14 +253,15 @@ class TasksActivity : AppCompatActivity() {
         val listClean = tasksRepository.readOnlyUserLists //tasksRepository.list.toMutableList()
 
         if (listClean.containsKey("defaultList")) { listClean.remove("defaultList") }
-        val listOfNames = tasksRepository.readOnlyUserLists.keys
 
-        b.choiceList.adapter =
-            ArrayAdapter(this, R.layout.list_spinner_item, listClean.values.toList())
-        b.choiceList.setSelection(listOfNames.indexOf(tasksRepository.currentListName))
+        //val listOfNames = listClean.keys
 
-        Log.e("lists", tasksRepository.readOnlyUserLists.toString())
-        Toast.makeText(this, "currentlist is ${tasksRepository.currentListName}", Toast.LENGTH_SHORT).show()
+        //b.choiceList.adapter = ArrayAdapter(this, R.layout.list_spinner_item, listClean.values.toList())
+        //b.choiceList.setSelection(listOfNames.indexOf(tasksRepository.currentListName))
+
+        b.toolbar.title = listClean[tasksRepository.currentListName].toString()
+
+        Log.e("lists", listClean.toString())
         Log.e("Selected List", "${tasksRepository.currentListName} selected")
 
         // DO THIS WORK ASYNCHRONOUSLY: COROUTINE
@@ -230,33 +269,72 @@ class TasksActivity : AppCompatActivity() {
 
         selectedListEditor = selectedListContent.edit()
 
-        val allTasksList = ArrayList<Task>()
         selectedListContent.all.map { it.key }.forEach { str ->
             selectedListContent.getString(str, null)?.let {
-                allTasksList.add(Json.decodeFromString(it)) //Decode to task & add
+                try  {
+                    allTasksList.add(Json { ignoreUnknownKeys = true }.decodeFromString(Task.serializer(),it)) //Decode to task & add
+                } catch ( e : Exception) {
+                    Log.e("Error decode","deserialization error : ${e.stackTraceToString()}")
+                    Toast.makeText(this,"Erreur de décodage... Signalez ce bug aux dévs svp", Toast.LENGTH_LONG).show()
+                }
             }
         }
         allTasksList.sortWith { o1, o2 -> o1.position.compareTo(o2.position) }
         allTasksList.sortWith { o1, o2 -> o1.done.compareTo(o2.done) }
 
+
         // ArrayList<Task> created by the Object Class Task
-        tasks = Task.createTasksList(allTasksList)
+
+        tasks = allTasksList
+
+        setEmptyState(tasks.isEmpty())
+
+        if (tasks.isNullOrEmpty()) {
+            Log.i("TaskList!!","isNull or Empty : $tasks")
+            tasks = Task.emptyState()
+            setEmptyState(true)
+            /*tasks.forEach { task ->
+                val taskToJson = Json.encodeToString(task)
+                selectedListEditor.putString(task.uid, taskToJson).apply()
+            }*/
+        }
 
         // Here we create the Adapter for the RecyclerView, with the tasks
         adapter = TasksAdapter(tasks, this, this)
 
         b.includeRecycler.tasksRecyclerview.adapter = adapter
         b.includeRecycler.tasksRecyclerview.layoutManager = LinearLayoutManager(this)
-        ViewCompat.setNestedScrollingEnabled(b.includeRecycler.tasksRecyclerview, false)
+        //ViewCompat.setNestedScrollingEnabled(b.includeRecycler.tasksRecyclerview, false)
 
-        val helperCallback = ItemTouchHelperCallback(adapter as TasksAdapter, this)
-        val helper = ItemTouchHelper(helperCallback)
-        helper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
+        itemTouchHelperCallback = ItemTouchHelperCallback(adapter as TasksAdapter, this)
+        itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
 
         val bottomDialog = AddTaskFragment()
         bottomDialog.isCancelable = true
 
-        b.choiceList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        /*val obj = PronoteConnection("https://0141164p.index-education.net/pronote/eleve.html")
+        obj.login("COCAIN", "Eclair14")
+
+        val cal = Calendar.getInstance()
+        val currentWeekNumber = cal.get(Calendar.WEEK_OF_YEAR)
+        Log.e("Week nb","Current week nb is $currentWeekNumber")
+        val homework = obj.getHomeworkList(currentWeekNumber)
+
+        Log.e("WORK","homework is $homework")*/
+
+        //b.swipeRefresh.visibility = View.GONE
+        b.swipeRefresh.isEnabled = false
+        b.swipeRefresh.setOnRefreshListener {
+
+            Handler(Looper.getMainLooper()).postDelayed({
+
+                b.swipeRefresh.isRefreshing = false
+
+            }, 1100)
+        }
+
+        /*b.choiceList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -267,6 +345,8 @@ class TasksActivity : AppCompatActivity() {
                 Log.i("Lists Spinner", "Selected $pairSelected")
                 val listSelected = pairSelected.first
                 tasksRepository.currentListName = listSelected
+                b.toolbar.title = pairSelected.second.toString()
+                Toast.makeText(applicationContext,"new list  ${pairSelected.second.toString()}",Toast.LENGTH_SHORT).show()
                 changeList(listSelected)
 
                 // TODO : HERE WE GOT A FUCK**G BUG : 2 ADAPTERS ARE CREATED
@@ -274,16 +354,28 @@ class TasksActivity : AppCompatActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
-        }
+        }*/
 
         b.fab.setOnClickListener {
-            bottomDialog.show(supportFragmentManager, "dialog")
+            //bottomDialog.show(supportFragmentManager, "dialog")
 
+            AddTaskFragment.newInstance(tasksRepository.currentListName)
+                .show(supportFragmentManager, "dialog")
             // Start an activityForResult instead
         }
 
+        b.includeRecycler.addTask.setOnClickListener {
+
+            AddTaskFragment.newInstance(tasksRepository.currentListName)
+                .show(supportFragmentManager, "dialog")
+
+        }
+
         if (intent.hasExtra("shortcut")) {
-            bottomDialog.show(supportFragmentManager, "dialog")
+            //bottomDialog.show(supportFragmentManager, "dialog")
+
+            AddTaskFragment.newInstance(tasksRepository.currentListName)
+                .show(supportFragmentManager, "dialog")
         }
 
         findViewById<View>(R.id.contextItem).setOnClickListener {
@@ -292,27 +384,55 @@ class TasksActivity : AppCompatActivity() {
                 .show(supportFragmentManager, "dialog")
             //scrollToTask(12)
         }
+
+        var userLists: List<Pair<String, Any?>>
+        var userListsSerialized: String
+
+        fun showListsBottomSheet() {
+            userLists =  tasksRepository.readOnlyUserLists.toList()
+            userListsSerialized = Json.encodeToString(userLists as? List<Pair<String,String>>)
+            ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
+                .show(supportFragmentManager, "dialog")
+        }
+
+        b.bottomAppBar.setNavigationOnClickListener {
+            showListsBottomSheet()
+        }
+
+        b.toolbarLayout.setOnClickListener {
+            showListsBottomSheet()
+        }
+
+        b.appBar.setOnClickListener {
+            showListsBottomSheet()
+        }
+        b.toolbar.setOnClickListener {
+            showListsBottomSheet()
+        }
+
     }
+
 
 
     override fun onStop() {
         super.onStop()
 
-        if (tasksRepository.currentListName == tasksRepository.defaultListKey) {
+        if (tasksRepository.currentListName == tasksRepository.lastOpenedList_Key) {
             Log.i(
                 "Lists",
-                "No change, current is ${tasksRepository.currentListName}, default is ${tasksRepository.defaultListKey}"
+                "No change, current ${tasksRepository.currentListName}, default ${tasksRepository.lastOpenedList_Key}"
             )
         } else { // save the last opened list
             Log.i(
                 "Lists",
-                "DefaultList changed :  ${tasksRepository.currentListName}, default was ${tasksRepository.defaultListKey}"
+                "DefaultList changed :  ${tasksRepository.currentListName}, default ${tasksRepository.lastOpenedList_Key}"
             )
             tasksRepository.listsPrefs.edit()
                 .putString("defaultList", tasksRepository.currentListName).apply()
         }
 
-        Log.e("AllLists text", tasksRepository.listsPrefs.all.toString())
+
+        Log.e("AllLists User", tasksRepository.listsPrefs.all.toString())
 
         // HERE UPDATE POSITION OF EVERY TASK,
         // AND SAVE IT TO PERSISTENT STORAGE
@@ -324,7 +444,7 @@ class TasksActivity : AppCompatActivity() {
             val taskToJson = Json.encodeToString(task)
             selectedListEditor.putString(task.creationDate.toString(), taskToJson).apply()
         }
-        Log.i("Order", "Saved data with position")
+        Log.i("onStop", "Ordered list saved")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
@@ -342,7 +462,7 @@ class TasksActivity : AppCompatActivity() {
         } else if (requestCode == 2 && resultCode == Activity.RESULT_OK) { // FIle imported
             resultData?.data?.also { uri ->
                 val newList = tasksRepository.readTextContent(uri)
-                Log.i("Import", "Imported successfully list ${newList}")
+                Log.i("Import", "Imported successfully list $newList")
                 // Perform operations on the document using its URI.
             }
         } else if (requestCode == 500 && resultCode == Activity.RESULT_OK && resultData != null) { // Task modified
@@ -353,10 +473,11 @@ class TasksActivity : AppCompatActivity() {
             if (resultData.hasExtra("delete")) {
                 val deleteBool = resultData.getBooleanExtra("delete", false)
                 if (deleteBool) {
-                    Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Tâche supprimée", Toast.LENGTH_SHORT).show()
                     // SWIPE TO DELETE AT POSITION
-
+                    deleteItem(position)
                 }
+
             }
 
             if (position != -1 && taskJson != null) {
@@ -372,9 +493,10 @@ class TasksActivity : AppCompatActivity() {
 
                     val task = Json.decodeFromString<Task>(taskJson)
 
+                    // updating result
                     selectedListEditor.putString(
                         task.creationDate.toString(),
-                        Json.encodeToString(task)
+                        taskJson
                     ).apply()
 
                     tasks[position] = task
@@ -384,6 +506,7 @@ class TasksActivity : AppCompatActivity() {
                         val newPosition = tasks.size - 1
                         tasks.removeAt(position)
                         tasks.add(tasks.size, task)
+
                         adapter.notifyItemMoved(position, newPosition)
                         //adapter.notifyItemRangeChanged(position, newPosition + 1)
 

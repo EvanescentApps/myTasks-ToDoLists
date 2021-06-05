@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/fullscreenBackgroundColor"
+    android:theme="@style/ThemeOverlay.Todolist.FullscreenContainer"
+    tools:context=".FlowActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+
+
+    <LinearLayout
+        android:id="@+id/fullscreen_content_controls"
+        style="@style/Widget.Theme.Todolist.ButtonBar.Fullscreen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UselessParent">
+
+        <Button
+            android:id="@+id/dummy_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Effectuer la tâche maintenant !"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/taskTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.66"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Titre de la tâche"
+            android:textColor="@color/textContent"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/motivText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.9"
+            android:gravity="center"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Reste motivé(e), c'est bientôt fini !"
+            android:textColor="?attr/fullscreenTextColor"
+            android:textSize="18sp" />
+
+        <RelativeLayout
+            android:id="@+id/relativeParent"
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="150dp"
+            android:gravity="center">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progressTime"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:indeterminate="false"
+                android:padding="8dp"
+                app:indicatorColor="@color/textContentPrimary"
+
+                app:indicatorSize="270dp"
+                app:trackColor="#DAE0FF"
+                app:trackThickness="24dp"
+                tools:max="100"
+                tools:progress="50" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/countdownTextView"
+                android:layout_width="220dp"
+                android:layout_height="180dp"
+                android:layout_alignStart="@+id/progressTime"
+                android:layout_alignTop="@+id/progressTime"
+                android:layout_alignEnd="@+id/progressTime"
+                android:layout_alignBottom="@+id/progressTime"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"
+                android:lines="1"
+                android:paddingStart="38dp"
+                android:paddingEnd="38dp"
+                android:text="43:34"
+                android:textColor="@color/textContentPrimary"
+                app:autoSizeTextType="uniform" />
+
+            <TextView
+                android:id="@+id/totalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/progressTime"
+                android:layout_alignEnd="@+id/progressTime"
+                android:layout_alignBottom="@+id/progressTime"
+                android:layout_marginBottom="110dp"
+                android:alpha="0.8"
+                android:gravity="center"
+                android:text="Total : 45:00"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/progressTime"
+                android:layout_alignEnd="@+id/progressTime"
+                android:layout_alignBottom="@+id/progressTime"
+                android:layout_marginBottom="64dp"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/modifyTimer"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="6dp"
+                    app:srcCompat="@drawable/timer_black_24dp"
+                    app:tint="@color/textContentPrimary" />
+
+                <ImageButton
+                    android:id="@+id/playPause"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:cropToPadding="true"
+                    android:padding="6dp"
+                    app:srcCompat="@drawable/pause_black_24dp"
+                    app:tint="@color/textContentPrimary" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/leaveFlow"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:text="Revenir à l'accueil"
+        android:visibility="gone"
+        android:textColor="#4942A8"
+        android:textSize="20sp"
+        app:backgroundTint="#DBDCFF"
+        android:layout_marginBottom="16dp"
+        app:cornerRadius="12dp"
+        app:elevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/infoLeave"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/infoLeave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        android:alpha="0.4"
+        android:text="Pour quitter le Flow, appuie 2x sur Retour\n(seulement si c'est nécessaire)"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

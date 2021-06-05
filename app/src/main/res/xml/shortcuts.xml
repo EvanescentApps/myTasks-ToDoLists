@@ -18,9 +18,30 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.electro.todolist"
-            android:targetClass="com.electro.todolist.TasksActivity" >
+            android:targetClass="com.electro.todolist.ui.TasksActivity" >
 
             <extra android:name="shortcut" android:value="add" />
+
+        </intent>
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <!--<categories android:name="android.shortcut.conversation" />-->
+    </shortcut>
+    <shortcut
+        android:shortcutId="short"
+        android:enabled="false"
+        android:icon="@drawable/mytasks6"
+        android:shortcutShortLabel="@string/shortcut_add"
+        android:shortcutLongLabel="@string/shortcut_add"
+        android:shortcutDisabledMessage="@string/unavailable"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.electro.todolist"
+            android:targetClass="com.electro.todolist.SettingsActivity" >
+
+          <!--  <extra android:name="shortcut" android:value="add" />-->
 
         </intent>
         <!-- If your shortcut is associated with multiple intents, include them

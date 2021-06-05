@@ -13,21 +13,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.ui.TasksAdapter
+import kotlin.math.roundToInt
 
-
-//import androidx.test.runner.intent.IntentStubberRegistry.reset
-
-
-interface ItemTouchHelperAdapter {
-    /**
-     * @param fromPosition starting position
-     * @param toPosition The location of the move
-     */
-    fun onMove(fromPosition: Int, toPosition: Int)
-    fun onSwipe(position: Int)
-}
-
-class ItemTouchHelperCallback: ItemTouchHelper.Callback {
+class ItemTouchHelperCallback : ItemTouchHelper.Callback {
     private val mAdapter: TasksAdapter
 
     private var longPressDragEnabled = false
@@ -37,6 +25,7 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
     lateinit var mBackground: ColorDrawable
     private var backgroundColor = 0
     private lateinit var deleteDrawable: Drawable
+    private lateinit var doneDrawable: Drawable
     private var intrinsicWidth = 0
     private var intrinsicHeight = 0
     private var cardPicked = true
@@ -55,12 +44,12 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
         )!! //ContextCompat.getDrawable(mContext, R.drawable.ic_delete)!!
         intrinsicWidth = deleteDrawable.intrinsicWidth
         intrinsicHeight = deleteDrawable.intrinsicHeight
+
+        doneDrawable = ContextCompat.getDrawable(
+            context,
+            R.drawable.ic_baseline_task_alt_24)!!
     }
-    constructor(adapter: TasksAdapter, canDrag: Boolean, canSwipe: Boolean) {
-        mAdapter = adapter
-        this.longPressDragEnabled = canDrag
-        this.itemViewSwipeEnabled = canSwipe
-    }
+
     /**
      * Can the settings be dragged and dropped?
      *
@@ -69,6 +58,7 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
     fun setDragEnable(canDrag: Boolean) {
         longPressDragEnabled = canDrag
     }
+
     /**
      * Set whether it can be swiped
      *
@@ -77,40 +67,56 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
     fun setSwipeEnable(canSwipe: Boolean) {
         itemViewSwipeEnabled = canSwipe
     }
+
     /**
      * When the user drags or slides the Item, we need to tell the system to slide or drag the direction
      * @param recyclerView
      * @param viewHolder
      * @return
      */
-    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder):Int {
+    override fun getMovementFlags(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ): Int {
         val layoutManager = recyclerView.layoutManager
-        if (layoutManager is GridLayoutManager)
-        {// GridLayoutManager
+        if (layoutManager is GridLayoutManager) {// GridLayoutManager
             // flag If the value is 0, it is equivalent to this function being turned off.
-            val dragFlag = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            val dragFlag =
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.UP or ItemTouchHelper.DOWN
             val swipeFlag = 0
             // create make
             return makeMovementFlags(dragFlag, swipeFlag)
-        }
-        else if (layoutManager is LinearLayoutManager) {// linearLayoutManager
+        } else if (layoutManager is LinearLayoutManager) {// linearLayoutManager
             val orientation = layoutManager.orientation
             var dragFlag = 0
             var swipeFlag = 0
             // For the sake of easy understanding, it is equivalent to a horizontal ListView and a vertical ListView.
-            if(orientation == LinearLayoutManager.HORIZONTAL)
-            run {// If it is a horizontal layout
-                swipeFlag = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                dragFlag = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-            }
-            if (orientation == LinearLayoutManager.VERTICAL)
-            {// If it is a vertical layout, equivalent to ListView
+            if (orientation == LinearLayoutManager.HORIZONTAL)
+                run {// If it is a horizontal layout
+                    swipeFlag = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                    dragFlag = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                }
+            if (orientation == LinearLayoutManager.VERTICAL) {// If it is a vertical layout, equivalent to ListView
                 dragFlag = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                swipeFlag = ItemTouchHelper.RIGHT // or ItemTouchHelper.LEFT
+                swipeFlag = ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
             }
             return makeMovementFlags(dragFlag, swipeFlag)
         }
         return 0
+    }
+
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
+
+        val dragging = actionState == ItemTouchHelper.ACTION_STATE_DRAG || actionState == ItemTouchHelper.ACTION_STATE_SWIPE
+
+        if (false) {
+            mAdapter.setSwipeRefresh(!dragging)
+        }
+    }
+
+    override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
+        return 0.30f
     }
 
     override fun onMoved(
@@ -131,8 +137,7 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
-    ):Boolean {
-        //mAdapter.onMove(viewHolder.adapterPosition, target.adapterPosition)
+    ): Boolean {
 
         val adapter = recyclerView.adapter as TasksAdapter
         val from = viewHolder.bindingAdapterPosition
@@ -140,12 +145,18 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
 
         adapter.moveItem(from, to)
 
-        //adapter.notifyItemMoved(from, to)
-
         return true
     }
+
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, i: Int) {
-        mAdapter.onSwipe(viewHolder.bindingAdapterPosition)
+
+        if (i == ItemTouchHelper.LEFT) { //<<
+            Log.e("Swipe","Swipe LEFT")
+        } else if (i == ItemTouchHelper.RIGHT) { // >>
+            Log.e("Swipe","Swipe RIGHT")
+        }
+
+        mAdapter.onSwipe(viewHolder, i)
     }
 
     override fun onChildDraw(
@@ -162,34 +173,31 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
         val itemHeight: Int = itemView.height
         val isCancelled = dX == 0f && !isCurrentlyActive
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        //Log.e("dX","is $dX")
 
-            if(actionState == ItemTouchHelper.ACTION_STATE_DRAG ) {
-                val animator = viewHolder.itemView.animate()
-                if (isCurrentlyActive) {
-                    animator.translationZ(8f)
-                    //animator.duration = 200
-                    //animator.interpolator = AccelerateInterpolator()
-                    //cardPicked = true
-                } else {
-                    //val animator = viewHolder.itemView.animate()
-                    animator.translationZ(0f)
-                    //animator.start()
-                    //cardPicked = false
-                    //reset = false
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            val animator = viewHolder.itemView.animate()
+
+            if (isCurrentlyActive) {
+                animator.translationZ(16f)
+                animator.withEndAction {
+                    viewHolder.itemView.setBackgroundColor(mContext.resources.getColor(R.color.backgroundSelected))
                 }
+            } else {
 
-                animator.duration = 200
-                animator.interpolator = AccelerateInterpolator()
-                animator.start()
-
+                animator.translationZ(0f)
+                animator.withEndAction {
+                    viewHolder.itemView.setBackgroundColor(mContext.resources.getColor(R.color.background))
+                }
             }
 
+            animator.duration = 100
+            animator.interpolator = AccelerateInterpolator()
+            animator.start()
         }
 
-
         if (isCancelled) {
-            //Log.e("End","Swipe finished or cancelled")
+
             clearCanvas(
                 canvas,
                 itemView.left.toFloat(),
@@ -211,30 +219,81 @@ class ItemTouchHelperCallback: ItemTouchHelper.Callback {
 
         //backgroundColor = Color.parseColor("#E65100")
 
-        mBackground.color = backgroundColor
-        mBackground.setBounds(
-            itemView.left,
-            itemView.top,
-            itemView.left + dX.toInt(),
-            itemView.bottom
-        )
-        mBackground.draw(canvas)
+        if (dX > 0) { // SWIPE RIGHT
 
-        if (dX>0) {
+            mBackground.color = Color.parseColor("#4F5CA4")
+            mBackground.setBounds(
+                itemView.left,
+                itemView.top,
+                itemView.left + dX.toInt(),
+                itemView.bottom
+            )
+            mBackground.draw(canvas)
 
-            val slidePercent = (dX / itemView.width) *100
-            Log.e("Slide", "$slidePercent% $dX ${itemView.width}")
+            val slidePercent = ((dX / itemView.width) * 100).roundToInt()
 
-            deleteDrawable = if (dX>200) {
+            if ((slidePercent % 20) == 0 && slidePercent >= 30) {
+                Log.e("Slide", "${slidePercent}% ${dX.roundToInt()} ${itemView.width}")
+            }
+
+            doneDrawable.setTint(Color.parseColor("#FFFFFF"))
+
+            doneDrawable = if (slidePercent >= 18) {
+                ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_task_alt_24)!!
+            } else {
+                ContextCompat.getDrawable(
+                    mContext,
+                    R.drawable.ic_baseline_task_alt_24
+                )!!
+            }
+
+            val doneIconTop: Int = itemView.top + (itemHeight - intrinsicHeight) / 2
+            val doneIconMargin: Int = (itemHeight - intrinsicHeight) / 2
+            val doneIconLeft: Int = itemView.left + doneIconMargin
+            val doneIconRight: Int = itemView.left + doneIconMargin + intrinsicWidth
+            val doneIconBottom: Int = doneIconTop + intrinsicHeight
+            doneDrawable.setBounds(
+                doneIconLeft,
+                doneIconTop,
+                doneIconRight,
+                doneIconBottom
+            )
+
+            doneDrawable.draw(canvas)
+        } else if (dX < 0) { // SWIPE <<
+
+            mBackground.color = backgroundColor
+            mBackground.setBounds(
+                itemView.right + dX.toInt(),
+                itemView.top,
+                itemView.right,
+                itemView.bottom
+            )
+            mBackground.draw(canvas)
+
+            val slidePercent = ((-dX / itemView.width) * 100).roundToInt()
+
+            Log.e("Slide", "${slidePercent}% ${dX.roundToInt()} ${itemView.width}")
+
+            if ((slidePercent % 20) == 0 && slidePercent >= 30) {
+                Log.e("Slide", "${slidePercent}% ${dX.roundToInt()} ${itemView.width}")
+            }
+
+            deleteDrawable.setTint(Color.parseColor("#FFFFFF"))
+
+            deleteDrawable = if (slidePercent >= 30) {
                 ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_delete_24)!!
             } else {
-                ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_delete_outline_24_white)!!
+                ContextCompat.getDrawable(
+                    mContext,
+                    R.drawable.ic_baseline_delete_outline_24_white
+                )!!
             }
 
             val deleteIconTop: Int = itemView.top + (itemHeight - intrinsicHeight) / 2
             val deleteIconMargin: Int = (itemHeight - intrinsicHeight) / 2
-            val deleteIconLeft: Int = itemView.left + deleteIconMargin
-            val deleteIconRight: Int = itemView.left + deleteIconMargin + intrinsicWidth
+            val deleteIconLeft: Int = itemView.right - deleteIconMargin - intrinsicWidth
+            val deleteIconRight: Int = itemView.right - deleteIconMargin
             val deleteIconBottom: Int = deleteIconTop + intrinsicHeight
             deleteDrawable.setBounds(
                 deleteIconLeft,

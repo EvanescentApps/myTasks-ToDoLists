@@ -8,15 +8,7 @@
     android:orientation="vertical"
     android:clipToPadding="false"
     android:clipChildren="false"
-    tools:context=".AddTaskFragment">
-
-
-    <!--<TextView
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:textSize="26sp"
-
-        android:text="Ajouter une tâche"/>-->
+    tools:context=".ui.AddTaskFragment">
 
         <EditText
             android:layout_width="match_parent"
@@ -28,6 +20,7 @@
             android:hint="Ajouter une tâche"
             android:maxHeight="150dp"
             android:textSize="22sp"
+            android:backgroundTint="@color/iconTint"
             android:autofillHints="" />
 
     <EditText
@@ -40,6 +33,7 @@
         android:id="@+id/description"
         android:maxHeight="150dp"
         android:hint="Ajouter une description"
+        android:backgroundTint="@color/iconTint"
         android:alpha="0.8"
         android:textSize="18sp"
         android:autofillHints="" />

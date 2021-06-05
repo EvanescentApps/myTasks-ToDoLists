@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="12dp"
+    android:clipChildren="true"
+    android:clipToPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:background="@color/background"
+        android:clipToPadding="true"
+        android:clipChildren="true"
+        android:orientation="vertical">
+
+       <RadioGroup
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+
+           <RadioButton
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text=" Très Important"
+               android:gravity="center_vertical"
+               android:textSize="22sp"
+               android:textColor="@color/textContentPrimary" />
+
+           <RadioButton
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text=" Important"
+               android:gravity="center_vertical"
+               android:textSize="22sp"
+               android:textColor="@color/textContentPrimary" />
+
+           <RadioButton
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text=" Très Urgent"
+               android:gravity="center_vertical"
+               android:textSize="22sp"
+               android:textColor="@color/textContentPrimary" />
+
+           <RadioButton
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text=" Pas Urgent"
+               android:gravity="center_vertical"
+               android:textSize="22sp"
+               android:textColor="@color/textContentPrimary" />
+
+           <RadioButton
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text=" Facultatif"
+               android:gravity="center_vertical"
+               android:textSize="22sp"
+               android:textColor="@color/textContentPrimary" />
+
+       </RadioGroup>
+
+    </LinearLayout>
+</FrameLayout>

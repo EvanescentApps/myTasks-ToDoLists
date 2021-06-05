@@ -1,5 +1,6 @@
 package com.electro.todolist
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -8,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.datastore.preferences.preferencesDataStore
@@ -18,60 +21,124 @@ const val ARG_CURRENT_LIST = "currentList"
 
 data class ListAction(
     val title : String,
+    val iconResource : Int? = null,
     val action: () -> Unit
 )
 
 class BottomFragment : BottomSheetDialogFragment() {
 
-    val Context.dataStore by preferencesDataStore(name = "settings")
+    private val Context.dataStore by preferencesDataStore(name = "settings")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_bottom_list_dialog, container, false)
+        return inflater.inflate(R.layout.context_menu_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val tasksRepository = TasksRepository(requireContext().dataStore, requireActivity())
+        val tasksRepository = TasksRepository(requireActivity())
         val recyclerList = view.findViewById<RecyclerView>(R.id.list)
 
-        val currentList = requireArguments().getString(ARG_CURRENT_LIST)
+        val currentListId = requireArguments().getString(ARG_CURRENT_LIST)
 
-        if(currentList != null){
+        if(currentListId != null){
             recyclerList?.layoutManager = LinearLayoutManager(context)
             recyclerList?.adapter = ItemAdapter(arrayListOf( //"Paramètres","Mes tâches","Aujourd'hui","Demain","Projets","Un Jour"
 
-                ListAction("Renommer la liste") {
-                    Toast.makeText(requireActivity(), "Renommer la liste", Toast.LENGTH_SHORT).show()
-                },
-                ListAction("Supprimer la liste") {
-                    Toast.makeText(requireActivity(), "Supprimer la liste", Toast.LENGTH_SHORT).show()
-                },
-                ListAction("Supprimer toutes les tâches terminées") {
-                    Toast.makeText(requireActivity(), "Supprimer toutes les tâches terminées", Toast.LENGTH_SHORT).show()
-                },
-                ListAction("Exporter la liste") {
-                    /*Le code s'exécute dans une fonction de l'activité,
-                    * qui possède les droits d'accès aux données requises, et le contexte*/
+                ListAction("Renommer la liste", R.drawable.outline_drive_file_rename_outline_24) {
+                    //Toast.makeText(requireActivity(), "Renommer la liste", Toast.LENGTH_SHORT).show()
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+                    // I'm using fragment here so I'm using getView() to provide ViewGroup
+                    // but you can provide here any other instance of ViewGroup from your Fragment / Activity
 
-                    tasksRepository.exportToFile(currentList)
+                    val viewInflated: View = LayoutInflater.from(context).inflate(R.layout.list_name_edit, getView() as ViewGroup?, false)
+
+                    val input = viewInflated.findViewById<EditText>(R.id.input)
+                    // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                    builder.setView(viewInflated)
+
+                    builder.setTitle("Renommer une liste")
+
+                    builder.setPositiveButton(
+                        R.string.ok
+                    ) { dialog, _ ->
+                        dialog.dismiss()
+                        val newName = input.text.toString()
+
+                        if (newName.isNotEmpty()) {
+                            tasksRepository.renameList(newName, currentListId)
+                        } else {
+                            Toast.makeText(context,"Veuillez définir un nom pour la liste",Toast.LENGTH_LONG).show()
+                        }
+
+                        dismissAllowingStateLoss()
+                    }
+                    builder.setNegativeButton(
+                        R.string.cancel
+                    ) { dialog, _ -> dialog.cancel() }
+
+                    builder.show()
+
+                    // TODO : RENAME THE LIST IN THE CHANGELISTBS
+                    // Launch popup to rename list
                 },
-                ListAction("Importer une liste") {
+                ListAction("Supprimer la liste", R.drawable.ic_baseline_delete_outline_24) {
+                    //Toast.makeText(requireActivity(), "Suppression de la liste...", Toast.LENGTH_SHORT).show()
+                    tasksRepository.deleteList(currentListId)
+                    dismissAllowingStateLoss()
+                },
+                ListAction("Supprimer toutes les tâches terminées", R.drawable.outline_delete_sweep_24) {
+                    //Toast.makeText(requireActivity(), "Suppression des tâches terminées...", Toast.LENGTH_SHORT).show()
+                    tasksRepository.deleteAllDoneTasks(currentListId)
+                    dismissAllowingStateLoss()
+                },
+                ListAction("Exporter la liste", R.drawable.outline_file_upload_24) {
+                    /*Le code s'exécute dans une fonction du repository,
+                    * qui possède les droits d'accès aux données requises, et le contexte*/
+                    Toast.makeText(requireActivity(), "Export de la liste au format texte (JSON)", Toast.LENGTH_SHORT).show()
+                    tasksRepository.exportToFile(currentListId)
+                    dismissAllowingStateLoss()
+                },
+                ListAction("Importer une liste", R.drawable.outline_file_download_24) {
                     //(requireActivity() as TasksActivity?)!!.exportToJson()
+                    Toast.makeText(requireActivity(), "Importez une liste au format texte (JSON)", Toast.LENGTH_SHORT).show()
                     tasksRepository.openFile()
+                    dismissAllowingStateLoss()
                 },
-                ListAction("Créer une nouvelle liste") {
-                    //(requireActivity() as TasksActivity?)!!.exportToJson()
-                    tasksRepository.openFile()
+                ListAction("Créer une nouvelle liste", R.drawable.ic_add_black_48dp) {
+                    Toast.makeText(requireActivity(), "Création d'une liste", Toast.LENGTH_SHORT).show()
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+                    // I'm using fragment here so I'm using getView() to provide ViewGroup
+                    // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+
+                    val viewInflated: View = LayoutInflater.from(context).inflate(R.layout.list_name_edit, getView() as ViewGroup?, false)
+
+                    val input = viewInflated.findViewById<EditText>(R.id.input)
+                    // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                    builder.setView(viewInflated)
+
+                    builder.setTitle("Créer une liste")
+
+                    builder.setPositiveButton(
+                        R.string.ok
+                    ) { dialog, _ ->
+                        dialog.dismiss()
+                        val mText = input.text.toString()
+                        tasksRepository.createList(mText)
+                        dismissAllowingStateLoss()
+                    }
+                    builder.setNegativeButton(
+                        R.string.cancel
+                    ) { dialog, _ -> dialog.cancel() }
+
+                    builder.show()
+                    // Launch popup or bottomsheet for the name
                 },
-                ListAction("Paramètres") {
-                    Toast.makeText(requireActivity(), "Paramètres", Toast.LENGTH_SHORT).show()
-                },
-                ListAction("Changer le thème") {
+                /*ListAction("Changer le thème") {
                     Toast.makeText(requireActivity(), "Changer le thème", Toast.LENGTH_SHORT).show()
-                }
+                }*/
             ))
         } else {
             Toast.makeText(requireActivity(), "Aucune liste sélectionnée...", Toast.LENGTH_SHORT).show()
@@ -86,13 +153,14 @@ class BottomFragment : BottomSheetDialogFragment() {
         parent: ViewGroup
     ) : RecyclerView.ViewHolder(
         inflater.inflate(
-            R.layout.fragment_bottom_list_dialog_item,
+            R.layout.context_menu_list_item,
             parent,
             false
         )
     ) {
 
         val text: TextView = itemView.findViewById(R.id.text)
+        val icon: ImageView = itemView.findViewById(R.id.icon)
     }
 
     private inner class ItemAdapter(private val mList: ArrayList<ListAction>) : //private val mItemCount: Int,
@@ -106,6 +174,9 @@ class BottomFragment : BottomSheetDialogFragment() {
             holder.text.text = mList[position].title
             holder.itemView.setOnClickListener {
                 mList[position].action()
+            }
+            mList[position].iconResource?.let { res ->
+                holder.icon.setImageDrawable(resources.getDrawable(res))
             }
         }
 
