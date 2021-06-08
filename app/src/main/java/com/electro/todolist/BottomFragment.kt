@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.datastore.preferences.preferencesDataStore
 import com.electro.todolist.data.TasksRepository
 
@@ -57,36 +58,42 @@ class BottomFragment : BottomSheetDialogFragment() {
 
                     val input = viewInflated.findViewById<EditText>(R.id.input)
                     // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                    builder.setView(viewInflated)
+                    builder.apply {
+                        setTitle("Renommer une liste")
+                        setView(viewInflated)
+                        setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                            val newName = input.text.toString()
+                            if (newName.isNotEmpty())
+                                tasksRepository.renameList(newName, currentListId)
+                            else
+                                Toast.makeText(context,"Veuillez définir un nom pour la liste",Toast.LENGTH_LONG).show()
 
-                    builder.setTitle("Renommer une liste")
-
-                    builder.setPositiveButton(
-                        R.string.ok
-                    ) { dialog, _ ->
-                        dialog.dismiss()
-                        val newName = input.text.toString()
-
-                        if (newName.isNotEmpty()) {
-                            tasksRepository.renameList(newName, currentListId)
-                        } else {
-                            Toast.makeText(context,"Veuillez définir un nom pour la liste",Toast.LENGTH_LONG).show()
+                            dismissAllowingStateLoss()
                         }
-
-                        dismissAllowingStateLoss()
+                        setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+                        show()
                     }
-                    builder.setNegativeButton(
-                        R.string.cancel
-                    ) { dialog, _ -> dialog.cancel() }
-
-                    builder.show()
-
-                    // TODO : RENAME THE LIST IN THE CHANGELISTBS
                     // Launch popup to rename list
                 },
                 ListAction("Supprimer la liste", R.drawable.ic_baseline_delete_outline_24) {
                     //Toast.makeText(requireActivity(), "Suppression de la liste...", Toast.LENGTH_SHORT).show()
-                    tasksRepository.deleteList(currentListId)
+
+                    val builder: androidx.appcompat.app.AlertDialog.Builder = androidx.appcompat.app.AlertDialog.Builder(
+                        ContextThemeWrapper(requireContext(), R.style.AlertDialogCustom)
+                    )
+                    builder.apply {
+                        setTitle("Supprimer la liste ?")
+                        setMessage("Toutes les tâches de cette liste seront définitivement supprimées, continuer ?")
+                        setPositiveButton(R.string.ok) { dialog, id ->
+                            tasksRepository.deleteList(currentListId)
+                        }
+                        setNegativeButton(R.string.cancel) { dialog, id ->
+                            dialog.dismiss()
+                        }
+                        show()
+                    }
+
                     dismissAllowingStateLoss()
                 },
                 ListAction("Supprimer toutes les tâches terminées", R.drawable.outline_delete_sweep_24) {
@@ -117,23 +124,21 @@ class BottomFragment : BottomSheetDialogFragment() {
 
                     val input = viewInflated.findViewById<EditText>(R.id.input)
                     // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                    builder.setView(viewInflated)
-
-                    builder.setTitle("Créer une liste")
-
-                    builder.setPositiveButton(
-                        R.string.ok
-                    ) { dialog, _ ->
-                        dialog.dismiss()
-                        val mText = input.text.toString()
-                        tasksRepository.createList(mText)
-                        dismissAllowingStateLoss()
+                    builder.apply {
+                        setView(viewInflated)
+                        setTitle("Créer une liste")
+                        setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                            val mText = input.text.toString()
+                            tasksRepository.createList(mText)
+                            dismissAllowingStateLoss()
+                        }
+                        setNegativeButton(R.string.cancel) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        show()
                     }
-                    builder.setNegativeButton(
-                        R.string.cancel
-                    ) { dialog, _ -> dialog.cancel() }
 
-                    builder.show()
                     // Launch popup or bottomsheet for the name
                 },
                 /*ListAction("Changer le thème") {

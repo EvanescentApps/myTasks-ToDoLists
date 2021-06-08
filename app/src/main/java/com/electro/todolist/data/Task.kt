@@ -1,6 +1,7 @@
 package com.electro.todolist.data
 
 import androidx.annotation.Keep
+import com.electro.todolist.R
 import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
@@ -8,25 +9,25 @@ import kotlin.random.Random
 @Serializable
 class Priority {
     companion object {
-        val VERY_HIGH = Pair("Très important", "#FF0000")
-        val HIGH = Pair("Important", "#FF0000")
-        val URGENT = Pair("Très urgent !", "#FF0000")
-        val FACULTATIVE = Pair("Facultatif", "#FF0000")
-        val NOT_URGENT = Pair("Pas urgent", "#FF0000")
-
+        val VERY_HIGH = Pair("Très important", R.color.taskTresImportant)
+        val HIGH = Pair("Important", R.color.taskImportant)
+        val URGENT = Pair("Très urgent !", R.color.taskUrgent)
+        val FACULTATIVE = Pair("Facultatif", R.color.taskFacultative) // C8FFCD
+        val NOT_URGENT = Pair("Pas urgent", R.color.taskPasUrgent) // B3FF74
+        val NONE = Pair("Indéfini", R.color.textContent)
     }
 }
 
 @Keep
 @Serializable
-class Task(
+data class Task(
     var title: String,
     var description: String? = null,
     val creationDate: Long,
     var done: Boolean,
     val uid: String? = null,
     var position: Int = 0,
-    var priority: Int = 0,
+    var priority: Pair<String, Int> = Priority.NONE,
     var date: Long? = null,
     var duration : Long? = null
     // Timestamp lastEdit or lastSync ?

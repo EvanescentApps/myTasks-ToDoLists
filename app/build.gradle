@@ -18,8 +18,8 @@ android {
         applicationId "com.electro.todolist"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 8
-        versionName "Alpha C8"
+        versionCode 10
+        versionName "Alpha C10"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
@@ -43,27 +43,27 @@ android {
 }
 
 dependencies {
-
     implementation platform('com.google.firebase:firebase-bom:26.5.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1'
     implementation 'androidx.core:core-ktx:1.5.0'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.google.code.gson:gson:2.8.7'
+    //implementation 'com.github.simonvt:android-numberpicker-sample:1.0.0'
+    //implementation 'net.simonvt.numberpicker:numberpicker:1.0.0'
+    //implementation 'cn.carbswang.android:NumberPickerView:1.2.0'
     implementation "androidx.datastore:datastore-preferences:1.0.0-beta01"
     implementation 'com.firebaseui:firebase-ui-auth:7.1.1'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    //implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.10"
     implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-
     implementation 'com.github.LelouBil:PronoteLib:0.4.2'
 
     testImplementation 'junit:junit:4.13.2'

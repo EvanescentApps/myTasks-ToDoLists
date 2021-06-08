@@ -12,7 +12,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -26,7 +25,7 @@ import kotlin.random.Random
  */
 class FlowActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityFlowBinding
+    private lateinit var b: ActivityFlowBinding
     private lateinit var fullscreenContent: LinearLayout
     private lateinit var fullscreenContentControls: LinearLayout
     private val hideHandler = Handler(Looper.getMainLooper())
@@ -89,8 +88,8 @@ class FlowActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityFlowBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        b = ActivityFlowBinding.inflate(layoutInflater)
+        setContentView(b.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -107,10 +106,10 @@ class FlowActivity : AppCompatActivity() {
         isFullscreen = true
 
         // Set up the user interaction to manually show or hide the system UI.
-        fullscreenContent = binding.fullscreenContent
+        fullscreenContent = b.fullscreenContent
         //fullscreenContent.setOnClickListener { toggle() }
 
-        fullscreenContentControls = binding.fullscreenContentControls
+        fullscreenContentControls = b.fullscreenContentControls
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -129,8 +128,8 @@ class FlowActivity : AppCompatActivity() {
 
         val taskTitle = intent.getStringExtra("taskTitle")
 
-        binding.taskTitle.text = taskTitle
-        binding.motivText.text = motivation[Random.nextInt(motivation.size)]
+        b.taskTitle.text = taskTitle
+        b.motivText.text = motivation[Random.nextInt(motivation.size)]
 
         timeLeft = taskDurationMillis.toLong()
         // TODO : pass as an argument in intent bundle
@@ -139,9 +138,6 @@ class FlowActivity : AppCompatActivity() {
 
         setTimer(taskDurationSec)
 
-        /*Handler(Looper.getMainLooper()).postDelayed({
-
-        },800)*/
     }
 
     fun updateTimer(timeLeftMillis: Long) {
@@ -161,14 +157,14 @@ class FlowActivity : AppCompatActivity() {
         }
         textTimeLeft += "$seconds"
 
-        binding.countdownTextView.text = textTimeLeft
+        b.countdownTextView.text = textTimeLeft
     }
 
     fun setCountdownProgress(p: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            binding.progressTime.setProgress(p, true)
+            b.progressTime.setProgress(p, true)
         } else {
-            binding.progressTime.progress = p
+            b.progressTime.progress = p
         }
     }
 
@@ -187,13 +183,13 @@ class FlowActivity : AppCompatActivity() {
                 i += 2
                 setCountdownProgress(taskDurationMillis / 100)
 
-                binding.countdownTextView.text = "00:00"
+                b.countdownTextView.text = "00:00"
 
                 finished = true
 
                 Handler(Looper.getMainLooper()).postDelayed({
 
-                    binding.leaveFlow.visibility = View.VISIBLE
+                    b.leaveFlow.visibility = View.VISIBLE
 
                     try {
                         val notification: Uri =
@@ -205,32 +201,39 @@ class FlowActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
 
-                    binding.progressTime.trackColor = Color.parseColor("#00CD00")
-                    binding.progressTime.setIndicatorColor(Color.parseColor("#00CD00"))
+                    b.progressTime.apply {
+                        trackColor = Color.parseColor("#00CD00")
+                        setIndicatorColor(Color.parseColor("#00CD00"))
+                    }
 
-                    binding.leaveFlow.setOnClickListener {
+                    b.leaveFlow.setOnClickListener {
                         val returnIntent = Intent()
                         returnIntent.putExtra("done", true)
                         setResult(Activity.RESULT_OK, returnIntent)
                         finish()
                     }
-                    binding.leaveFlow.visibility = View.VISIBLE
+                    b.leaveFlow.visibility = View.VISIBLE
                 }, 1000)
             }
         }
         mCountDownTimer.start()
     }
 
+    fun modifyTimer(variation: Int = 0) {
+
+    }
+    
     fun setTimer(taskDurationSec: Int) {
 
-        taskDurationMillis = (taskDurationSec) * 1000
-        binding.progressTime.isIndeterminate = false
-        binding.progressTime.max = taskDurationMillis / 100
-
         i = 0
-        //binding.progressTime.trackCornerRadius = 2
 
-        binding.progressTime.progress = 0
+        taskDurationMillis = (taskDurationSec) * 1000
+
+        b.progressTime.apply {
+            isIndeterminate = false
+            max = taskDurationMillis / 100
+            progress = 0
+        }
 
         startCountdownTimer(taskDurationMillis.toLong())
 
@@ -246,28 +249,45 @@ class FlowActivity : AppCompatActivity() {
         }
         textTimeTotal += "$seconds"
 
-        binding.totalTime.text = "Total $textTimeTotal"
-        binding.progressTime.max = (taskDurationMillis / 100)
+        b.totalTime.text = "Total $textTimeTotal"
 
-        //isPaused = false
+        baseColor = b.progressTime.indicatorColor
 
-        baseColor = binding.progressTime.indicatorColor
+        b.playPause.setOnClickListener {
+            if (isPaused) play() else pause()
+        }
+        b.modifyTimer.setOnClickListener {
 
-        binding.playPause.setOnClickListener {
-            if (isPaused) { // was paused, now playing
-               /* Toast.makeText(
-                    this,
-                    "was paused now playing",
-                    Toast.LENGTH_SHORT
-                ).show()*/
-                play()
-            } else { // was playing, now paused
-                /*Toast.makeText(
-                    this,
-                    "was playing now paused",
-                    Toast.LENGTH_SHORT
-                ).show()*/
+            // TODO : ADD OR MINUS TIME ON TIMER
+
+
+        }
+        b.backLeave.setOnClickListener {
+            if (!finished) {
+
                 pause()
+
+                val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+                builder.apply {
+                    setTitle("Quitter le Flow ?")
+                    setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
+                    setPositiveButton(
+                        R.string.ok
+                    ) { dialog, id -> finish() }
+                    setNegativeButton(
+                        R.string.cancel
+                    ) { dialog, id ->
+                        dialog.dismiss()
+                        play()
+                    }
+                    show()
+                }
+            } else {
+
+                val returnIntent = Intent()
+                returnIntent.putExtra("done", true)
+                setResult(Activity.RESULT_OK, returnIntent)
+                finish()
             }
         }
 
@@ -275,18 +295,18 @@ class FlowActivity : AppCompatActivity() {
 
     fun play() {
         isPaused = false
-        binding.playPause.setImageDrawable(resources.getDrawable(R.drawable.pause_black_24dp))
+        b.playPause.setImageDrawable(resources.getDrawable(R.drawable.pause_black_24dp))
         startCountdownTimer(timeLeft, timeElapsedStop)
 
-        binding.progressTime.setIndicatorColor(baseColor[0])
+        b.progressTime.setIndicatorColor(baseColor[0])
     }
 
     fun pause() {
         isPaused = true
-        //binding.progressTime.trackColor = Color.parseColor("#E65100")
-        binding.progressTime.setIndicatorColor(Color.parseColor("#E65100"))
 
-        binding.playPause.setImageDrawable(resources.getDrawable(R.drawable.play_arrow_black_24dp))
+        b.progressTime.setIndicatorColor(Color.parseColor("#E65100"))
+
+        b.playPause.setImageDrawable(resources.getDrawable(R.drawable.play_arrow_black_24dp))
         mCountDownTimer.cancel()
 
         timeElapsedStop = i
@@ -306,61 +326,37 @@ class FlowActivity : AppCompatActivity() {
     override fun onBackPressed() {
 
         if (!finished) {
-            /*if (doubleBack < 1) {
-                Toast.makeText(
-                    this,
-                    "Vraiment sûr(e) de vouloir quitter ton Flow ?",
-                    Toast.LENGTH_LONG
-                ).show()
-                doubleBack++
-            } else {
-                super.onBackPressed()
-            }*/
-
-            /*Toast.makeText(
-                this,
-                "Vraiment sûr(e) de vouloir quitter ton Flow ?",
-                Toast.LENGTH_LONG
-            ).show()*/
+            /*if (doubleBack < 1) doubleBack++
+            else  super.onBackPressed() */
 
             pause()
 
             val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
             builder.apply {
+                setTitle("Quitter le Flow ?")
+                setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
                 setPositiveButton(
                     R.string.ok
-                ) { dialog, id ->
-                    // User clicked OK button
-                    //super.onBackPressed()
-                    finish()
-                }
+                ) { dialog, id -> finish() }
                 setNegativeButton(
                     R.string.cancel
                 ) { dialog, id ->
-                    // User cancelled the dialog
                     dialog.dismiss()
                     play()
                 }
+                show()
             }
-            // Set other dialog properties
-            builder.setTitle("Quitter le Flow ?")
-            builder.setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
-
-            // Create the AlertDialog
-            builder.create()
-            builder.show()
         } else {
-            super.onBackPressed()
-        }
 
+            val returnIntent = Intent()
+            returnIntent.putExtra("done", true)
+            setResult(Activity.RESULT_OK, returnIntent)
+            finish()
+        }
     }
 
     private fun toggle() {
-        if (isFullscreen) {
-            hide()
-        } else {
-            show()
-        }
+        if (isFullscreen) hide() else show()
     }
 
     private fun hide() {

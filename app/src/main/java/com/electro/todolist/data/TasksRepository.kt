@@ -2,52 +2,49 @@
 
 package com.electro.todolist.data
 
-import android.app.Activity
-import android.content.Intent
-import android.content.SharedPreferences
-import android.net.Uri
-import android.os.Build
-import android.provider.DocumentsContract
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.electro.todolist.ui.TasksActivity
 import kotlinx.serialization.decodeFromString
+import com.electro.todolist.ui.TasksActivity
 import kotlinx.serialization.encodeToString
+import android.provider.DocumentsContract
+import android.content.SharedPreferences
 import kotlinx.serialization.json.Json
-import java.io.*
 import java.text.SimpleDateFormat
+import android.content.Intent
+import android.widget.Toast
+import java.text.Normalizer
+import android.app.Activity
+import android.util.Log
+import android.os.Build
+import android.net.Uri
 import java.util.*
+import java.io.*
 
 class TasksRepository(private val activity: Activity) {
 
-    private fun String.toSafeCase(): String {
-        return java.text.Normalizer.normalize(this.lowercase(), java.text.Normalizer.Form.NFD)
+    fun String.toSafeCase(): String = Normalizer.normalize(this.lowercase(), Normalizer.Form.NFD)
             .filter { it.isLetterOrDigit() or it.isWhitespace() }.replace(" ", "_")
-    }
 
     // Shared Preferences directory containing all the user's lists as Key Value Pairs (id, name)
     var listsPrefs: SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
+    var lastOpenedList_Key = ""
+    var currentListName = ""
+
+    //var currentListName = lastOpenedList_Key // Important, needs to be up to date
 
     // Getting all the lists as a MutableMap (read only)
-    var readOnlyUserLists: MutableMap<String, *> = listsPrefs.all
+    var userListGroup: MutableMap<String, *> = listsPrefs.all
+    //var listOfIds = userListGroup.values.toList() //arrayListOf("List 1","List 2","List 3")
+    //var userLists : List<Pair<String,String>> = (userListGroup.toList()) as List<Pair<String,String>>
 
-    // the last opened list
-    var lastOpenedList_Key = ""
+    /*fun getUpdatedLists() {
+        userListGroup = getListGroup()
+        //listOfIds = userListGroup.values.toList()
+    }*/
 
-    // list of ids
-    var listOfIds = readOnlyUserLists.values.toList() //arrayListOf("List 1","List 2","List 3")
-    var userLists : List<Pair<String,String>> = (readOnlyUserLists.toList()) as List<Pair<String,String>>
+    fun getListGroup(): MutableMap<String, *> = getListGroupPrefs().all
 
-    //Important, needs to be up to date
-    var currentListName = lastOpenedList_Key
-
-    fun updateLists() {
-        readOnlyUserLists = getAllListsPref().all
-        listOfIds = readOnlyUserLists.values.toList()
-    }
-
-    fun parseTimestampToDuration( timestamp : Long) : String {
+    fun timestampToDuration(timestamp : Long): String {
 
         val taskDurationSec = (timestamp/1000).toInt()
 
@@ -74,9 +71,8 @@ class TasksRepository(private val activity: Activity) {
         return durationText
     }
 
-    fun parseTimestampToDate(timestamp : Long): String {
+    fun timestampToDate(timestamp: Long): String {
         val cal = Calendar.getInstance()
-
         cal.timeInMillis = timestamp
 
         val daysOfWeek = listOf("Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi")
@@ -84,33 +80,29 @@ class TasksRepository(private val activity: Activity) {
 
         val currentCal = Calendar.getInstance()
         currentCal.timeInMillis = System.currentTimeMillis()
-        var day = ""
-        if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR) + 1) {
-            day = "Demain"
-        } else if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR)) {
-            day = "Aujourd'hui"
-        } else if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR) -1) {
-            day = "Hier"
-        } else if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR) + 2) {
-            day = "Après-Demain"
-        } else {
-            day = "${  daysOfWeek[cal.get(Calendar.DAY_OF_WEEK)-1].take(3)   }. ${cal.get(Calendar.DAY_OF_MONTH)} ${monthsOfYear[cal.get(Calendar.MONTH)]}"
+
+        val today = currentCal.get(Calendar.DAY_OF_YEAR)
+        val day = when(cal.get(Calendar.DAY_OF_YEAR)) {
+            today - 2 -> "Avant-Hier"
+            today -1 -> "Hier"
+            today -> "Aujourd'hui"
+            today + 1 -> "Demain"
+            today + 2 -> "Après-Demain"
+            else -> "${daysOfWeek[cal.get(Calendar.DAY_OF_WEEK)-1].take(3)}. ${cal.get(Calendar.DAY_OF_MONTH)} ${monthsOfYear[cal.get(Calendar.MONTH)]}"
         }
 
-        return "${day} à ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)}"
+        return "$day à ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)}"
     }
 
     fun getDefaultList() {
 
-        if(readOnlyUserLists.isNotEmpty()) {
+        userListGroup = getListGroup()
+
+        if(userListGroup.isNotEmpty()) {
 
             listsPrefs.getString("defaultList", null)?.let {
                 lastOpenedList_Key = it
-                Log.e("Default","shared is not null")
-            } ?: run {
-                lastOpenedList_Key = readOnlyUserLists.map { it.key }[0]
-                Log.e("Default","shared is null, taking first list")
-            }
+            } ?: run { lastOpenedList_Key = userListGroup.map { it.key }[0] }
 
             Log.e("defaultListKey","is $lastOpenedList_Key , but ${listsPrefs.getString("defaultList", null)}")
         } else {
@@ -118,57 +110,63 @@ class TasksRepository(private val activity: Activity) {
             Log.e("Empty ListsPrefs","Creating -Mes Tâches- List")
             putNewLists()
             lastOpenedList_Key = "list1"
-            updateLists()
+            //getUpdatedLists()
         }
 
         currentListName = lastOpenedList_Key
     }
 
-    fun getAllListsPref() : SharedPreferences {
-        return activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
-    }
+    fun getListGroupPrefs() : SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
 
     fun putNewLists() {
-        val listsPrefs = getAllListsPref()
-
-        listsPrefs.edit().putString("list1", "Mes tâches").apply()
-        listsPrefs.edit().putString("list2", "Aujourd'hui").apply()
-        listsPrefs.edit().putString("list3", "Demain").apply()
-        listsPrefs.edit().putString("defaultList","list1").apply()
+        getListGroupPrefs().edit().apply {
+            putString("list1", "Mes tâches")
+            putString("list2", "Aujourd'hui")
+            putString("list3", "Demain")
+            putString("defaultList","list1")
+        }.apply()
     }
 
     fun createList(name : String) {
         // create entry in sharedPreferences for a new list
 
-        getAllListsPref().edit().putString(Task.generateId(6), name).commit().let {
-            // update list of lists
-            updateLists()
-        }
+        val newListId = Task.generateId(6)
+
+        getListGroupPrefs().edit().putString(newListId, name).apply()
+
+        if (activity is TasksActivity) activity.changeList(newListId)
+
     }
 
     fun renameList(newName: String, listId: String) {
-        val listsPrefs = getAllListsPref()
+        val listsPrefs = getListGroupPrefs()
         if (listsPrefs.getString(listId,null) != null) {
             listsPrefs.edit().putString(listId, newName).apply()
-            (activity as TasksActivity).updateListName(newName)
+
+            if (activity is TasksActivity) activity.updateListName(newName)
+
         } else {
             Toast.makeText(activity,"Cette liste n'existe pas... Veuillez réessayer.",Toast.LENGTH_LONG).show()
         }
 
-        updateLists()
+        //getUpdatedLists()
     }
 
     fun deleteList(listId: String) {
-        val listsPrefs = getAllListsPref()
+
         try {
-            listsPrefs.edit().remove(listId).apply()
-            Toast.makeText(activity, "Liste supprimée", Toast.LENGTH_SHORT).show()
+            getListGroupPrefs().edit().remove(listId).apply()
+
         } catch (e: Exception) {
             Log.e("Error removing list", e.stackTrace.toString())
         }
-        updateLists()
-        (activity as TasksActivity).changeList(listOfIds[0].toString())
+        //getUpdatedLists()
 
+        val listOfIds = getListGroup().toList()
+
+        if (activity is TasksActivity) activity.changeList(listOfIds[0].first)
+
+        //Toast.makeText(activity, "Liste supprimée, liste par défaut : ${listOfIds[0].first}", Toast.LENGTH_LONG).show()
     }
 
     fun deleteAllDoneTasks(list : String) {
@@ -191,33 +189,23 @@ class TasksRepository(private val activity: Activity) {
                     Log.e("Error Tasks Removal",e.stackTrace.toString())
                     isError = true
                 }
-
             }
         }
 
-        if (!isError) {
-            Toast.makeText(activity, "Tâches terminées supprimées ✔", Toast.LENGTH_SHORT).show()
-        }
-
+        if (!isError) Toast.makeText(activity, "Tâches terminées supprimées ✔", Toast.LENGTH_SHORT).show()
     }
 
     fun exportToFile(currentList: String) {
-
         /* snackbar, which action is SHOW ME */
-
-        val fileName = "${currentList.toSafeCase()}-${getDate()}"
-
-        createFile(fileName)
+        createFile("${currentList.toSafeCase()}-${getDate()}")
     }
 
     fun createFile(fileName: String, pickerInititalUri: Uri? = null) {
-
         try {
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            val intentCreateDoc = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/txt"
                 putExtra(Intent.EXTRA_TITLE, "$fileName.txt")
-                //Optionally
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     pickerInititalUri?.let {
                         putExtra(DocumentsContract.EXTRA_INITIAL_URI,it)
@@ -225,17 +213,14 @@ class TasksRepository(private val activity: Activity) {
                 }
             }
             Toast.makeText(activity, "Fichier $fileName.txt créé", Toast.LENGTH_LONG).show()
-            activity.startActivityForResult(intent,1)
+            activity.startActivityForResult(intentCreateDoc,1)
             Log.i("Tasks to file", "Waiting for a result (user choosing directory)")
-        } catch (e: Exception) {
-            Log.e("Save error","Error thrown")
-            e.printStackTrace()
-        }
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     fun writeTaskListTofile(currentList: String, uri: Uri) {
-        Log.e("CURRENT LIST","is $currentList vs list1 normally")
-        val selectedList = activity.getSharedPreferences("list1", AppCompatActivity.MODE_PRIVATE)
+        Log.e("CURRENT LIST","is $currentList")
+        val selectedList = activity.getSharedPreferences("currentList", AppCompatActivity.MODE_PRIVATE)
         val allTasksList = ArrayList<Task>()
         selectedList.all.map { it.key }.forEach { str ->
             selectedList.getString(str, null)?.let {
@@ -253,11 +238,9 @@ class TasksRepository(private val activity: Activity) {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/txt"
 
-            // Optionally, specify a URI for the file that should appear in the
-            // system file picker when it loads.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Optionally, specify a URI for the file
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 pickerInitialUri?.let { putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri) }
-            }
         }
 
         activity.startActivityForResult(intent, 2)
@@ -280,29 +263,23 @@ class TasksRepository(private val activity: Activity) {
     }
 
     fun modifyDoc(uri: Uri, textContent: String = "Overwritten at ${System.currentTimeMillis()}\n") {
-        val contentResolver = activity.applicationContext.contentResolver
 
         try {
-
-            val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            // Check for the freshest data.
-            contentResolver.takePersistableUriPermission(uri, takeFlags)
-
-            contentResolver.openFileDescriptor(uri,"rw")?.use { descriptor ->
-                FileOutputStream(descriptor.fileDescriptor).use { output ->
-                    output.write((textContent).toByteArray()
-                    )
+            activity.applicationContext.contentResolver.apply {
+                takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                openFileDescriptor(uri,"rw")?.use { descriptor ->
+                    FileOutputStream(descriptor.fileDescriptor).use { output ->
+                        output.write((textContent).toByteArray()
+                        )
+                    }
                 }
             }
 
-            Toast.makeText(activity.baseContext,"File saved successfully !",Toast.LENGTH_SHORT).show()
-        } catch (e: FileNotFoundException) {
+            Toast.makeText(activity.baseContext,"Fichier sauvegardé avec succès !",Toast.LENGTH_SHORT).show()
+        } catch (e : Exception){
             e.printStackTrace()
-            Toast.makeText(activity.baseContext,"Error...",Toast.LENGTH_SHORT).show()
-        } catch (e : IOException){
-            e.printStackTrace()
-            Toast.makeText(activity.baseContext,"Error...",Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity.baseContext,"Erreur...",Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -317,8 +294,7 @@ class TasksRepository(private val activity: Activity) {
         var single : TasksRepository? = null
 
         fun getInstance(activity: Activity): TasksRepository {
-            if (single == null)
-                single = TasksRepository(activity)
+            if (single == null) single = TasksRepository(activity)
             return single as TasksRepository
         }
     }

@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.util.Linkify
@@ -13,7 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
-import android.widget.Toast
+import android.widget.RadioGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -57,16 +58,10 @@ class TaskDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        //val setDoneFAB = findViewById<ExtendedFloatingActionButton>(R.id.setDoneFab)
-        //titreEditText = findViewById(R.id.title)
-        //descriptionEditText = findViewById(R.id.description)
-        //bottomAppBar = findViewById(R.id.bottomAppBar)
 
         val tasksRepository = TasksRepository.getInstance(this)
 
         tasksRepository.getDefaultList()
-
-
 
         delete = false
         isNewDone = false
@@ -83,49 +78,44 @@ class TaskDetailsActivity : AppCompatActivity() {
             )
         }
 
-        //b.title.movementMethod = LinkMovementMethod.getInstance()
-        //b.description.movementMethod = LinkMovementMethod.getInstance()
-
-
-
         b.title.setText(task.title)
         b.description.setText(task.description)
 
-        /*val duration = task.duration
-        if(duration != null) {
-            b.setDuration.text = TasksRepository.getInstance(this).parseTimestampToDuration(duration)
-        }
-
-        val dateTimestamp = task.date
-        if(dateTimestamp != null) {
-            b.setTime.text = TasksRepository.getInstance(this).parseTimestampToDate(dateTimestamp)
-        }*/
-
         task.date?.let {
-            val dateText = tasksRepository.parseTimestampToDate(it)
+            val dateText = tasksRepository.timestampToDate(it)
             if (dateText.isNotBlank()) b.setTime.text = dateText
             else b.setTime.text = "Ajouter date/heure"
         }
 
         task.duration?.let {
-            val durationText = tasksRepository.parseTimestampToDuration(it)
+            val durationText = tasksRepository.timestampToDuration(it)
             if (durationText.isNotBlank()) b.setDuration.text = durationText
             else b.setDuration.text = "Définir la durée"
         }
 
+        task.priority.let {
+            if ( it != Priority.NONE) {
+
+                b.setPriority.text = it.first
+
+                if (it.second is Int) b.setPriority.setTextColor(resources.getColor(it.second))
+
+            } else b.setPriority.text = "Définir la priorité"
+        }
+
         try {
-            b.description.linksClickable = true
-            b.description.autoLinkMask = Linkify.WEB_URLS
-            Linkify.addLinks(b.description, Linkify.WEB_URLS)
-
-            b.description.addTextChangedListener(
-                afterTextChanged = {
-                    if (it != null) {
-                        Linkify.addLinks(it, Linkify.WEB_URLS)
+            b.description.apply {
+                linksClickable = true
+                autoLinkMask = Linkify.WEB_URLS
+                Linkify.addLinks(this, Linkify.WEB_URLS)
+                addTextChangedListener(
+                    afterTextChanged = {
+                        if (it != null) {
+                            Linkify.addLinks(it, Linkify.WEB_URLS)
+                        }
                     }
-                }
-            )
-
+                )
+            }
         } catch (e: Exception) {
             Log.e("Clickable links", "Error : ${e.stackTrace}")
         }
@@ -142,11 +132,10 @@ class TaskDetailsActivity : AppCompatActivity() {
                 result: ActivityResult ->
 
             if (result.resultCode == Activity.RESULT_OK) {
-                val intent = result.data
 
-                if (intent != null) {
-                    if (intent.hasExtra("done")) {
-                        if (intent.getBooleanExtra("done", false)) {
+                result.data?.let {
+                    if (it.hasExtra("done")) {
+                        if (it.getBooleanExtra("done", false)) {
                             task.done = true
                             finish()
                         }
@@ -155,52 +144,182 @@ class TaskDetailsActivity : AppCompatActivity() {
             }
         }
 
+        fun setDurationDialog(){
+            val builder: AlertDialog.Builder =
+                AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+
+            // I'm using fragment here so I'm using getView() to provide ViewGroup
+            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+
+            val viewInflated: View = LayoutInflater.from(this)
+                .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
+
+            //val input = viewInflated.findViewById<EditText>(R.id.input)
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+
+            val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
+            val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
+            val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)
+
+            builder.apply {
+                setView(viewInflated)
+                setTitle("Définir la Durée")
+                setMessage("Définissez une durée pour cette tâche")
+                setCancelable(false)
+
+                setPositiveButton(
+                    R.string.ok
+                ) { dialog, _ ->
+                    dialog.dismiss()
+
+                    val hours = hoursPicker.value
+                    val minutes = minutesPicker.value
+                    val seconds = secondsPicker.value
+
+                    var durationText = ""
+                    if (hours != 0) {
+                        durationText += "${hours}h"
+                    }
+                    if (minutes != 0) {
+                        var space = if (durationText.isNotEmpty()) " " else ""
+                        durationText += "${space}${minutes} min"
+                    }
+                    if (seconds != 0) {
+                        var space =  if (durationText.isNotEmpty()) " " else ""
+                        durationText += "${space}${seconds}s"
+                    }
+
+                    val timeDurationSeconds = hours*3600 + minutes * 60 + seconds
+                    val timeDurationMillis = timeDurationSeconds * 1000
+
+                    task.duration = timeDurationMillis.toLong()
+
+                    if (durationText.isNotBlank()) b.setDuration.text = durationText
+                }
+
+                setNegativeButton(
+                    R.string.cancel
+                ) { dialog, _ -> dialog.cancel() }
+
+                show()
+
+                val taskDurationMillis = task.duration
+
+                var taskDurationSec = 0
+
+                var hoursDuration = 0
+                var minutesDuration = 0
+                var secondsDuration = 0
+
+                if (taskDurationMillis != null) {
+                    taskDurationSec = (taskDurationMillis/1000).toInt()
+
+                    secondsDuration = taskDurationSec % 60
+                    minutesDuration = (taskDurationSec / 60) % 60
+                    hoursDuration = (taskDurationSec/ 3600 ) % 24
+                }
+
+                hoursPicker.apply {
+                    minValue = 0
+                    maxValue = 48
+                    value = hoursDuration
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        textSize = 100f
+                }
+
+                minutesPicker.apply {
+                    minValue = 0
+                    maxValue = 59
+                    value = minutesDuration
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        textSize = 100f
+                }
+
+                secondsPicker.apply {
+                    minValue = 0
+                    maxValue = 59
+                    value = secondsDuration
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        textSize = 100f
+                }
+            }
+        }
+
         b.launchFlow.setOnClickListener {
+
+            // TODO : CHECK IF DURATION : ELSE  SHOW DIALOG THEN LAUNCH FLOW
 
             val taskDuration: Int = task.duration?.div(1000)?.toInt() ?: 900
 
-            val flowIntent = Intent(this, FlowActivity::class.java)
-            flowIntent.putExtra("taskDuration", taskDuration)
-            flowIntent.putExtra("taskTitle", task.title)
+            task.duration?.let{
+                val flowIntent = Intent(this, FlowActivity::class.java).apply {
+                    putExtra("taskDuration", taskDuration)
+                    putExtra("taskTitle", task.title)
+                }
 
-            startFlowForResult.launch(flowIntent)
+                startFlowForResult.launch(flowIntent)
+            } ?: run { setDurationDialog() }
         }
 
-        b.setTime.setOnClickListener {
+        fun showPriorityDialog() {
+            val viewInflated: View = LayoutInflater.from(this).inflate(R.layout.choose_priority, window.decorView.rootView as ViewGroup?, false)
+            val newBuilder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+            newBuilder.apply {
+                setView(viewInflated)
+                setTitle("Définir la Priorité") // TODO : TEXT TITLE
+                setCancelable(false)
+                setPositiveButton(R.string.ok) { dialog, _ ->
+                    dialog.dismiss()
 
+                    // TODO : UNIT
+                    val priorityGroup = viewInflated.findViewById<RadioGroup>(R.id.priorityGroup)
+
+                    val priorityVal = when(priorityGroup.checkedRadioButtonId){
+                        R.id.tres_important -> Priority.VERY_HIGH
+                        R.id.important -> Priority.HIGH
+                        R.id.tres_urgent -> Priority.URGENT
+                        R.id.pas_urgent -> Priority.NOT_URGENT
+                        R.id.facultatif -> Priority.FACULTATIVE
+                        else -> Priority.NONE
+                    }
+
+                    if (priorityVal != Priority.NONE)  {
+                        b.setPriority.text = priorityVal.first
+                        b.setPriority.setTextColor(resources.getColor(priorityVal.second))
+                        task.priority = priorityVal
+                    }
+                }
+                setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+                show()
+            }
+        }
+
+        fun setTimeDialog() {
             val cal = Calendar.getInstance()
 
             val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 cal.set(Calendar.MINUTE, minute)
-               /* Toast.makeText(
-                    this,
-                    "Time selected : ${
-                        SimpleDateFormat(
-                            "HH:mm",
-                            Locale.getDefault()
-                        ).format(cal.time)
-                    }",
-                    Toast.LENGTH_LONG
-                ).show()
-*/
+
                 val daysOfWeek = listOf("Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi")
                 val monthsOfYear = listOf("Janvier", "Février", "Mars","Avril","Mai","Juin","Juillet", "Août", "Septembre", "Octobre","Novembre","Décembre")
 
                 val currentCal = Calendar.getInstance()
                 currentCal.timeInMillis = System.currentTimeMillis()
-                var day = ""
-                if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR) + 1) {
-                    day = "Demain"
-                } else if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR)) {
-                    day = "Aujourd'hui"
-                } else if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR) -1) {
-                    day = "Hier"
-                } else if (cal.get(Calendar.DAY_OF_YEAR) == currentCal.get(Calendar.DAY_OF_YEAR) + 2) {
-                    day = "Après-Demain"
-                } else {
-                    day = "${  daysOfWeek[cal.get(Calendar.DAY_OF_WEEK)-1].take(3)   }. ${cal.get(Calendar.DAY_OF_MONTH)} ${monthsOfYear[cal.get(Calendar.MONTH)]}"
+
+                val today = currentCal.get(Calendar.DAY_OF_YEAR)
+                val day = when(cal.get(Calendar.DAY_OF_YEAR)) {
+                    today - 2 -> "Avant-Hier"
+                    today -1 -> "Hier"
+                    today -> "Aujourd'hui"
+                    today + 1 -> "Demain"
+                    today + 2 -> "Après-Demain"
+                    else -> "${daysOfWeek[cal.get(Calendar.DAY_OF_WEEK)-1].take(3)}. ${cal.get(Calendar.DAY_OF_MONTH)} ${monthsOfYear[cal.get(Calendar.MONTH)]}"
                 }
+
                 val timeStamp = cal.timeInMillis
                 task.date = timeStamp
                 b.setTime.text ="${day} à ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)}"
@@ -211,13 +330,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     cal.set(Calendar.YEAR, year)
                     cal.set(Calendar.MONTH, month)
                     cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                    /*Toast.makeText(
-                        this,
-                        "Date selected : ${cal.get(Calendar.DAY_OF_MONTH)} ${cal.get(Calendar.MONTH)} ${
-                            cal.get(Calendar.YEAR)
-                        }",
-                        Toast.LENGTH_LONG
-                    ).show()*/
+
                     TimePickerDialog(
                         this,
                         R.style.MyDialogTheme,
@@ -238,162 +351,69 @@ class TaskDetailsActivity : AppCompatActivity() {
             ).show()
         }
 
+        fun showModifyOrDeleteDialog(modifyDialog: () -> Unit, deleteAction: () -> Unit) {
+            // TODO : PASS TWO ARGS : A RUNNABLE FOR MODIFY AND A RUNNABLE FOR DELETE
+            // FOR NOW ONLY WORKING FOR PRIORITY, BUT NEXT SHOULD BE REUSABLE FOR ALL
 
-        b.setPriority.setOnClickListener {
             val builder: AlertDialog.Builder =
                 AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
 
-            // I'm using fragment here so I'm using getView() to provide ViewGroup
-            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+            builder.apply {
+                setTitle("Modifier ou Supprimer ?")
 
-            val viewInflated: View = LayoutInflater.from(this)
-                .inflate(R.layout.choose_priority, window.decorView.rootView as ViewGroup?, false)
-
-            //val input = viewInflated.findViewById<EditText>(R.id.input)
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            builder.setView(viewInflated)
-
-            builder.setTitle("Définir la Priorité")
-
-            builder.setCancelable(false)
-
-            builder.setPositiveButton(
-                R.string.ok
-            ) { dialog, _ ->
-                dialog.dismiss()
-
-                b.setPriority.text = Priority.HIGH.first
+                setPositiveButton("MODIFIER") { dialog, _ ->
+                    dialog.dismiss()
+                    modifyDialog()
+                }
+                setNegativeButton("SUPPRIMER") { dialog, _ ->
+                    dialog.dismiss()
+                    deleteAction()
+                }
+                show()
             }
-            builder.setNegativeButton(
-                R.string.cancel
-            ) { dialog, _ -> dialog.cancel() }
-
-            val alertDialogDuration = builder.create()
-            alertDialogDuration.show()
-
         }
 
         b.setDuration.setOnClickListener {
+            if (task.duration != null) {
+                showModifyOrDeleteDialog(
+                    { setDurationDialog() },
+                    {
+                        task.duration = null
+                        b.setDuration.text = "Définir la durée"
+                        b.setDuration.setTextColor(resources.getColor(R.color.textContent))
+                    }
+                )
+            } else setDurationDialog()
+        }
 
-            val builder: AlertDialog.Builder =
-                AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+        b.setTime.setOnClickListener {
+            if (task.date != null) {
+                showModifyOrDeleteDialog(
+                    { setTimeDialog() },
+                    {
+                        task.date = null
+                        b.setTime.text = "Ajouter date/heure"
+                        b.setTime.setTextColor(resources.getColor(R.color.textContent))
+                    }
+                )
+            } else setTimeDialog()
+        }
 
-            // I'm using fragment here so I'm using getView() to provide ViewGroup
-            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
-
-            val viewInflated: View = LayoutInflater.from(this)
-                .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
-
-            //val input = viewInflated.findViewById<EditText>(R.id.input)
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            builder.setView(viewInflated)
-
-            builder.setTitle("Définir la Durée")
-
-            builder.setCancelable(false)
-
-            val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
-            val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
-            val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)
-
-            builder.setPositiveButton(
-                R.string.ok
-            ) { dialog, _ ->
-                dialog.dismiss()
-
-                val hours = hoursPicker.value
-                val minutes = minutesPicker.value
-                val seconds = secondsPicker.value
-
-                var durationText = ""
-                if (hours != 0) {
-                    durationText += "${hours}h"
-                }
-                if (minutes != 0) {
-                    var space = ""
-                    if (durationText.isNotEmpty()) space = " "
-
-
-                    durationText += "${space}${minutes} min"
-                }
-                if (seconds != 0) {
-                    var space = ""
-                    if (durationText.isNotEmpty()) space = " "
-
-                    durationText += "${space}${seconds}s"
-                }
-
-                val timeDurationSeconds = hours*3600 + minutes * 60 + seconds
-                val timeDurationMillis = timeDurationSeconds * 1000
-
-                task.duration = timeDurationMillis.toLong()
-
-                if (!durationText.isNullOrBlank()) {
-                    b.setDuration.text = durationText
-                }
-
-            }
-            builder.setNegativeButton(
-                R.string.cancel
-            ) { dialog, _ -> dialog.cancel() }
-
-            val alertDialogDuration = builder.create()
-            alertDialogDuration.show()
-
-            val taskDurationMillis = task.duration
-
-            var taskDurationSec = 0
-
-            var hoursDuration = 0
-            var minutesDuration = 0
-            var secondsDuration = 0
-
-            if (taskDurationMillis != null) {
-                /*taskDurationSec = (taskDurationMillis/1000).toInt()
-                hoursDuration = taskDurationSec % 3600
-                taskDurationSec -= hoursDuration * 3600
-                minutesDuration = taskDurationSec % 60
-                taskDurationSec -= minutesDuration*60
-                secondsDuration = taskDurationSec*/
-
-                taskDurationSec = (taskDurationMillis/1000).toInt()
-                //Toast.makeText(this, " $taskDurationSec", Toast.LENGTH_LONG).show()
-                secondsDuration = taskDurationSec % 60
-                minutesDuration = (taskDurationSec / 60) % 60
-                hoursDuration = (taskDurationSec/ 3600 ) % 24
-                //Toast.makeText(this, " $hoursDuration $minutesDuration $secondsDuration", Toast.LENGTH_LONG).show()
-            }
-
-            hoursPicker.minValue = 0
-            hoursPicker.maxValue = 100
-            hoursPicker.value = hoursDuration
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                hoursPicker.textSize = 64f
-                //hoursPicker.setPadding(0, 18, 0, 18)
-            }
-
-            minutesPicker.minValue = 0
-            minutesPicker.maxValue = 59
-            minutesPicker.value = minutesDuration
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                minutesPicker.textSize = 64f
-                //minutesPicker.setPadding(0, 32, 0, 32)
-            }
-
-            secondsPicker.minValue = 0
-            secondsPicker.maxValue = 59
-            secondsPicker.value = secondsDuration
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                secondsPicker.textSize = 64f
-                //secondsPicker.setPadding(0, 18, 0, 18)
-            }
-
+        b.setPriority.setOnClickListener {
+            if (task.priority != Priority.NONE) {
+                showModifyOrDeleteDialog(
+                    { showPriorityDialog() },
+                    {
+                        task.priority = Priority.NONE
+                        b.setPriority.text = "Définir la priorité"
+                        b.setPriority.setTextColor(resources.getColor(R.color.textContent))
+                    }
+                )
+            } else showPriorityDialog()
         }
 
         b.bottomAppBar.setNavigationOnClickListener {
-            val userLists = tasksRepository.readOnlyUserLists.toList()
+            val userLists = tasksRepository.getListGroup().toList()
             val userListsSerialized = Json.encodeToString(userLists as? List<Pair<String, String>>)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")
@@ -422,20 +442,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             }
         }
 
-        // CHECK IF EXISTS !!!!
         position = intent.getIntExtra("position", -1)
-        // Parse JSON to Task here
-        // And then set text to title and description fields
-
-        // Handle Changes for fields onStop
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // SAVE CHANGES AND TELL THE MAIN ACTIVITY TO UPDATE THIS ITEM
-        // SO HERE CALL MainActivity's function to update
-        // with updated task, and position given
-        // IF POSITION == -1 then error raised, do nothing & show snackbar error occured : Pos error
     }
 
     private fun generateResult(): Intent {
@@ -446,13 +453,17 @@ class TaskDetailsActivity : AppCompatActivity() {
         val returnTaskJson = Json.encodeToString(Task.serializer(), task)
         Log.e("DetailsAct", returnTaskJson)
 
-        val returnIntent = Intent()
-        returnIntent.putExtra("returnTask", returnTaskJson)
-        returnIntent.putExtra("position", position)
-        returnIntent.putExtra("delete", delete)
-        //returnIntent.putExtra("done", isNewDone)
+        /* returnIntent.apply {
+            putExtra("returnTask", returnTaskJson)
+            putExtra("position", position)
+            putExtra("delete", delete)
+        }*/
 
-        return returnIntent
+        return Intent().apply {
+            putExtra("returnTask", returnTaskJson)
+            putExtra("position", position)
+            putExtra("delete", delete)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

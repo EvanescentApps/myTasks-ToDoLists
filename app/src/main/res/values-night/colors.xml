@@ -30,6 +30,12 @@
 
     <color name="checkbox">#E6FFFFFF</color>
 
+    <color name="taskTresImportant">#FF0000</color>
+    <color name="taskImportant">#FF803C</color>
+    <color name="taskUrgent">#FF0046</color>
+    <color name="taskPasUrgent">#B3FF74</color>
+    <color name="taskFacultative">#C8FFCD</color>
+
 </resources> <!--69B4BC-->
 
 <!--

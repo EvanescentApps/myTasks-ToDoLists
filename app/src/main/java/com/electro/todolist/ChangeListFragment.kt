@@ -3,7 +3,6 @@ package com.electro.todolist
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +18,6 @@ import com.electro.todolist.ui.TasksActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-
 
 data class ListObject(
     val id: String,
@@ -52,9 +50,8 @@ class ChangeListFragment : BottomSheetDialogFragment() {
 
         val currentList = requireArguments().getString("currentList")
 
-
         val listOfAllLists = ArrayList<ListObject>()
-        var listOfPairs: ArrayList<Pair<String, String>>
+        var listOfPairs: List<Pair<String, String>>
 
         requireArguments().getString("list")?.let { string ->
             listOfPairs = Json.decodeFromString(string)
@@ -74,17 +71,12 @@ class ChangeListFragment : BottomSheetDialogFragment() {
 
         listAdapter = ItemAdapter(listOfAllLists)
 
-        if(currentList != null){
-            recyclerList?.layoutManager = LinearLayoutManager(context)
-            /*recyclerList?.adapter = ItemAdapter(arrayListOf( //"Paramètres","Mes tâches","Aujourd'hui","Demain","Projets","Un Jour"
-
-                ListObject("Mes tâches", "list1", true) ,
-                ListObject("Aujourd'hui", "list2", false),
-                ListObject("Demain", "list3", false)
-            ))*/
-
-            recyclerList?.adapter = listAdapter
-        } else {
+        currentList?.let {
+            recyclerList?.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = listAdapter
+            }
+        } ?: run {
             Toast.makeText(requireActivity(), "Aucune liste sélectionnée...", Toast.LENGTH_SHORT).show()
             dismissAllowingStateLoss()
         }
@@ -93,55 +85,41 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         val settingsButton : LinearLayout = view.findViewById(R.id.settings)
 
         createListButton.setOnClickListener {
-            Toast.makeText(requireActivity(), "Création d'une liste", Toast.LENGTH_SHORT).show()
 
             val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(requireContext(),R.style.AlertDialogCustom))
-            builder.setTitle("Title")
             // I'm using fragment here so I'm using getView() to provide ViewGroup
             // but you can provide here any other instance of ViewGroup from your Fragment / Activity
 
             val viewInflated: View = LayoutInflater.from(context).inflate(R.layout.list_name_edit, getView() as ViewGroup?, false)
 
             val input = viewInflated.findViewById<EditText>(R.id.input)
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            builder.setView(viewInflated)
 
-            builder.setTitle("Créer une liste")
-
-            builder.setPositiveButton(
-                R.string.ok
-            ) { dialog, _ ->
-                dialog.dismiss()
-                val mText = input.text.toString()
-                tasksRepository.createList(mText)
-                newListAdded()
-                dismissAllowingStateLoss()
+            builder.apply {
+                setTitle("Créer une liste")
+                setView(viewInflated)
+                setPositiveButton(
+                    R.string.ok
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                    val mText = input.text.toString()
+                    tasksRepository.createList(mText)
+                    newListAdded()
+                    dismissAllowingStateLoss()
+                }
+                setNegativeButton(
+                    R.string.cancel
+                ) { dialog, _ -> dialog.cancel() }
+                show()
             }
-            builder.setNegativeButton(
-                R.string.cancel
-            ) { dialog, _ -> dialog.cancel() }
-
-            builder.show()
         }
 
         settingsButton.setOnClickListener {
-            Toast.makeText(requireActivity(), "Ouverture des paramètres", Toast.LENGTH_SHORT).show()
             requireContext().startActivity(Intent(requireActivity(),SettingsActivity::class.java))
         }
-
-         //arguments?.getInt(ARG_ITEM_COUNT2)?.let {  }
     }
 
-    private inner class ViewHolder(
-        inflater: LayoutInflater,
-        parent: ViewGroup
-    ) : RecyclerView.ViewHolder(
-        inflater.inflate(
-            R.layout.list_item,
-            parent,
-            false
-        )
-    ) {
+    private inner class ViewHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(
+        inflater.inflate(R.layout.list_item, parent, false)) {
 
         val linearLayout: LinearLayout = itemView.findViewById(R.id.bottomSheetParent)
         val text: TextView = itemView.findViewById(R.id.text)
@@ -164,8 +142,6 @@ class ChangeListFragment : BottomSheetDialogFragment() {
             }
 
             holder.itemView.setOnClickListener {
-                //Toast.makeText(context,"Liste sélectionnée : ${mList[position].id}", Toast.LENGTH_SHORT).show()
-
                 if (requireActivity() is TasksActivity) {
                     (requireActivity() as TasksActivity).changeList(mList[position].id)
                 } else if (requireActivity() is TaskDetailsActivity) {
@@ -183,14 +159,12 @@ class ChangeListFragment : BottomSheetDialogFragment() {
     companion object {
 
         // TODO: Customize parameters
-        fun newInstance(currentList: String, allLists: String): ChangeListFragment =
+        fun newInstance(currentList: String, listsGroup: String): ChangeListFragment =
             ChangeListFragment().apply {
                 arguments = Bundle().apply {
                     putString("currentList", currentList)
-                    putString("list", allLists)
-
+                    putString("list", listsGroup)
                 }
             }
-
     }
 }

@@ -24,7 +24,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
-import kotlin.random.Random
 
 class TasksAdapter(
     val mTasks: ArrayList<Task>,
@@ -35,18 +34,6 @@ class TasksAdapter(
     private var mContext: Context = context
 
     private val tasksActivity = activity as TasksActivity
-
-    /*fun reorderEach() {
-        // Set position to mTasks
-        // forEach, take list position and pass it to the last param
-
-        // for item in range length list, mTasks[item].position = item
-        mTasks.forEachIndexed { index, task ->
-            task.position = index
-        }
-
-        // Pass mTasks to main activity
-    }*/
 
     val logEnabled = false
 
@@ -59,7 +46,6 @@ class TasksAdapter(
             Log.i("b4 mTs", Json.encodeToString(titlesBefore))
         }
 
-        //Collections.swap(mTasks, from, to)
         tasksActivity.swapItems(from, to)
         notifyItemMoved(from, to)
 
@@ -77,9 +63,7 @@ class TasksAdapter(
         //val taskToJson = Json.encodeToString(taskDone) // Converted to Json for storage
         //listEdit.putString(taskDone.creationDate.toString(), taskToJson).apply()
 
-
-        Log.e("Activity", "Remove item at $position")
-        Log.e("tasks (activity)", "size after removed : ${mTasks.size}")
+        Log.e("Activity", "Remove item at $position, size after removed : ${mTasks.size}")
 
         Handler(Looper.getMainLooper()).postDelayed(
             {
@@ -135,18 +119,14 @@ class TasksAdapter(
             //notifyItemRangeChanged(position,mTasks.size)
         } else if (side == ItemTouchHelper.RIGHT) { // >>
 
-            Log.i("Swipe","Swipe SET DONE")
-            Log.i("task", "Checked item ${viewHolder.bindingAdapterPosition}")
+            Log.i("Swipe","Swipe SET DONE, Checked item ${viewHolder.bindingAdapterPosition}")
 
             val task: Task = mTasks[viewHolder.bindingAdapterPosition]
             task.done = true
 
             onCheck(viewHolder.bindingAdapterPosition)
             tasksActivity.setTaskDone(task, true)
-
         }
-
-
     }
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
@@ -185,56 +165,38 @@ class TasksAdapter(
 
         checkbox.isChecked = task.done
 
-        /*if (checkbox.isChecked) {
-            mTasks.removeAt(position)
-            mTasks.add(mTasks.size,task)
-            notifyItemMoved(position,mTasks.size-1)
-            notifyItemRangeChanged(position, mTasks.size)
-        }*/
         val timestamp = task.date
         if (timestamp != null) {
             viewHolder.dateChip.visibility = View.VISIBLE
 
-            val dateText = TasksRepository.getInstance(tasksActivity).parseTimestampToDate(timestamp)
+            val dateText = TasksRepository.getInstance(tasksActivity).timestampToDate(timestamp)
 
-            if ( !dateText.isNullOrBlank()) {
+            if ( !dateText.isNullOrBlank())
                 viewHolder.dateChip.text = dateText
-            } else {
+            else
                 viewHolder.dateChip.visibility = View.GONE
-            }
 
-        } else {
-            viewHolder.dateChip.visibility = View.GONE
-        }
+        } else viewHolder.dateChip.visibility = View.GONE
+
+        val priority = task.priority
+        if (priority != Priority.NONE) {
+            viewHolder.priorityChip.apply {
+                visibility = View.VISIBLE
+                text = priority.first
+                setTextColor(resources.getColor(priority.second))
+            }
+        } else viewHolder.priorityChip.visibility = View.GONE
 
         val durationTimestamp = task.duration
         if (durationTimestamp != null) {
             viewHolder.durationChip.visibility = View.VISIBLE
 
-            val durationText = TasksRepository.getInstance(tasksActivity).parseTimestampToDuration(durationTimestamp)
+            val durationText = TasksRepository.getInstance(tasksActivity).timestampToDuration(durationTimestamp)
 
-            if ( !durationText.isNullOrBlank()) {
-                viewHolder.durationChip.text = durationText
-            } else {
-                viewHolder.durationChip.visibility = View.GONE
-            }
+            if ( !durationText.isNullOrBlank()) viewHolder.durationChip.text = durationText
+            else viewHolder.durationChip.visibility = View.GONE
 
-        } else {
-            viewHolder.durationChip.visibility = View.GONE
-        }
-
-        if (false) {
-            viewHolder.priorityChip.text = Priority.VERY_HIGH.first
-            viewHolder.priorityChip.setTextColor(Color.parseColor(Priority.VERY_HIGH.second))
-            viewHolder.priorityChip.visibility = View.VISIBLE
-
-            viewHolder.dateChip.text = "Demain 14h"
-            // Si date passée afficher en rouge
-            //viewHolder.dateChip.setTextColor(Color.parseColor("#FF0000"))
-            viewHolder.dateChip.visibility = View.VISIBLE
-        }
-
-        //viewHolder.dateChip.
+        } else viewHolder.durationChip.visibility = View.GONE
 
         checkbox.setOnClickListener {
 
@@ -247,7 +209,6 @@ class TasksAdapter(
             }
             tasksActivity.setTaskDone(task, checkbox.isChecked)
         }
-
 
         // Set onclick listener for the whole item, to show details fragment
         viewHolder.itemView.setOnClickListener {

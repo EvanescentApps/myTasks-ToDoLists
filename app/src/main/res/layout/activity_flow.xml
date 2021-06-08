@@ -169,14 +169,14 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:text="Revenir à l'accueil"
-        android:visibility="gone"
         android:textColor="#4942A8"
         android:textSize="20sp"
+        android:visibility="gone"
         app:backgroundTint="#DBDCFF"
-        android:layout_marginBottom="16dp"
         app:cornerRadius="12dp"
+        android:layout_marginBottom="16dp"
         app:elevation="6dp"
-        app:layout_constraintBottom_toTopOf="@+id/infoLeave"
+        app:layout_constraintBottom_toTopOf="@+id/backLeave"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -185,11 +185,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:visibility="gone"
         android:padding="8dp"
         android:alpha="0.4"
-        android:text="Pour quitter le Flow, appuie 2x sur Retour\n(seulement si c'est nécessaire)"
+        android:text="Pour quitter le Flow, appuie sur Retour\n(seulement si c'est nécessaire)"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/backLeave"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:cropToPadding="true"
+        android:padding="6dp"
+        android:alpha="0.8"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_arrow_back_ios_new_black_24dp"
+        app:tint="@color/textContentPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
