@@ -1,11 +1,7 @@
-package com.electro.todolist
+package com.electro.todolist.ui
 
 import android.app.AlertDialog
-import android.content.Context
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +10,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.electro.todolist.R
 import com.electro.todolist.data.TasksRepository
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 // TODO: Customize parameter argument names
 const val ARG_CURRENT_LIST = "currentList"
@@ -28,7 +28,7 @@ data class ListAction(
 
 class BottomFragment : BottomSheetDialogFragment() {
 
-    private val Context.dataStore by preferencesDataStore(name = "settings")
+    //private val Context.dataStore by preferencesDataStore(name = "settings")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,10 +85,10 @@ class BottomFragment : BottomSheetDialogFragment() {
                     builder.apply {
                         setTitle("Supprimer la liste ?")
                         setMessage("Toutes les tâches de cette liste seront définitivement supprimées, continuer ?")
-                        setPositiveButton(R.string.ok) { dialog, id ->
+                        setPositiveButton(R.string.ok) { _, _ ->
                             tasksRepository.deleteList(currentListId)
                         }
-                        setNegativeButton(R.string.cancel) { dialog, id ->
+                        setNegativeButton(R.string.cancel) { dialog, _ ->
                             dialog.dismiss()
                         }
                         show()
@@ -181,7 +181,7 @@ class BottomFragment : BottomSheetDialogFragment() {
                 mList[position].action()
             }
             mList[position].iconResource?.let { res ->
-                holder.icon.setImageDrawable(resources.getDrawable(res))
+                holder.icon.setImageDrawable(ContextCompat.getDrawable(requireContext(),res))
             }
         }
 

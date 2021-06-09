@@ -8,7 +8,6 @@ import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -16,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat
 import com.electro.todolist.databinding.ActivityFlowBinding
 import kotlin.random.Random
 
@@ -69,7 +69,7 @@ class FlowActivity : AppCompatActivity() {
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-    private val delayHideTouchListener = View.OnTouchListener { view, motionEvent ->
+    /*private val delayHideTouchListener = View.OnTouchListener { view, motionEvent ->
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> if (AUTO_HIDE) {
                 delayedHide(AUTO_HIDE_DELAY_MILLIS)
@@ -79,7 +79,7 @@ class FlowActivity : AppCompatActivity() {
             }
         }
         false
-    }
+    }*/
 
     private var timeLeft: Long = 0
 
@@ -168,7 +168,7 @@ class FlowActivity : AppCompatActivity() {
         }
     }
 
-    fun startCountdownTimer(timeLeftMillis: Long, timeElapsed: Int = 0) {
+    private fun startCountdownTimer(timeLeftMillis: Long, timeElapsed: Int = 0) {
 
         i = timeElapsed
 
@@ -179,6 +179,7 @@ class FlowActivity : AppCompatActivity() {
                 updateTimer(millisUntilFinished)
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onFinish() {
                 i += 2
                 setCountdownProgress(taskDurationMillis / 100)
@@ -225,7 +226,8 @@ class FlowActivity : AppCompatActivity() {
 
     }
     
-    fun setTimer(taskDurationSec: Int) {
+    @SuppressLint("SetTextI18n")
+    private fun setTimer(taskDurationSec: Int) {
 
         i = 0
 
@@ -275,10 +277,10 @@ class FlowActivity : AppCompatActivity() {
                     setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
                     setPositiveButton(
                         R.string.ok
-                    ) { dialog, id -> finish() }
+                    ) { _, _ -> finish() }
                     setNegativeButton(
                         R.string.cancel
-                    ) { dialog, id ->
+                    ) { dialog, _ ->
                         dialog.dismiss()
                         play()
                     }
@@ -295,20 +297,20 @@ class FlowActivity : AppCompatActivity() {
 
     }
 
-    fun play() {
+    private fun play() {
         isPaused = false
-        b.playPause.setImageDrawable(resources.getDrawable(R.drawable.pause_black_24dp))
+        b.playPause.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.pause_black_24dp))
         startCountdownTimer(timeLeft, timeElapsedStop)
 
         b.progressTime.setIndicatorColor(baseColor[0])
     }
 
-    fun pause() {
+    private fun pause() {
         isPaused = true
 
         b.progressTime.setIndicatorColor(Color.parseColor("#E65100"))
 
-        b.playPause.setImageDrawable(resources.getDrawable(R.drawable.play_arrow_black_24dp))
+        b.playPause.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.play_arrow_black_24dp))
         mCountDownTimer.cancel()
 
         timeElapsedStop = i
@@ -321,7 +323,8 @@ class FlowActivity : AppCompatActivity() {
         // Trigger the initial hide() shortly after the activity has been
         // created, to briefly hint to the user that UI controls
         // are available.
-        delayedHide(0)
+        hideHandler.removeCallbacks(hideRunnable)
+        hideHandler.post(hideRunnable)
     }
 
     //var doubleBack = 0
@@ -339,10 +342,10 @@ class FlowActivity : AppCompatActivity() {
                 setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
                 setPositiveButton(
                     R.string.ok
-                ) { dialog, id -> finish() }
+                ) { _, _ -> finish() }
                 setNegativeButton(
                     R.string.cancel
-                ) { dialog, id ->
+                ) { dialog, _ ->
                     dialog.dismiss()
                     play()
                 }
@@ -357,9 +360,9 @@ class FlowActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggle() {
+    /*private fun toggle() {
         if (isFullscreen) hide() else show()
-    }
+    }*/
 
     private fun hide() {
         // Hide UI first
@@ -372,7 +375,7 @@ class FlowActivity : AppCompatActivity() {
         hideHandler.postDelayed(hidePart2Runnable, UI_ANIMATION_DELAY.toLong())
     }
 
-    private fun show() {
+    /*private fun show() {
         // Show the system bar
         fullscreenContent.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
@@ -382,16 +385,16 @@ class FlowActivity : AppCompatActivity() {
         // Schedule a runnable to display UI elements after a delay
         hideHandler.removeCallbacks(hidePart2Runnable)
         hideHandler.postDelayed(showPart2Runnable, UI_ANIMATION_DELAY.toLong())
-    }
+    }*/
 
     /**
-     * Schedules a call to hide() in [delayMillis], canceling any
+     * Schedules a call to hide() in delayMillis, canceling any
      * previously scheduled calls.
      */
-    private fun delayedHide(delayMillis: Int) {
+    /*private fun delayedHide(delayMillis: Int) {
         hideHandler.removeCallbacks(hideRunnable)
         hideHandler.postDelayed(hideRunnable, delayMillis.toLong())
-    }
+    }*/
 
     companion object {
         /**

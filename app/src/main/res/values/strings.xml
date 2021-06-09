@@ -33,4 +33,10 @@
     <string name="login_failed">"Login failed"</string>
     <string name="ok">OK</string>
     <string name="cancel">ANNULER</string>
+    <string name="parametres">Paramètres</string>
+    <string name="inspiration">Librement inspiré de Tasks (Google) et Forest - Stay focused\nEvan Cocain - Tous droits réservés</string>
+    <string name="icon_settings">Icône Paramètres</string>
+    <string name="create_new_list">Créer une nouvelle liste</string>
+    <string name="add_list">Ajouter une liste</string>
+    <string name="switch_list">Déplacer vers une autre liste</string>
 </resources>

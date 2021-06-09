@@ -2,6 +2,7 @@
 
 package com.electro.todolist.data
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.serialization.decodeFromString
 import com.electro.todolist.ui.TasksActivity
@@ -24,25 +25,21 @@ import java.io.*
 
 class TasksRepository(private val activity: Activity) {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun String.toSafeCase(): String = Normalizer.normalize(this.lowercase(), Normalizer.Form.NFD)
             .filter { it.isLetterOrDigit() or it.isWhitespace() }.replace(" ", "_")
 
     // Shared Preferences directory containing all the user's lists as Key Value Pairs (id, name)
-    var listsPrefs: SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
+    private var listsPrefs: SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
     var lastOpenedList_Key = ""
     var currentListName = ""
 
     //var currentListName = lastOpenedList_Key // Important, needs to be up to date
 
     // Getting all the lists as a MutableMap (read only)
-    var userListGroup: MutableMap<String, *> = listsPrefs.all
+    private var userListGroup: MutableMap<String, *> = listsPrefs.all
     //var listOfIds = userListGroup.values.toList() //arrayListOf("List 1","List 2","List 3")
     //var userLists : List<Pair<String,String>> = (userListGroup.toList()) as List<Pair<String,String>>
-
-    /*fun getUpdatedLists() {
-        userListGroup = getListGroup()
-        //listOfIds = userListGroup.values.toList()
-    }*/
 
     fun getListGroup(): MutableMap<String, *> = getListGroupPrefs().all
 
@@ -120,6 +117,7 @@ class TasksRepository(private val activity: Activity) {
 
     fun getListGroupPrefs() : SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun putNewLists() {
         getListGroupPrefs().edit().apply {
             putString("list1", "Mes tâches")
@@ -194,6 +192,7 @@ class TasksRepository(private val activity: Activity) {
         createFile("${currentList.toSafeCase()}-${getDate()}")
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun createFile(fileName: String, pickerInititalUri: Uri? = null) {
         try {
             val intentCreateDoc = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -256,6 +255,7 @@ class TasksRepository(private val activity: Activity) {
         return stringBuilder.toString()
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun modifyDoc(uri: Uri, textContent: String = "Overwritten at ${System.currentTimeMillis()}\n") {
 
         try {
@@ -285,6 +285,7 @@ class TasksRepository(private val activity: Activity) {
     }
 
     companion object {
+        @SuppressLint("StaticFieldLeak")
         var single : TasksRepository? = null
 
         fun getInstance(activity: Activity): TasksRepository {
@@ -292,6 +293,7 @@ class TasksRepository(private val activity: Activity) {
             return single as TasksRepository
         }
 
+        @Suppress("unused")
         val Number.dp get() = toFloat() * (Resources.getSystem().displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 

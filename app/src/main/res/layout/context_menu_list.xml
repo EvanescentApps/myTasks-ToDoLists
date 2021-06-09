@@ -7,6 +7,6 @@
     android:clipToPadding="false"
     android:paddingTop="@dimen/list_item_spacing_half"
     android:paddingBottom="@dimen/list_item_spacing_half"
-    tools:context=".BottomFragment"
+    tools:context=".ui.BottomFragment"
     android:background="@color/background"
     tools:listitem="@layout/context_menu_list_item" />

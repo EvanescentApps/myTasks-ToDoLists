@@ -21,8 +21,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.electro.todolist.BottomFragment
-import com.electro.todolist.ChangeListFragment
 import com.electro.todolist.ItemTouchHelperCallback
 import com.electro.todolist.R
 import com.electro.todolist.data.Task
@@ -58,7 +56,7 @@ class TasksActivity : AppCompatActivity() {
     @Suppress("MemberVisibilityCanBePrivate")
     val Context.dataStore by preferencesDataStore(name = "settings")
 
-    @SuppressLint("unused")
+    @Suppress("unused")
     fun updatedTask(task: Task, position: Int) {
         tasks[position] = task
         adapter.notifyItemChanged(position)
@@ -156,6 +154,7 @@ class TasksActivity : AppCompatActivity() {
         b.toolbarLayout.title = newName
     }
 
+    @SuppressLint("CommitPrefEdits")
     fun changeList(newSelectedList : String) {
         // Notify recyclerView to change dataset
 
@@ -206,6 +205,7 @@ class TasksActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
     }
 
+    @SuppressLint("CommitPrefEdits")
     override fun onCreate(savedInstanceState: Bundle?) {
         //setTheme(R.style.glow)
         super.onCreate(savedInstanceState)

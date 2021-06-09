@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.electro.todolist.data
 
 import androidx.annotation.Keep

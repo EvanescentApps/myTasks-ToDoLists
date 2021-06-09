@@ -1,11 +1,11 @@
 package com.electro.todolist.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.util.Linkify
@@ -19,8 +19,8 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
-import com.electro.todolist.ChangeListFragment
 import com.electro.todolist.FlowActivity
 import com.electro.todolist.R
 import com.electro.todolist.data.Priority
@@ -46,6 +46,7 @@ class TaskDetailsActivity : AppCompatActivity() {
     private var position: Int = -1
     private lateinit var b: ActivityTaskDetailsBinding
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -97,8 +98,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             if ( it != Priority.NONE) {
 
                 b.setPriority.text = it.first
-
-                if (it.second is Int) b.setPriority.setTextColor(resources.getColor(it.second))
+                b.setPriority.setTextColor(ContextCompat.getColor(this, it.second))
 
             } else b.setPriority.text = "Définir la priorité"
         }
@@ -181,11 +181,11 @@ class TaskDetailsActivity : AppCompatActivity() {
                         durationText += "${hours}h"
                     }
                     if (minutes != 0) {
-                        var space = if (durationText.isNotEmpty()) " " else ""
+                        val space = if (durationText.isNotEmpty()) " " else ""
                         durationText += "${space}${minutes} min"
                     }
                     if (seconds != 0) {
-                        var space =  if (durationText.isNotEmpty()) " " else ""
+                        val space =  if (durationText.isNotEmpty()) " " else ""
                         durationText += "${space}${seconds}s"
                     }
 
@@ -205,7 +205,7 @@ class TaskDetailsActivity : AppCompatActivity() {
 
                 val taskDurationMillis = task.duration
 
-                var taskDurationSec = 0
+                val taskDurationSec: Int
 
                 var hoursDuration = 0
                 var minutesDuration = 0
@@ -288,7 +288,7 @@ class TaskDetailsActivity : AppCompatActivity() {
 
                     if (priorityVal != Priority.NONE)  {
                         b.setPriority.text = priorityVal.first
-                        b.setPriority.setTextColor(resources.getColor(priorityVal.second))
+                        b.setPriority.setTextColor(ContextCompat.getColor(this.context, priorityVal.second))
                         task.priority = priorityVal
                     }
                 }
@@ -300,7 +300,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         fun setTimeDialog() {
             val cal = Calendar.getInstance()
 
-            val timeSetListener = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+            val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 cal.set(Calendar.MINUTE, minute)
 
@@ -322,11 +322,11 @@ class TaskDetailsActivity : AppCompatActivity() {
 
                 val timeStamp = cal.timeInMillis
                 task.date = timeStamp
-                b.setTime.text ="${day} à ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)}"
+                b.setTime.text ="$day à ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)}"
             }
 
             val dateSetListener =
-                DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+                DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                     cal.set(Calendar.YEAR, year)
                     cal.set(Calendar.MONTH, month)
                     cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -380,7 +380,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     {
                         task.duration = null
                         b.setDuration.text = "Définir la durée"
-                        b.setDuration.setTextColor(resources.getColor(R.color.textContent))
+                        b.setDuration.setTextColor(ContextCompat.getColor(this, R.color.textContent))
                     }
                 )
             } else setDurationDialog()
@@ -393,7 +393,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     {
                         task.date = null
                         b.setTime.text = "Ajouter date/heure"
-                        b.setTime.setTextColor(resources.getColor(R.color.textContent))
+                        b.setTime.setTextColor(ContextCompat.getColor(this, R.color.textContent))
                     }
                 )
             } else setTimeDialog()
@@ -406,7 +406,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     {
                         task.priority = Priority.NONE
                         b.setPriority.text = "Définir la priorité"
-                        b.setPriority.setTextColor(resources.getColor(R.color.textContent))
+                        b.setPriority.setTextColor(ContextCompat.getColor(this, R.color.textContent))
                     }
                 )
             } else showPriorityDialog()
@@ -414,6 +414,7 @@ class TaskDetailsActivity : AppCompatActivity() {
 
         b.bottomAppBar.setNavigationOnClickListener {
             val userLists = tasksRepository.getListGroup().toList()
+            @Suppress("UNCHECKED_CAST")
             val userListsSerialized = Json.encodeToString(userLists as? List<Pair<String, String>>)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")

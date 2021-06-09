@@ -1,20 +1,22 @@
-package com.electro.todolist
+package com.electro.todolist.ui
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.electro.todolist.R
+import com.electro.todolist.SettingsActivity
 import com.electro.todolist.data.TasksRepository
-import com.electro.todolist.ui.TaskDetailsActivity
-import com.electro.todolist.ui.TasksActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -27,7 +29,7 @@ data class ListObject(
 
 class ChangeListFragment : BottomSheetDialogFragment() {
 
-    private val Context.dataStore by preferencesDataStore(name = "settings")
+    //private val Context.dataStore by preferencesDataStore(name = "settings")
 
     private lateinit var listAdapter : ItemAdapter
     private var currentListSelected : Int = 0
@@ -86,7 +88,9 @@ class ChangeListFragment : BottomSheetDialogFragment() {
 
         createListButton.setOnClickListener {
 
-            val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(requireContext(),R.style.AlertDialogCustom))
+            val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(requireContext(),
+                R.style.AlertDialogCustom
+            ))
             // I'm using fragment here so I'm using getView() to provide ViewGroup
             // but you can provide here any other instance of ViewGroup from your Fragment / Activity
 
@@ -114,7 +118,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         }
 
         settingsButton.setOnClickListener {
-            requireContext().startActivity(Intent(requireActivity(),SettingsActivity::class.java))
+            requireContext().startActivity(Intent(requireActivity(), SettingsActivity::class.java))
         }
     }
 
@@ -146,14 +150,13 @@ class ChangeListFragment : BottomSheetDialogFragment() {
                     (requireActivity() as TasksActivity).changeList(mList[position].id)
                 } else if (requireActivity() is TaskDetailsActivity) {
                     // TODO : SWITCH TASK TO SELECTED LIST
+                    Log.i("Switch","Switching task to selected list : ${mList[position].title}")
                 }
                 dismissAllowingStateLoss()
             }
         }
 
-        override fun getItemCount(): Int {
-            return mList.size
-        }
+        override fun getItemCount(): Int = mList.size
     }
 
     companion object {

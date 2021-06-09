@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.R
@@ -184,7 +185,7 @@ class TasksAdapter(
             viewHolder.priorityChip.apply {
                 visibility = View.VISIBLE
                 text = priority.first
-                setTextColor(resources.getColor(priority.second))
+                setTextColor(ContextCompat.getColor(mContext, priority.second))
             }
         } else viewHolder.priorityChip.visibility = View.GONE
 

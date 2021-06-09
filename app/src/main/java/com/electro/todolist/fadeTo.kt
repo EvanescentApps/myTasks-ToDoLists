@@ -10,6 +10,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
  * Fade a view to visible or gone. This function is idempotent - it can be called over and over again with the same
  * value without affecting an in-progress animation.
  */
+@Suppress("unused")
 fun View.fadeTo(visible: Boolean, duration: Long = 500, startDelay: Long = 0, toAlpha: Float = 1f) {
     // Make this idempotent.
     val tagKey = "fadeTo".hashCode()
@@ -53,6 +54,7 @@ fun View.cancelFade() {
 /**
  * Cancels the fade for this view and any ancestors.
  */
+@Suppress("unused")
 fun View.cancelFadeRecursively() {
     cancelFade()
 
