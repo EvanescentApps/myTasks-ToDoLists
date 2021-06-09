@@ -156,6 +156,7 @@ class TasksAdapter(
         val task: Task = mTasks[viewHolder.bindingAdapterPosition]
         titleTasktextView2.text = task.title //set title to item
         //descriptionTaskTextView2.text = task.description
+        descriptionTaskTextView2.visibility = View.GONE
         if (task.description.isNullOrBlank()) {
             descriptionTaskTextView2.visibility = View.GONE
         } else {

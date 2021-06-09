@@ -1,5 +1,6 @@
 package com.electro.todolist.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -31,18 +32,18 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.reflect.typeOf
 
 
 class TasksActivity : AppCompatActivity() {
 
     private lateinit var tasks: ArrayList<Task>
+    // tasks : ArrayList qui sert à sync les données, gérée par l'activité
+    // mTasks : ArrayList qui sert à l'affichage de la recyclerView uniquement
     private lateinit var adapter: RecyclerView.Adapter<TasksAdapter.ViewHolder>
     private lateinit var selectedListContent: SharedPreferences
     private lateinit var selectedListEditor: SharedPreferences.Editor
@@ -51,14 +52,13 @@ class TasksActivity : AppCompatActivity() {
 
     private lateinit var itemTouchHelperCallback: ItemTouchHelperCallback
     private lateinit var itemTouchHelper: ItemTouchHelper
+    @Suppress("MemberVisibilityCanBePrivate")
     val allTasksList = ArrayList<Task>()
 
+    @Suppress("MemberVisibilityCanBePrivate")
     val Context.dataStore by preferencesDataStore(name = "settings")
 
-    // mTasks : ArrayList qui sert à l'affichage
-    // tasks : ArrayList qui sert à sync les données, gérée par l'activité
-
-
+    @SuppressLint("unused")
     fun updatedTask(task: Task, position: Int) {
         tasks[position] = task
         adapter.notifyItemChanged(position)
@@ -80,6 +80,7 @@ class TasksActivity : AppCompatActivity() {
         b.includeRecycler.tasksRecyclerview.smoothScrollToPosition(position)
     }
 
+    @SuppressLint("ShowToast")
     fun deleteItem(index: Int) { // Called onSwipe
         val taskToDelete = tasks[index] // Get the task to delete
 
@@ -112,6 +113,7 @@ class TasksActivity : AppCompatActivity() {
         setEmptyState(tasks.isEmpty())
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun setEmptyState(enabled: Boolean) {
         b.includeRecycler.emptyTasks.visibility = if (enabled) View.VISIBLE else View.GONE
     }
@@ -121,18 +123,12 @@ class TasksActivity : AppCompatActivity() {
         Log.i("Activity position", "from: $fromPosition to: $toPosition")
     }
 
-    /*fun removeItem(index: Int) {
-        val taskDone = tasks[index] // We get the task
-        taskDone.done = true
-        val taskToJson = Json.encodeToString(taskDone) // Converted to Json for storage
-        selectedListEditor.putString(taskDone.creationDate.toString(), taskToJson).apply()
-    }*/
-
     fun setTaskDone(task: Task, done: Boolean) {
         task.done = done
         selectedListEditor.putString(task.creationDate.toString(), Json.encodeToString(task)).apply()
     }
 
+    @Suppress("unused")
     private suspend fun save(key: String, value: String) {
         val dataStoreKey = stringPreferencesKey(key)
         dataStore.edit { settings ->
@@ -140,8 +136,11 @@ class TasksActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("PropertyName")
     val COUNTER = intPreferencesKey("counter")
 
+
+    @Suppress("unused")
     suspend fun incrementCounter() {
         this.dataStore.edit { settings ->
             val currentCounterValue = settings[COUNTER] ?: 0
@@ -257,7 +256,7 @@ class TasksActivity : AppCompatActivity() {
                         val parsedJson = Gson().fromJson(jsonToCorrect, JsonElement::class.java)
                         parsedJson.asString
 
-                        Log.e("Alternate JSON parsing", parsedJson.asString)
+                        Log.e("Alternate JSON parsing", parsedJson.toString())
                     } catch (e:Exception) {
 
                     }
@@ -285,7 +284,7 @@ class TasksActivity : AppCompatActivity() {
         b.includeRecycler.tasksRecyclerview.adapter = adapter
         b.includeRecycler.tasksRecyclerview.layoutManager = LinearLayoutManager(this)
         //ViewCompat.setNestedScrollingEnabled(b.includeRecycler.tasksRecyclerview, false)
-
+        // This line caused UI bugs onScroll
         itemTouchHelperCallback = ItemTouchHelperCallback(adapter as TasksAdapter, this)
         itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
@@ -305,38 +304,12 @@ class TasksActivity : AppCompatActivity() {
 
         b.swipeRefresh.isEnabled = false
         b.swipeRefresh.setOnRefreshListener {
-
             Handler(Looper.getMainLooper()).postDelayed({
-
                 b.swipeRefresh.isRefreshing = false
-
             }, 1100)
         }
 
-        /*b.choiceList.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                val pairSelected = tasksRepository.readOnlyUserLists.toList()[position]
-                Log.i("Lists Spinner", "Selected $pairSelected")
-                val listSelected = pairSelected.first
-                tasksRepository.currentListName = listSelected
-                b.toolbar.title = pairSelected.second.toString()
-                Toast.makeText(applicationContext,"new list  ${pairSelected.second.toString()}",Toast.LENGTH_SHORT).show()
-                changeList(listSelected)
-
-                // TODO : HERE WE GOT A FUCK**G BUG : 2 ADAPTERS ARE CREATED
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }*/
-
         b.fab.setOnClickListener {
-            //bottomDialog.show(supportFragmentManager, "dialog")
             AddTaskFragment.newInstance(tasksRepository.currentListName)
                 .show(supportFragmentManager, "dialog")
             // Start an activityForResult instead
@@ -348,7 +321,6 @@ class TasksActivity : AppCompatActivity() {
         }
 
         if (intent.hasExtra("shortcut")) {
-            //bottomDialog.show(supportFragmentManager, "dialog")
             AddTaskFragment.newInstance(tasksRepository.currentListName)
                 .show(supportFragmentManager, "dialog")
         }
@@ -357,7 +329,6 @@ class TasksActivity : AppCompatActivity() {
             //startActivityForResult(Intent(this, TestActivity::class.java), 200)
             BottomFragment.newInstance(tasksRepository.currentListName)
                 .show(supportFragmentManager, "dialog")
-            //scrollToTask(12)
         }
 
         var userLists: MutableMap<String, *>
@@ -369,6 +340,7 @@ class TasksActivity : AppCompatActivity() {
 
             if (userLists.containsKey("defaultList")) { userLists.remove("defaultList") }
 
+            @Suppress("UNCHECKED_CAST")
             userListsSerialized = Json.encodeToString(userLists.toList() as? List<Pair<String,String>>)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")
@@ -388,10 +360,7 @@ class TasksActivity : AppCompatActivity() {
         b.toolbar.setOnClickListener {
             showListsBottomSheet()
         }
-
     }
-
-
 
     override fun onStop() {
         super.onStop()
@@ -415,7 +384,8 @@ class TasksActivity : AppCompatActivity() {
 
         // HERE UPDATE POSITION OF EVERY TASK,
         // AND SAVE IT TO PERSISTENT STORAGE
-        //val orderCheck= arrayListOf<Int>()
+
+        // TODO : DO THIS WORK ASYNC
 
         tasks.forEachIndexed { index, task ->
             task.position = index
@@ -426,11 +396,13 @@ class TasksActivity : AppCompatActivity() {
         Log.i("onStop", "Ordered list saved")
     }
 
+    @Suppress("DEPRECATION")
+    @SuppressLint("ShowToast")
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
 
         Log.e("Activity Result", "We got a result !")
 
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) { // File created
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) { // File created, write it
             // The result data contains a URI for the document or directory that
             // the user selected.
             resultData?.data?.also { uri ->
@@ -438,10 +410,17 @@ class TasksActivity : AppCompatActivity() {
                 tasksRepository.writeTaskListTofile(tasksRepository.currentListName, uri)
                 // Perform operations on the document using its URI.
             }
-        } else if (requestCode == 2 && resultCode == Activity.RESULT_OK) { // FIle imported
+        } else if (requestCode == 2 && resultCode == Activity.RESULT_OK) { // File imported
             resultData?.data?.also { uri ->
+
+                // TODO : CREATE NEW LIST WITH THESE TASKS AND TITLE : LISTE IMPORTEE
+
                 val newList = tasksRepository.readTextContent(uri)
                 Log.i("Import", "Imported successfully list $newList")
+                // TODO : PARSE CONTENT TO TASKS
+                val parsedTasks = Json.decodeFromString<ArrayList<Task>>(newList)
+
+                Log.d("parsed json", parsedTasks.toString())
                 // Perform operations on the document using its URI.
             }
         } else if (requestCode == 500 && resultCode == Activity.RESULT_OK && resultData != null) { // Task modified
@@ -456,18 +435,12 @@ class TasksActivity : AppCompatActivity() {
                     // SWIPE TO DELETE AT POSITION
                     deleteItem(position)
                 }
-
             }
 
             if (position != -1 && taskJson != null) {
 
                 if (!taskJson.isNullOrBlank()) {
 
-                    /*Toast.makeText(
-                        this,
-                        "Resultat reçu ! Processing data update",
-                        Toast.LENGTH_SHORT
-                    ).show()*/
                     Log.e("Result", taskJson)
 
                     val task = Json.decodeFromString<Task>(taskJson)
@@ -510,6 +483,7 @@ class TasksActivity : AppCompatActivity() {
                                 //adapter.notifyItemRangeChanged(position, newPosition + 1)
 
                             }.show()
+
                     }
 
                     adapter.notifyItemChanged(position)

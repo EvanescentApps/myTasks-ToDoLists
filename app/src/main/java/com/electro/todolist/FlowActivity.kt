@@ -189,7 +189,9 @@ class FlowActivity : AppCompatActivity() {
 
                 Handler(Looper.getMainLooper()).postDelayed({
 
-                    b.leaveFlow.visibility = View.VISIBLE
+                    //b.leaveFlow.visibility = View.VISIBLE
+
+                    b.leaveFlow.fadeTo(true, 1000)
 
                     try {
                         val notification: Uri =

@@ -14,9 +14,11 @@ import android.content.Intent
 import android.widget.Toast
 import java.text.Normalizer
 import android.app.Activity
+import android.content.res.Resources
 import android.util.Log
 import android.os.Build
 import android.net.Uri
+import android.util.DisplayMetrics
 import java.util.*
 import java.io.*
 
@@ -128,28 +130,20 @@ class TasksRepository(private val activity: Activity) {
     }
 
     fun createList(name : String) {
-        // create entry in sharedPreferences for a new list
-
         val newListId = Task.generateId(6)
-
         getListGroupPrefs().edit().putString(newListId, name).apply()
-
         if (activity is TasksActivity) activity.changeList(newListId)
-
     }
 
     fun renameList(newName: String, listId: String) {
         val listsPrefs = getListGroupPrefs()
         if (listsPrefs.getString(listId,null) != null) {
             listsPrefs.edit().putString(listId, newName).apply()
-
             if (activity is TasksActivity) activity.updateListName(newName)
-
         } else {
             Toast.makeText(activity,"Cette liste n'existe pas... Veuillez réessayer.",Toast.LENGTH_LONG).show()
         }
 
-        //getUpdatedLists()
     }
 
     fun deleteList(listId: String) {
@@ -297,6 +291,8 @@ class TasksRepository(private val activity: Activity) {
             if (single == null) single = TasksRepository(activity)
             return single as TasksRepository
         }
+
+        val Number.dp get() = toFloat() * (Resources.getSystem().displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 
 }
