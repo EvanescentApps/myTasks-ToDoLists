@@ -10,6 +10,7 @@
         <item name="colorSecondaryVariant">@color/textContentPrimary</item>
         <item name="colorOnSecondary">@color/textContent</item>
         <item name="labelStyle">@color/iconTint</item>
+
         <item name="android:textColorPrimary">@color/textContent</item>
         <item name="android:textColorSecondary">@color/textContent</item>
         <item name="android:colorForeground">@color/textContent</item>
@@ -19,11 +20,30 @@
         <item name="backgroundColor">@color/background</item>
         <item name="font">@font/lexend_semibold</item>
         <item name="android:textColor">@color/textContent</item>
+
         <!-- <item name="android:fontFamily">@font/lexend</item>-->
         <!--<item name="fontWeight">600</item>-->
         <item name="android:windowBackground">@drawable/splash</item>
         <item name="fullscreenBackgroundColor">@color/flowBackground</item>
         <item name="fullscreenTextColor">@color/textContent</item>
+
+        <item name="colorOnSurface">@color/textContent</item>
+        <item name="buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/positiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/positiveButtonStyle</item>
+
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+
+
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="positiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+
+        <item name="android:textColor">@color/textContent</item>
+        <item name="android:solidColor">#E65100</item>
+        <item name="background">?attr/selectableItemBackground</item>
+        <item name="colorAccent">#652400</item>
     </style>
 
     <style name="Theme.Todolist.NoActionBar">
@@ -81,13 +101,47 @@
 
     </style>
 
-    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="backgroundColor">@color/background</item>
+        <item name="android:textColor">@color/textContent</item>
+        <item name="background">@color/background</item>
+        <item name="android:background">@color/background</item>
+        <item name="colorOnSurface">@color/textContent</item>
+        <item name="colorControlNormal">@color/textContentSecondary</item>
+        <item name="buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/positiveButtonStyle</item>
+        <!--<item name="android:buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>-->
+        <item name="buttonBarButtonStyle">@style/positiveButtonStyle</item>
+        <item name="android:buttonBarButtonStyle">@style/positiveButtonStyle</item>
+    </style>
+
+    <style name="MaterialAlertDialog_rounded" parent="MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="dialogCornerRadius">22dp</item>
+    </style>
+
+    <style name="DialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">22dp</item>
+    </style>
+
+    <style name="MaterialTimePicker" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="colorControlNormal">@color/background</item>
         <item name="colorControlActivated">@color/textContentPrimary</item>
         <item name="textColorAlertDialogListItem">@color/textContentPrimary</item>
         <item name="colorAccent">@color/textContent</item>
         <item name="android:textColorPrimary">@color/textContentPrimary</item>
         <item name="iconTint">@color/iconTint</item>
+        <item name="buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/positiveButtonStyle</item>
+        <!--<item name="android:buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>-->
+        <item name="buttonBarButtonStyle">@style/positiveButtonStyle</item>
+        <item name="android:buttonBarButtonStyle">@style/positiveButtonStyle</item>
+    </style>
+
+    <style name="MyDialogTheme" parent="MaterialTimePicker">
+        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="dialogCornerRadius">22dp</item>
     </style>
 
 </resources>

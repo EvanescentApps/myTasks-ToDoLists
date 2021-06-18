@@ -1,7 +1,5 @@
 package com.electro.todolist.ui
 
-import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,13 +9,15 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.view.ContextThemeWrapper
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.R
-import com.electro.todolist.SettingsActivity
 import com.electro.todolist.data.TasksRepository
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -38,6 +38,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.bottom_sheet_lists, container, false)
     }
 
@@ -47,9 +48,20 @@ class ChangeListFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        val d = dialog as BottomSheetDialog
+        val bottomSheetInternal =
+            d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetInternal as View)
+
+        val coordinatorLayout = bottomSheetInternal.parent as CoordinatorLayout
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        //bottomSheetBehavior.peekHeight = bottomSheetInternal.height
+        coordinatorLayout.parent.requestLayout();
+
         val tasksRepository = TasksRepository.getInstance(requireActivity())
         val recyclerList = view.findViewById<RecyclerView>(R.id.all_lists)
-
         val currentList = requireArguments().getString("currentList")
 
         val listOfAllLists = ArrayList<ListObject>()
@@ -88,9 +100,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
 
         createListButton.setOnClickListener {
 
-            val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(requireContext(),
-                R.style.AlertDialogCustom
-            ))
+            val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
             // I'm using fragment here so I'm using getView() to provide ViewGroup
             // but you can provide here any other instance of ViewGroup from your Fragment / Activity
 
@@ -106,7 +116,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
                 ) { dialog, _ ->
                     dialog.dismiss()
                     val mText = input.text.toString()
-                    tasksRepository.createList(mText)
+                    tasksRepository.createList(mText, true)
                     newListAdded()
                     dismissAllowingStateLoss()
                 }
@@ -118,7 +128,20 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         }
 
         settingsButton.setOnClickListener {
-            requireContext().startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+            //requireContext().startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+
+            val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+
+            builder.apply {
+                setTitle("Fonctionnalité en cours de développement")
+                setMessage("Les paramètres ne sont pas disponibles pour l'instant, ce sera pour une prochaine mise à jour.")
+                setPositiveButton(
+                    "D'accord"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                show()
+            }
         }
     }
 

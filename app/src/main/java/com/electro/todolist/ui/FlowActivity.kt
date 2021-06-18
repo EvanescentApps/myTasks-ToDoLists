@@ -1,4 +1,4 @@
-package com.electro.todolist
+package com.electro.todolist.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -8,15 +8,21 @@ import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.*
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.LinearLayout
+import android.widget.NumberPicker
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
+import com.electro.todolist.R
 import com.electro.todolist.databinding.ActivityFlowBinding
+import com.electro.todolist.fadeTo
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.random.Random
 
 /**
@@ -35,7 +41,7 @@ class FlowActivity : AppCompatActivity() {
 
     private var finished = false
 
-    private lateinit var baseColor : IntArray
+    private lateinit var baseColor: IntArray
 
     private var isPaused = false
     private var timeElapsedStop = 0
@@ -188,16 +194,15 @@ class FlowActivity : AppCompatActivity() {
 
                 finished = true
 
+                b.leaveFlow.fadeTo(true, 1000)
+
                 Handler(Looper.getMainLooper()).postDelayed({
-
-                    //b.leaveFlow.visibility = View.VISIBLE
-
-                    b.leaveFlow.fadeTo(true, 1000)
 
                     try {
                         val notification: Uri =
                             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                        val r: Ringtone = RingtoneManager.getRingtone(applicationContext, notification)
+                        val r: Ringtone =
+                            RingtoneManager.getRingtone(applicationContext, notification)
                         r.play()
 
                     } catch (e: Exception) {
@@ -216,7 +221,7 @@ class FlowActivity : AppCompatActivity() {
                         finish()
                     }
                     b.leaveFlow.visibility = View.VISIBLE
-                }, 1000)
+                }, 700)
             }
         }
         mCountDownTimer.start()
@@ -225,7 +230,7 @@ class FlowActivity : AppCompatActivity() {
     fun modifyTimer(variation: Int = 0) {
 
     }
-    
+
     @SuppressLint("SetTextI18n")
     private fun setTimer(taskDurationSec: Int) {
 
@@ -262,27 +267,146 @@ class FlowActivity : AppCompatActivity() {
         }
         b.modifyTimer.setOnClickListener {
 
-            // TODO : ADD OR MINUS TIME ON TIMER
 
 
+            // I'm using fragment here so I'm using getView() to provide ViewGroup
+            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+            /*val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+            val viewInflated: View = LayoutInflater.from(this)
+                .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
+
+            //val input = viewInflated.findViewById<EditText>(R.id.input)
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+
+            val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
+            val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
+            val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)*/
+
+            //val hoursPicker2 = viewInflated.findViewById<NumberPickerView>(R.id.hours2)
+
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+
+            builder.apply {
+                setTitle("Fonctionnalité en cours de développement")
+                setMessage("Cette fonctionnalité n'est pas disponible pour l'instant, ce sera pour une prochaine mise à jour.")
+                setPositiveButton(
+                    "D'accord"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                show()
+            }
+
+            /*builder.apply {
+                setView(viewInflated)
+                title = "Définir la Durée"
+                setMessage("Définissez une durée pour cette tâche")
+                setCancelable(false)
+
+                setPositiveButton(
+                    R.string.ok
+                ) { dialog, _ ->
+                    dialog.dismiss()
+
+                    val hoursVal = hoursPicker.value
+                    val minutesVal = minutesPicker.value
+                    val secondsVal = secondsPicker.value
+
+                    var durationText = ""
+                    if (hoursVal != 0) {
+                        durationText += "${hoursVal}h"
+                    }
+                    if (minutesVal != 0) {
+                        val space = if (durationText.isNotEmpty()) " " else ""
+                        durationText += "${space}${minutesVal} min"
+                    }
+                    if (secondsVal != 0) {
+                        val space = if (durationText.isNotEmpty()) " " else ""
+                        durationText += "${space}${secondsVal}s"
+                    }
+
+                    val timeDurationSeconds = hoursVal * 3600 + minutesVal * 60 + secondsVal
+                    val timeDurationMillis = timeDurationSeconds * 1000
+
+                    val changedTime = timeDurationMillis.toLong()
+
+                    //if (durationText.isNotBlank()) b.setDuration.text = durationText
+                }
+
+                setNegativeButton(
+                    R.string.cancel
+                ) { dialog, _ -> dialog.cancel() }
+
+                show()
+
+                val taskDurationMillis = task.duration
+
+                val taskDurationSec: Int
+
+                var hoursDuration = 0
+                var minutesDuration = 0
+                var secondsDuration = 0
+
+                if (taskDurationMillis != null) {
+                    taskDurationSec = (taskDurationMillis / 1000).toInt()
+
+                    secondsDuration = taskDurationSec % 60
+                    minutesDuration = (taskDurationSec / 60) % 60
+                    hoursDuration = (taskDurationSec / 3600) % 24
+                }
+
+                hoursPicker.apply {
+                    minValue = 0
+                    maxValue = 48
+                    value = hoursDuration
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        textSize = 100f
+                        textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                    }
+                }
+
+                minutesPicker.apply {
+                    minValue = 0
+                    maxValue = 59
+                    value = minutesDuration
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        textSize = 100f
+                        textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                    }
+                }
+
+                secondsPicker.apply {
+                    minValue = 0
+                    maxValue = 59
+                    value = secondsDuration
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        textSize = 100f
+                        textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                    }
+                }
+            }*/
         }
         b.backLeave.setOnClickListener {
             if (!finished) {
 
+                val wasPaused = isPaused
                 pause()
 
-                val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+                val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
                 builder.apply {
                     setTitle("Quitter le Flow ?")
                     setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
                     setPositiveButton(
-                        R.string.ok
+                        "Quitter"
                     ) { _, _ -> finish() }
                     setNegativeButton(
                         R.string.cancel
                     ) { dialog, _ ->
                         dialog.dismiss()
-                        play()
+                        if (!wasPaused) play()
                     }
                     show()
                 }
@@ -299,7 +423,7 @@ class FlowActivity : AppCompatActivity() {
 
     private fun play() {
         isPaused = false
-        b.playPause.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.pause_black_24dp))
+        b.playPause.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.pause_black_24dp))
         startCountdownTimer(timeLeft, timeElapsedStop)
 
         b.progressTime.setIndicatorColor(baseColor[0])
@@ -310,7 +434,12 @@ class FlowActivity : AppCompatActivity() {
 
         b.progressTime.setIndicatorColor(Color.parseColor("#E65100"))
 
-        b.playPause.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.play_arrow_black_24dp))
+        b.playPause.setImageDrawable(
+            ContextCompat.getDrawable(
+                this,
+                R.drawable.play_arrow_black_24dp
+            )
+        )
         mCountDownTimer.cancel()
 
         timeElapsedStop = i
@@ -334,20 +463,22 @@ class FlowActivity : AppCompatActivity() {
             /*if (doubleBack < 1) doubleBack++
             else  super.onBackPressed() */
 
+            val wasPaused = isPaused
             pause()
 
-            val builder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
             builder.apply {
                 setTitle("Quitter le Flow ?")
                 setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
                 setPositiveButton(
-                    R.string.ok
+                    "Quitter"
                 ) { _, _ -> finish() }
                 setNegativeButton(
                     R.string.cancel
                 ) { dialog, _ ->
                     dialog.dismiss()
-                    play()
+
+                    if (!wasPaused) play()
                 }
                 show()
             }

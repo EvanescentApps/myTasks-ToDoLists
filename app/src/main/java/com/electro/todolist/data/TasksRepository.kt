@@ -3,25 +3,26 @@
 package com.electro.todolist.data
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
-import kotlinx.serialization.decodeFromString
-import com.electro.todolist.ui.TasksActivity
-import kotlinx.serialization.encodeToString
-import android.provider.DocumentsContract
-import android.content.SharedPreferences
-import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import android.content.Intent
-import android.widget.Toast
-import java.text.Normalizer
 import android.app.Activity
+import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Resources
-import android.util.Log
-import android.os.Build
 import android.net.Uri
+import android.os.Build
+import android.provider.DocumentsContract
 import android.util.DisplayMetrics
-import java.util.*
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.electro.todolist.ui.TasksActivity
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.*
+import java.text.Normalizer
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class TasksRepository(private val activity: Activity) {
 
@@ -113,6 +114,8 @@ class TasksRepository(private val activity: Activity) {
         }
 
         currentListName = lastOpenedList_Key
+
+        //Toast.makeText(activity,"CurrentList is $currentListName",Toast.LENGTH_SHORT).show()
     }
 
     fun getListGroupPrefs() : SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
@@ -127,10 +130,10 @@ class TasksRepository(private val activity: Activity) {
         }.apply()
     }
 
-    fun createList(name : String) {
+    fun createList(name : String, emptyState: Boolean = true) {
         val newListId = Task.generateId(6)
         getListGroupPrefs().edit().putString(newListId, name).apply()
-        if (activity is TasksActivity) activity.changeList(newListId)
+        if (activity is TasksActivity) activity.changeList(newListId, emptyState)
     }
 
     fun renameList(newName: String, listId: String) {
@@ -141,50 +144,54 @@ class TasksRepository(private val activity: Activity) {
         } else {
             Toast.makeText(activity,"Cette liste n'existe pas... Veuillez réessayer.",Toast.LENGTH_LONG).show()
         }
-
     }
 
     fun deleteList(listId: String) {
 
         try {
             getListGroupPrefs().edit().remove(listId).apply()
-
         } catch (e: Exception) {
             Log.e("Error removing list", e.stackTrace.toString())
         }
-        //getUpdatedLists()
 
         val listOfIds = getListGroup().toList()
 
         if (activity is TasksActivity) activity.changeList(listOfIds[0].first)
+        currentListName = listOfIds[0].first
 
         //Toast.makeText(activity, "Liste supprimée, liste par défaut : ${listOfIds[0].first}", Toast.LENGTH_LONG).show()
     }
 
-    fun deleteAllDoneTasks(list : String) {
-        val selectedListContent = activity.getSharedPreferences(list, AppCompatActivity.MODE_PRIVATE)
+    fun deleteAllDoneTasks() {
 
-        val allTasksList = ArrayList<Task>()
+        if (activity is TasksActivity) activity.deleteAllDoneTasks()
+
+        /*val allTasksList = ArrayList<Task>()
         selectedListContent.all.map { it.key }.forEach { str ->
             selectedListContent.getString(str, null)?.let {
                 allTasksList.add(Json.decodeFromString(it)) //Decode to task & add
             }
         }
 
+        // TODO : GET THE RIGHT LIST...
+
         var isError = false
 
-        allTasksList.forEach { task ->
-            if (task.done) {
-                try {
-                    selectedListContent.edit().remove(task.creationDate.toString()).apply()
-                } catch (e:Exception) {
-                    Log.e("Error Tasks Removal",e.stackTrace.toString())
-                    isError = true
-                }
-            }
-        }
+        allTasksList.forEachIndexed { index, task ->
+                if (task.done) {
 
-        if (!isError) Toast.makeText(activity, "Tâches terminées supprimées ✔", Toast.LENGTH_SHORT).show()
+                    // TODO : MAKE THIS WORK
+
+                   *//* try {
+                        selectedListContent.edit().remove(task.creationDate.toString()).apply()
+                    } catch (e:Exception) {
+                        Log.e("Error Tasks Removal",e.stackTrace.toString())
+                        isError = true
+                    }*//*
+                }
+        }*/
+
+        Toast.makeText(activity, "Tâches terminées supprimées ✔", Toast.LENGTH_SHORT).show()
     }
 
     fun exportToFile(currentList: String) {
@@ -197,7 +204,9 @@ class TasksRepository(private val activity: Activity) {
         try {
             val intentCreateDoc = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/txt"
+                type = "*/*"
+                val mimetypes = arrayOf("application/txt", "text/*")
+                putExtra(Intent.EXTRA_MIME_TYPES, mimetypes)
                 putExtra(Intent.EXTRA_TITLE, "$fileName.txt")
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     pickerInititalUri?.let {
@@ -213,24 +222,31 @@ class TasksRepository(private val activity: Activity) {
 
     fun writeTaskListTofile(currentList: String, uri: Uri) {
         Log.e("CURRENT LIST","is $currentList")
-        val selectedList = activity.getSharedPreferences("currentList", AppCompatActivity.MODE_PRIVATE)
-        val allTasksList = ArrayList<Task>()
+        val selectedList = activity.getSharedPreferences(currentList, AppCompatActivity.MODE_PRIVATE)
+        // "currentList" était entre 2 ptn de guillemets et ça a tout fait buger
+        /*val allTasksList = ArrayList<Task>()
         selectedList.all.map { it.key }.forEach { str ->
             selectedList.getString(str, null)?.let {
                 allTasksList.add(Json.decodeFromString(it)) //Decode to task & add
             }
-        }
-        val jsonText = Json.encodeToString(allTasksList)
-        Log.e("json FILE","file is $jsonText")
+        }*/
 
+        val testList = selectedList.all.map { entry ->
+            selectedList.getString(entry.key, null)?.let {
+                Json.decodeFromString(Task.serializer(), it) //Decode to task & add
+            } ?: Task("Tâche vide...", creationDate = System.currentTimeMillis(), done = true)
+        }.toMutableList()
+
+        val jsonText = Json.encodeToString(testList)
         modifyDoc(uri, jsonText)
     }
 
     fun openFile(pickerInitialUri: Uri? = null) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/txt"
-
+            type = "*/*"
+            val mimetypes = arrayOf("application/txt", "text/*")
+            putExtra(Intent.EXTRA_MIME_TYPES, mimetypes)
             // Optionally, specify a URI for the file
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 pickerInitialUri?.let { putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri) }
@@ -252,20 +268,19 @@ class TasksRepository(private val activity: Activity) {
                 }
             }
         }
+
         return stringBuilder.toString()
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun modifyDoc(uri: Uri, textContent: String = "Overwritten at ${System.currentTimeMillis()}\n") {
-
+        val contentResolver = activity.applicationContext.contentResolver
         try {
-            activity.applicationContext.contentResolver.apply {
-                takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                openFileDescriptor(uri,"rw")?.use { descriptor ->
+            contentResolver.apply {
+                takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                openFileDescriptor(uri,"w")?.use { descriptor ->
                     FileOutputStream(descriptor.fileDescriptor).use { output ->
-                        output.write((textContent).toByteArray()
-                        )
+                        output.write((textContent).toByteArray())
                     }
                 }
             }

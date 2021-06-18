@@ -24,6 +24,8 @@
     <color name="background">@color/eyeCustomGrey</color>
     <color name="backgroundSelected">#2A2037</color>
 
+    <color name="backgroundRipple">#553DC6</color>
+
     <color name="eyeCustomGrey">#1F1B24</color>
 
     <color name="eyeWhite">#CCFFFFFF</color>
@@ -35,6 +37,9 @@
     <color name="taskUrgent">#FF0046</color>
     <color name="taskPasUrgent">#B3FF74</color>
     <color name="taskFacultative">#C8FFCD</color>
+
+    <color name="iconTintFab">#E6FFFFFF</color>
+    <color name="fabBg">#191B67</color>
 
 </resources> <!--69B4BC-->
 

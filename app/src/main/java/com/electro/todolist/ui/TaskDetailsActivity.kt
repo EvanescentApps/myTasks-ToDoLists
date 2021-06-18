@@ -2,7 +2,6 @@ package com.electro.todolist.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -15,18 +14,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.RadioGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
-import com.electro.todolist.FlowActivity
 import com.electro.todolist.R
 import com.electro.todolist.data.Priority
 import com.electro.todolist.data.Task
 import com.electro.todolist.data.TasksRepository
 import com.electro.todolist.databinding.ActivityTaskDetailsBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
@@ -39,11 +38,13 @@ class TaskDetailsActivity : AppCompatActivity() {
     //private lateinit var descriptionEditText: AppCompatEditText
     private lateinit var task: Task
     private lateinit var jsonTask: String
+    private lateinit var currentList : String
 
     //private lateinit var bottomAppBar: BottomAppBar
     private var delete: Boolean = false
     private var isNewDone: Boolean = false
     private var position: Int = -1
+
     private lateinit var b: ActivityTaskDetailsBinding
 
     @SuppressLint("SetTextI18n")
@@ -59,14 +60,13 @@ class TaskDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-
         val tasksRepository = TasksRepository.getInstance(this)
-
         tasksRepository.getDefaultList()
 
         delete = false
         isNewDone = false
         jsonTask = intent.getStringExtra("currentTask").toString()
+        currentList = intent.getStringExtra("currentList").toString()
 
         task = try {
             Json.decodeFromString(Task.serializer(), jsonTask)
@@ -94,14 +94,16 @@ class TaskDetailsActivity : AppCompatActivity() {
             else b.setDuration.text = "Définir la durée"
         }
 
-        task.priority.let {
-            if ( it != Priority.NONE) {
 
-                b.setPriority.text = it.first
-                b.setPriority.setTextColor(ContextCompat.getColor(this, it.second))
+        if ( task.priority != Priority.NONE) {
 
-            } else b.setPriority.text = "Définir la priorité"
-        }
+            b.setPriority.text = task.priority.first
+            b.setPriority.setTextColor(ContextCompat.getColor(this, task.priority.second))
+
+        } else b.setPriority.text = "Définir la priorité"
+        /*task.priority.let {
+
+        }*/
 
         try {
             b.description.apply {
@@ -145,8 +147,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         }
 
         fun setDurationDialog(){
-            val builder: AlertDialog.Builder =
-                AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
 
             // I'm using fragment here so I'm using getView() to provide ViewGroup
             // but you can provide here any other instance of ViewGroup from your Fragment / Activity
@@ -160,6 +161,8 @@ class TaskDetailsActivity : AppCompatActivity() {
             val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
             val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
             val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)
+
+            //val hoursPicker2 = viewInflated.findViewById<NumberPickerView>(R.id.hours2)
 
             builder.apply {
                 setView(viewInflated)
@@ -224,17 +227,24 @@ class TaskDetailsActivity : AppCompatActivity() {
                     maxValue = 48
                     value = hoursDuration
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         textSize = 100f
+                        textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                    }
                 }
+
+                //hoursPicker2.maxValue = 48
+                //hoursPicker2.minValue = 0
 
                 minutesPicker.apply {
                     minValue = 0
                     maxValue = 59
                     value = minutesDuration
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         textSize = 100f
+                        textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                    }
                 }
 
                 secondsPicker.apply {
@@ -242,8 +252,10 @@ class TaskDetailsActivity : AppCompatActivity() {
                     maxValue = 59
                     value = secondsDuration
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         textSize = 100f
+                        textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                    }
                 }
             }
         }
@@ -266,15 +278,13 @@ class TaskDetailsActivity : AppCompatActivity() {
 
         fun showPriorityDialog() {
             val viewInflated: View = LayoutInflater.from(this).inflate(R.layout.choose_priority, window.decorView.rootView as ViewGroup?, false)
-            val newBuilder: AlertDialog.Builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+            val newBuilder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
             newBuilder.apply {
                 setView(viewInflated)
-                setTitle("Définir la Priorité") // TODO : TEXT TITLE
+                setTitle("Définir la Priorité")
                 setCancelable(false)
                 setPositiveButton(R.string.ok) { dialog, _ ->
                     dialog.dismiss()
-
-                    // TODO : UNIT
                     val priorityGroup = viewInflated.findViewById<RadioGroup>(R.id.priorityGroup)
 
                     val priorityVal = when(priorityGroup.checkedRadioButtonId){
@@ -355,8 +365,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             // TODO : PASS TWO ARGS : A RUNNABLE FOR MODIFY AND A RUNNABLE FOR DELETE
             // FOR NOW ONLY WORKING FOR PRIORITY, BUT NEXT SHOULD BE REUSABLE FOR ALL
 
-            val builder: AlertDialog.Builder =
-                AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
 
             builder.apply {
                 setTitle("Modifier ou Supprimer ?")
@@ -413,9 +422,15 @@ class TaskDetailsActivity : AppCompatActivity() {
         }
 
         b.bottomAppBar.setNavigationOnClickListener {
-            val userLists = tasksRepository.getListGroup().toList()
+            val userLists = tasksRepository.getListGroup()
+
+            if (userLists.containsKey("defaultList")) { userLists.remove("defaultList") }
+
+            // TODO : SET "CHANGE LIST" MODE WITH DIFFERENT INTERFACE
+            // texte "Déplacer vers :
+
             @Suppress("UNCHECKED_CAST")
-            val userListsSerialized = Json.encodeToString(userLists as? List<Pair<String, String>>)
+            val userListsSerialized = Json.encodeToString(userLists.toList() as? List<Pair<String, String>>)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")
         }
@@ -428,8 +443,19 @@ class TaskDetailsActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-                R.id.favorite -> {
-                    Log.e("Favorite", "pressed")
+                R.id.moreOptions -> {
+                    val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+
+                    builder.apply {
+                        setTitle("Fonctionnalité en cours de développement")
+                        setMessage("Le menu contextuel pas disponible pour l'instant, ce sera pour une prochaine mise à jour.")
+                        setPositiveButton(
+                            "D'accord"
+                        ) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
+                    }
                     true
                 }
                 R.id.done -> {
@@ -446,19 +472,15 @@ class TaskDetailsActivity : AppCompatActivity() {
         position = intent.getIntExtra("position", -1)
     }
 
-    private fun generateResult(): Intent {
-
+    private fun updatedTaskJson(): String {
         task.title = b.title.text.toString()
         task.description = b.description.text.toString()
 
-        val returnTaskJson = Json.encodeToString(Task.serializer(), task)
-        Log.e("DetailsAct", returnTaskJson)
+        return Json.encodeToString(Task.serializer(), task)
+    }
 
-        /* returnIntent.apply {
-            putExtra("returnTask", returnTaskJson)
-            putExtra("position", position)
-            putExtra("delete", delete)
-        }*/
+    private fun generateResult(): Intent {
+        val returnTaskJson = updatedTaskJson()
 
         return Intent().apply {
             putExtra("returnTask", returnTaskJson)
@@ -475,7 +497,24 @@ class TaskDetailsActivity : AppCompatActivity() {
 
     override fun finish() {
         setResult(Activity.RESULT_OK, generateResult())
+
         super.finish()
+    }
+
+    @SuppressLint("ApplySharedPref")
+    override fun onStop() {
+
+        Thread {
+            Log.e("OnStop", "Stopping")
+            Log.e("TASK", updatedTaskJson())
+
+            if (!delete) {
+                getSharedPreferences(currentList, MODE_PRIVATE).edit()
+                    .putString(task.creationDate.toString(), updatedTaskJson()).apply()
+            }
+
+        }.start()
+        super.onStop()
     }
 
     override fun onBackPressed() {

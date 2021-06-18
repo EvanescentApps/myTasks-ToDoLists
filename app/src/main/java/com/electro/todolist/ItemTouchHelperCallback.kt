@@ -15,36 +15,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.ui.TasksAdapter
 import kotlin.math.roundToInt
 
-class ItemTouchHelperCallback : ItemTouchHelper.Callback {
-    private val mAdapter: TasksAdapter
+class ItemTouchHelperCallback//ContextCompat.getDrawable(mContext, R.drawable.ic_delete)!!
+    (adapter: TasksAdapter, context: Context) : ItemTouchHelper.Callback() {
+    private val mAdapter: TasksAdapter = adapter
 
     private var longPressDragEnabled = false
     private var itemViewSwipeEnabled = false
-    lateinit var mContext: Context
-    private lateinit var mClearPaint: Paint
-    lateinit var mBackground: ColorDrawable
+    var mContext: Context = context
+    private var mClearPaint: Paint
+    var mBackground: ColorDrawable = ColorDrawable()
     private var backgroundColor = 0
-    private lateinit var deleteDrawable: Drawable
-    private lateinit var doneDrawable: Drawable
+    private var deleteDrawable: Drawable
+    private var doneDrawable: Drawable
     private var intrinsicWidth = 0
     private var intrinsicHeight = 0
     private var cardPicked = true
     private var reset = false
 
-    constructor(adapter: TasksAdapter, context: Context) {
-        mAdapter = adapter
-        mContext = context
-        mBackground = ColorDrawable()
+    init {
         backgroundColor = Color.parseColor("#b80f0a")
         mClearPaint = Paint()
         mClearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         deleteDrawable = ContextCompat.getDrawable(
             context,
             R.drawable.ic_baseline_delete_outline_24
-        )!! //ContextCompat.getDrawable(mContext, R.drawable.ic_delete)!!
+        )!!
         intrinsicWidth = deleteDrawable.intrinsicWidth
         intrinsicHeight = deleteDrawable.intrinsicHeight
-
         doneDrawable = ContextCompat.getDrawable(
             context,
             R.drawable.ic_baseline_task_alt_24)!!
@@ -181,14 +178,18 @@ class ItemTouchHelperCallback : ItemTouchHelper.Callback {
             if (isCurrentlyActive) {
                 animator.translationZ(16f)
                 animator.withEndAction {
-                    viewHolder.itemView.setBackgroundColor(mContext.resources.getColor(R.color.backgroundSelected))
+                    viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.backgroundSelected))
                 }
+                viewHolder.itemView.translationZ = 16f
+                viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.backgroundSelected))
             } else {
 
                 animator.translationZ(0f)
+
                 animator.withEndAction {
-                    viewHolder.itemView.setBackgroundColor(mContext.resources.getColor(R.color.background))
+                    viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.background))
                 }
+                viewHolder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.background))
             }
 
             animator.duration = 100

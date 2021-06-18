@@ -3,6 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_item"
@@ -71,6 +72,8 @@
             <HorizontalScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:clipToPadding="false"
                 android:scrollbarSize="1dp">
 
                 <LinearLayout
@@ -87,6 +90,8 @@
                         android:layout_height="30dp"
                         android:layout_marginEnd="10dp"
                         android:checkable="false"
+                        android:clickable="false"
+                        android:enabled="false"
                         android:layout_marginTop="8dp"
                         app:chipMinTouchTargetSize="30dp"
                         android:clipToPadding="false"
@@ -107,6 +112,8 @@
                         android:layout_marginTop="8dp"
                         app:chipMinTouchTargetSize="30dp"
                         android:clipToPadding="false"
+                        android:clickable="false"
+                        android:enabled="false"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
                         app:fontFamily="@font/lexend_semibold"
                         android:fontFamily="@font/lexend_semibold"
@@ -123,6 +130,8 @@
                         android:layout_marginTop="8dp"
                         app:chipMinTouchTargetSize="30dp"
                         android:clipToPadding="false"
+                        android:clickable="false"
+                        android:enabled="false"
                         style="@style/Widget.MaterialComponents.Chip.Filter"
                         app:fontFamily="@font/lexend_semibold"
                         android:fontFamily="@font/lexend_semibold"

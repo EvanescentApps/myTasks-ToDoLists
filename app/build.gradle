@@ -7,6 +7,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            keyAlias 'todolistapp'
+            keyPassword '@OmegaNano4497'
+            storePassword '@OmegaNano4497'
+            storeFile file('C:\\Users\\evan1\\Documents\\Projets Programmation\\Projets Android\\Certificats et Importants\\todolistapp.jks')
+        }
+        release {
+            storeFile file('C:\\Users\\evan1\\Documents\\Projets Programmation\\Projets Android\\Certificats et Importants\\todolistapp.jks')
+            storePassword '@OmegaNano4497'
+            keyAlias 'todolistapp'
+            keyPassword '@OmegaNano4497'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
@@ -18,12 +32,13 @@ android {
         applicationId "com.electro.todolist"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 10
-        versionName "Alpha C10"
+        versionCode 13
+        versionName "Bêta M3"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
@@ -55,11 +70,11 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'com.google.code.gson:gson:2.8.7'
-    //implementation 'com.github.simonvt:android-numberpicker-sample:1.0.0'
+    //implementation 'com.github.simonvt:android-numberpicker:1.0.0'
     //implementation 'net.simonvt.numberpicker:numberpicker:1.0.0'
     //implementation 'cn.carbswang.android:NumberPickerView:1.2.0'
     implementation "androidx.datastore:datastore-preferences:1.0.0-beta01"
-    implementation 'com.firebaseui:firebase-ui-auth:7.1.1'
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

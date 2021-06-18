@@ -11,9 +11,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
 import com.electro.todolist.R
 import com.electro.todolist.data.Task
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 import kotlin.random.Random.Default.nextInt
@@ -69,20 +72,19 @@ class AddTaskFragment : BottomSheetDialogFragment() {
         val taskObject = Task(title,descriptionText,timeId,false, id)
         val taskToJson = Gson().toJson(taskObject)
 
-        val list1 = requireActivity().getSharedPreferences(currentList, AppCompatActivity.MODE_PRIVATE)
-        list1.edit().putString(timeId.toString(), taskToJson).apply()
+        val list = requireActivity().getSharedPreferences(currentList, AppCompatActivity.MODE_PRIVATE)
+        list.edit().putString(timeId.toString(), taskToJson).apply()
 
-        (requireActivity() as TasksActivity).addItem(taskObject)
-        // OMG c'est quoi ce cast hyper risqué !!! Transmettre au viewModel
 
+        if (requireActivity() is TasksActivity) {
+            (requireActivity() as TasksActivity).addItem(taskObject)
+        }
 
         description.text.clear()
         taskTitleEditText.text.clear()
 
         return
     }
-
-
 
     override fun onDismiss(dialog: DialogInterface) {
         //Toast.makeText(requireContext(),"BottomSheet dismissed",Toast.LENGTH_SHORT).show()
@@ -95,7 +97,25 @@ class AddTaskFragment : BottomSheetDialogFragment() {
         //HIDE KEYBOARD BEFORE
         super.onDismiss(dialog)
     }
-    
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        val d = dialog as BottomSheetDialog
+        val bottomSheetInternal =
+            d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetInternal as View)
+
+        val coordinatorLayout = bottomSheetInternal.parent as CoordinatorLayout
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        bottomSheetBehavior.peekHeight = bottomSheetInternal.height
+        coordinatorLayout.parent.requestLayout();
+
+
+        super.onViewCreated(view, savedInstanceState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 

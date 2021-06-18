@@ -1,23 +1,22 @@
 package com.electro.todolist.ui
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.view.ContextThemeWrapper
+import android.widget.*
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.R
 import com.electro.todolist.data.TasksRepository
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-// TODO: Customize parameter argument names
+
 const val ARG_CURRENT_LIST = "currentList"
 
 data class ListAction(
@@ -34,14 +33,58 @@ class BottomFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        /*dialog!!.setOnShowListener { dialog ->
+            val d = dialog as BottomSheetDialog
+            val bottomSheetInternal =
+                d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetInternal as View)
+
+            val coordinatorLayout = bottomSheetInternal.parent as CoordinatorLayout
+
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+            bottomSheetBehavior.peekHeight = bottomSheetInternal.height
+            coordinatorLayout.parent.requestLayout();
+        }*/
+
         return inflater.inflate(R.layout.context_menu_list, container, false)
     }
 
+    /*override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
+        val dialog = super.onCreateDialog(savedInstanceState)
+
+        dialog.setOnShowListener { dialog ->
+
+            val d = dialog as BottomSheetDialog
+
+            val bottomSheet =
+                d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout
+
+            // Right here!
+            BottomSheetBehavior.from<FrameLayout>(bottomSheet).state =
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+        }
+
+        return dialog
+    }*/
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        val d = dialog as BottomSheetDialog
+        val bottomSheetInternal =
+            d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetInternal as View)
+
+        val coordinatorLayout = bottomSheetInternal.parent as CoordinatorLayout
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        //bottomSheetBehavior.peekHeight = bottomSheetInternal.height
+        coordinatorLayout.parent.requestLayout();
 
         val tasksRepository = TasksRepository(requireActivity())
         val recyclerList = view.findViewById<RecyclerView>(R.id.list)
-
         val currentListId = requireArguments().getString(ARG_CURRENT_LIST)
 
         if(currentListId != null){
@@ -49,19 +92,14 @@ class BottomFragment : BottomSheetDialogFragment() {
             recyclerList?.adapter = ItemAdapter(arrayListOf( //"Paramètres","Mes tâches","Aujourd'hui","Demain","Projets","Un Jour"
 
                 ListAction("Renommer la liste", R.drawable.outline_drive_file_rename_outline_24) {
-                    //Toast.makeText(requireActivity(), "Renommer la liste", Toast.LENGTH_SHORT).show()
-                    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-                    // I'm using fragment here so I'm using getView() to provide ViewGroup
-                    // but you can provide here any other instance of ViewGroup from your Fragment / Activity
-
+                    val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
                     val viewInflated: View = LayoutInflater.from(context).inflate(R.layout.list_name_edit, getView() as ViewGroup?, false)
-
                     val input = viewInflated.findViewById<EditText>(R.id.input)
                     // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
                     builder.apply {
                         setTitle("Renommer une liste")
                         setView(viewInflated)
-                        setPositiveButton(R.string.ok) { dialog, _ ->
+                        setPositiveButton("Renommer") { dialog, _ ->
                             dialog.dismiss()
                             val newName = input.text.toString()
                             if (newName.isNotEmpty())
@@ -77,15 +115,11 @@ class BottomFragment : BottomSheetDialogFragment() {
                     // Launch popup to rename list
                 },
                 ListAction("Supprimer la liste", R.drawable.ic_baseline_delete_outline_24) {
-                    //Toast.makeText(requireActivity(), "Suppression de la liste...", Toast.LENGTH_SHORT).show()
-
-                    val builder: androidx.appcompat.app.AlertDialog.Builder = androidx.appcompat.app.AlertDialog.Builder(
-                        ContextThemeWrapper(requireContext(), R.style.AlertDialogCustom)
-                    )
+                    val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
                     builder.apply {
                         setTitle("Supprimer la liste ?")
                         setMessage("Toutes les tâches de cette liste seront définitivement supprimées, continuer ?")
-                        setPositiveButton(R.string.ok) { _, _ ->
+                        setPositiveButton("Supprimer") { _, _ ->
                             tasksRepository.deleteList(currentListId)
                         }
                         setNegativeButton(R.string.cancel) { dialog, _ ->
@@ -97,8 +131,19 @@ class BottomFragment : BottomSheetDialogFragment() {
                     dismissAllowingStateLoss()
                 },
                 ListAction("Supprimer toutes les tâches terminées", R.drawable.outline_delete_sweep_24) {
-                    //Toast.makeText(requireActivity(), "Suppression des tâches terminées...", Toast.LENGTH_SHORT).show()
-                    tasksRepository.deleteAllDoneTasks(currentListId)
+                    val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
+                    builder.apply {
+                        setTitle("Supprimer toutes les tâches terminées ?")
+                        setMessage("Toutes les tâches terminées seront définitivement supprimées, continuer ?")
+                        setPositiveButton("Supprimer") { _, _ ->
+                            tasksRepository.deleteAllDoneTasks()
+                        }
+                        setNegativeButton(R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        show()
+                    }
+
                     dismissAllowingStateLoss()
                 },
                 ListAction("Exporter la liste", R.drawable.outline_file_upload_24) {
@@ -109,28 +154,22 @@ class BottomFragment : BottomSheetDialogFragment() {
                     dismissAllowingStateLoss()
                 },
                 ListAction("Importer une liste", R.drawable.outline_file_download_24) {
-                    //(requireActivity() as TasksActivity?)!!.exportToJson()
                     Toast.makeText(requireActivity(), "Importez une liste au format texte (JSON)", Toast.LENGTH_SHORT).show()
                     tasksRepository.openFile()
                     dismissAllowingStateLoss()
                 },
                 ListAction("Créer une nouvelle liste", R.drawable.ic_add_black_48dp) {
-                    Toast.makeText(requireActivity(), "Création d'une liste", Toast.LENGTH_SHORT).show()
-                    val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-                    // I'm using fragment here so I'm using getView() to provide ViewGroup
-                    // but you can provide here any other instance of ViewGroup from your Fragment / Activity
-
+                    val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
                     val viewInflated: View = LayoutInflater.from(context).inflate(R.layout.list_name_edit, getView() as ViewGroup?, false)
-
                     val input = viewInflated.findViewById<EditText>(R.id.input)
                     // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
                     builder.apply {
                         setView(viewInflated)
                         setTitle("Créer une liste")
-                        setPositiveButton(R.string.ok) { dialog, _ ->
+                        setPositiveButton("Créer") { dialog, _ ->
                             dialog.dismiss()
                             val mText = input.text.toString()
-                            tasksRepository.createList(mText)
+                            tasksRepository.createList(mText, true)
                             dismissAllowingStateLoss()
                         }
                         setNegativeButton(R.string.cancel) { dialog, _ ->
@@ -138,19 +177,12 @@ class BottomFragment : BottomSheetDialogFragment() {
                         }
                         show()
                     }
-
-                    // Launch popup or bottomsheet for the name
-                },
-                /*ListAction("Changer le thème") {
-                    Toast.makeText(requireActivity(), "Changer le thème", Toast.LENGTH_SHORT).show()
-                }*/
+                }
             ))
         } else {
             Toast.makeText(requireActivity(), "Aucune liste sélectionnée...", Toast.LENGTH_SHORT).show()
             dismissAllowingStateLoss()
         }
-
-         //arguments?.getInt(ARG_ITEM_COUNT2)?.let {  }
     }
 
     private inner class ViewHolder(
@@ -185,14 +217,11 @@ class BottomFragment : BottomSheetDialogFragment() {
             }
         }
 
-        override fun getItemCount(): Int {
-            return mList.size
-        }
+        override fun getItemCount(): Int = mList.size
     }
 
     companion object {
 
-        // TODO: Customize parameters
         fun newInstance(currentList: String): BottomFragment =
             BottomFragment().apply {
                 arguments = Bundle().apply {

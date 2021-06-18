@@ -11,7 +11,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +29,7 @@ import kotlinx.serialization.json.Json
 import java.util.*
 
 class TasksAdapter(
-    val mTasks: ArrayList<Task>,
+    val mTasks: MutableList<Task>,
     private val context: Context,
     private val activity : Activity
 ) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
@@ -138,6 +140,7 @@ class TasksAdapter(
         val dateChip : Chip = itemView.findViewById(R.id.date_chip)
         val priorityChip : Chip = itemView.findViewById(R.id.priority_chip)
         val durationChip : Chip = itemView.findViewById(R.id.duration_chip)
+        val itemParent : LinearLayout = itemView.findViewById(R.id.itemParent)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -180,12 +183,12 @@ class TasksAdapter(
 
         } else viewHolder.dateChip.visibility = View.GONE
 
-        val priority = task.priority
-        if (priority != Priority.NONE) {
+
+        if (task.priority != Priority.NONE) {
             viewHolder.priorityChip.apply {
                 visibility = View.VISIBLE
-                text = priority.first
-                setTextColor(ContextCompat.getColor(mContext, priority.second))
+                text = task.priority.first
+                setTextColor(ContextCompat.getColor(mContext, task.priority.second))
             }
         } else viewHolder.priorityChip.visibility = View.GONE
 
@@ -213,7 +216,7 @@ class TasksAdapter(
         }
 
         // Set onclick listener for the whole item, to show details fragment
-        viewHolder.itemView.setOnClickListener {
+        viewHolder.itemParent.setOnClickListener {
             val item = mTasks[viewHolder.bindingAdapterPosition]
             //Toast.makeText(context,"Item Cicked with id ${item.uid}",Toast.LENGTH_SHORT).show()
 
@@ -227,7 +230,11 @@ class TasksAdapter(
 
             Log.i("Item clicked", taskJson)
 
+            val currentList = (activity as TasksActivity).getCurrentListName()
+
             intent.putExtra("currentTask", taskJson)
+            intent.putExtra("currentList", currentList)
+            //Toast.makeText(tasksActivity, "current list namer ${TasksRepository.getInstance(tasksActivity).currentListName}",Toast.LENGTH_SHORT).show()
             intent.putExtra("position", viewHolder.bindingAdapterPosition)
 
             tasksActivity.startActivityForResult(intent, 500)

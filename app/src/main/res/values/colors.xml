@@ -57,6 +57,10 @@
     <color name="taskPasUrgent">#099100</color>
     <color name="taskFacultative">#066600</color>
 
+    
+    <color name="iconTintFab">#2A2B71</color>
+    <color name="fabBg">#E2E3FF</color>
+
 </resources> <!--69B4BC-->
 
     <!--

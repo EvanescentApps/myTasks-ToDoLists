@@ -16,6 +16,7 @@
     tools:showIn="@layout/activity_tasks">-->
 
 <LinearLayout
+    android:id="@+id/parentRecyclerV"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -32,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:animateLayoutChanges="true"
         android:padding="8dp"
         android:clipToPadding="false"
         android:layout_marginTop="18dp"
@@ -41,8 +43,9 @@
         <ImageView
             android:layout_width="match_parent"
             android:elevation="6dp"
+            android:layout_marginTop="12dp"
             android:layout_height="190dp"
-            android:contentDescription="Ajoutez une tâche (illustration de deux personnes qui prennent en main leurs tâches)"
+            android:contentDescription="@string/add_task_empty_state"
             app:srcCompat="@drawable/ic_tasks_empty_state"/>
 
         <TextView
@@ -52,7 +55,7 @@
             android:layout_marginTop="16dp"
             android:textColor="@color/textContentSecondary"
             android:lineSpacingExtra="2dp"
-            android:text="Aucune tâche ajoutée, commencez à planifier\nvos projets ou votre journée !"/>
+            android:text="@string/empty_task_text"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/addTask"
@@ -61,12 +64,14 @@
             android:textSize="22sp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            android:text="Ajouter une tâche"
+            android:text="@string/add_task_empty"
             android:layout_marginTop="8dp"
             android:textAllCaps="false"
             app:cornerRadius="8dp"
-            android:backgroundTint="@color/purpleLight2"
+            android:backgroundTint="@color/backgroundRipple"
             android:textColor="@color/textContentPrimary"/>
+
+        <!--previously it was BGTINT purpleLight2-->
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
