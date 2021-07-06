@@ -46,4 +46,8 @@
     <string name="add_task_empty_state">Ajoutez une tâche (illustration de deux personnes qui prennent en main leurs tâches)</string>
     <string name="empty_task_text">Aucune tâche ajoutée, commencez à planifier\nvos projets ou votre journée !</string>
     <string name="add_task_empty">Ajouter une tâche</string>
+    <string name="back_homepage">Revenir à l\'accueil</string>
+    <string name="how_to_leave_flow">Pour quitter le Flow, appuie sur Retour\n(seulement si c\'est nécessaire)</string>
+    <string name="button_timer">Bouton modifier le temps</string>
+    <string name="button_play_pause">Bouton Pause ou Reprendre</string>
 </resources>

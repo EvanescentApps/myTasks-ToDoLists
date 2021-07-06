@@ -197,17 +197,11 @@ class FlowActivity : AppCompatActivity() {
                 b.leaveFlow.fadeTo(true, 1000)
 
                 Handler(Looper.getMainLooper()).postDelayed({
-
                     try {
-                        val notification: Uri =
-                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                        val r: Ringtone =
-                            RingtoneManager.getRingtone(applicationContext, notification)
+                        val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                        val r: Ringtone = RingtoneManager.getRingtone(applicationContext, notification)
                         r.play()
-
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+                    } catch (e: Exception) { e.printStackTrace() }
 
                     b.progressTime.apply {
                         trackColor = Color.parseColor("#00CD00")
@@ -221,6 +215,8 @@ class FlowActivity : AppCompatActivity() {
                         finish()
                     }
                     b.leaveFlow.visibility = View.VISIBLE
+
+                    // TODO : START LOTTIE ANIMATION
                 }, 700)
             }
         }
@@ -249,13 +245,9 @@ class FlowActivity : AppCompatActivity() {
         val minutes = taskDurationMillis / 60000
         val seconds = (taskDurationMillis % 60000 / 1000)
         var textTimeTotal = ""
-        if (minutes < 10) {
-            textTimeTotal += "0"
-        }
+        if (minutes < 10) textTimeTotal += "0"
         textTimeTotal += "${minutes}:"
-        if (seconds < 10) {
-            textTimeTotal += "0"
-        }
+        if (seconds < 10)  textTimeTotal += "0"
         textTimeTotal += "$seconds"
 
         b.totalTime.text = "Total $textTimeTotal"
@@ -267,37 +259,25 @@ class FlowActivity : AppCompatActivity() {
         }
         b.modifyTimer.setOnClickListener {
 
-
-
-            // I'm using fragment here so I'm using getView() to provide ViewGroup
-            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
-            /*val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
-            val viewInflated: View = LayoutInflater.from(this)
-                .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
-
-            //val input = viewInflated.findViewById<EditText>(R.id.input)
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-
-            val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
-            val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
-            val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)*/
-
-            //val hoursPicker2 = viewInflated.findViewById<NumberPickerView>(R.id.hours2)
-
             val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
-
             builder.apply {
                 setTitle("Fonctionnalité en cours de développement")
                 setMessage("Cette fonctionnalité n'est pas disponible pour l'instant, ce sera pour une prochaine mise à jour.")
-                setPositiveButton(
-                    "D'accord"
-                ) { dialog, _ ->
+                setPositiveButton("D'accord") { dialog, _ ->
                     dialog.dismiss()
                 }
                 show()
             }
 
-            /*builder.apply {
+            /*val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+            val viewInflated: View = LayoutInflater.from(this)
+                .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
+
+            val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
+            val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
+            val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)
+
+            builder.apply {
                 setView(viewInflated)
                 title = "Définir la Durée"
                 setMessage("Définissez une durée pour cette tâche")
@@ -391,7 +371,6 @@ class FlowActivity : AppCompatActivity() {
         }
         b.backLeave.setOnClickListener {
             if (!finished) {
-
                 val wasPaused = isPaused
                 pause()
 
@@ -399,33 +378,28 @@ class FlowActivity : AppCompatActivity() {
                 builder.apply {
                     setTitle("Quitter le Flow ?")
                     setMessage("Dommage de s'arrêter si près du but... Vraiment sûr(e) de vouloir quitter le Flow ?")
-                    setPositiveButton(
-                        "Quitter"
-                    ) { _, _ -> finish() }
-                    setNegativeButton(
-                        R.string.cancel
-                    ) { dialog, _ ->
+                    setPositiveButton("Quitter") { _, _ ->
+                        finish()
+                    }
+                    setNegativeButton(R.string.cancel) { dialog, _ ->
                         dialog.dismiss()
                         if (!wasPaused) play()
                     }
                     show()
                 }
             } else {
-
                 val returnIntent = Intent()
                 returnIntent.putExtra("done", true)
                 setResult(Activity.RESULT_OK, returnIntent)
                 finish()
             }
         }
-
     }
 
     private fun play() {
         isPaused = false
         b.playPause.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.pause_black_24dp))
         startCountdownTimer(timeLeft, timeElapsedStop)
-
         b.progressTime.setIndicatorColor(baseColor[0])
     }
 

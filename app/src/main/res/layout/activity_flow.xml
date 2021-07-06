@@ -143,6 +143,7 @@
                     android:layout_marginEnd="10dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="6dp"
+                    android:contentDescription="@string/button_timer"
                     app:srcCompat="@drawable/timer_black_24dp"
                     app:tint="@color/textContentPrimary" />
 
@@ -154,12 +155,26 @@
                     android:cropToPadding="true"
                     android:padding="6dp"
                     app:srcCompat="@drawable/pause_black_24dp"
-                    app:tint="@color/textContentPrimary" />
+                    app:tint="@color/textContentPrimary"
+                    android:contentDescription="@string/button_play_pause" />
 
             </LinearLayout>
 
-        </RelativeLayout>
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/doneAnimation"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_alignStart="@+id/progressTime"
+                android:layout_alignTop="@+id/progressTime"
+                android:layout_alignEnd="@+id/progressTime"
+                android:layout_alignBottom="@+id/progressTime"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                app:lottie_rawRes="@raw/check_done_light"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true" />
 
+        </RelativeLayout>
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -168,7 +183,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:text="Revenir à l'accueil"
+        android:text="@string/back_homepage"
         android:textColor="#4942A8"
         android:textSize="20sp"
         android:visibility="gone"
@@ -188,7 +203,7 @@
         android:visibility="gone"
         android:padding="8dp"
         android:alpha="0.4"
-        android:text="Pour quitter le Flow, appuie sur Retour\n(seulement si c'est nécessaire)"
+        android:text="@string/how_to_leave_flow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

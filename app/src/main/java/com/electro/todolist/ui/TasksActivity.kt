@@ -206,6 +206,8 @@ class TasksActivity : AppCompatActivity() {
         b.toolbarLayout.title = newName
     }
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     @SuppressLint("CommitPrefEdits")
     fun changeList(newSelectedList: String, emptyState: Boolean = true) {
 
@@ -264,13 +266,13 @@ class TasksActivity : AppCompatActivity() {
 
         tasks = selectedListContent.all.map { entry ->
             selectedListContent.getString(entry.key, null)?.let { taskJson ->
-                try { Json { ignoreUnknownKeys = true }.decodeFromString(Task.serializer(), taskJson) }
+                try { json.decodeFromString(Task.serializer(), taskJson) }
                 catch (e: Exception) {
                     e.printStackTrace()
                     try {
                         val parsedJson = Gson().fromJson(taskJson, JsonObject::class.java)
                         parsedJson.remove("priority")
-                        Json { ignoreUnknownKeys = true }.decodeFromString(Task.serializer(), parsedJson.toString())
+                        json.decodeFromString(Task.serializer(), parsedJson.toString())
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Task("Erreur de décryptage de la tâche...", creationDate = System.currentTimeMillis(), done = true)
@@ -353,7 +355,7 @@ class TasksActivity : AppCompatActivity() {
 
         b.toolbar.title = listClean[tasksRepository.currentListName].toString()
 
-        Log.i("Selected List", "${tasksRepository.currentListName} selected among ${listClean.toString()}")
+        Log.i("Selected List", "${tasksRepository.currentListName} selected among $listClean")
 
         selectedListContent = getSharedPreferences(tasksRepository.currentListName, MODE_PRIVATE)
         selectedListEditor = selectedListContent.edit()
@@ -412,13 +414,13 @@ class TasksActivity : AppCompatActivity() {
         tasks = selectedListContent.all.map { entry ->
             selectedListContent.getString(entry.key, null)?.let { taskJson ->
                 try {
-                    Json { ignoreUnknownKeys = true }.decodeFromString(Task.serializer(), taskJson)
+                    json.decodeFromString(Task.serializer(), taskJson)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     try {
                         val parsedJson = Gson().fromJson(taskJson, JsonObject::class.java)
                         parsedJson.remove("priority")
-                        Json { ignoreUnknownKeys = true }.decodeFromString(Task.serializer(), parsedJson.toString())
+                        json.decodeFromString(Task.serializer(), parsedJson.toString())
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Task("Erreur de décryptage de la tâche...", creationDate = System.currentTimeMillis(), done = true)
@@ -591,7 +593,7 @@ class TasksActivity : AppCompatActivity() {
             showListsBottomSheet()
         }
 
-        b.includeRecycler.parentRecyclerV.setOnTouchListener { v, event ->
+        b.includeRecycler.parentRecyclerV.setOnTouchListener { _, _ ->
 
             b.bottomAppBar.performShow()
             true

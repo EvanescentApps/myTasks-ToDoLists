@@ -47,6 +47,8 @@ class TaskDetailsActivity : AppCompatActivity() {
 
     private lateinit var b: ActivityTaskDetailsBinding
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +71,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         currentList = intent.getStringExtra("currentList").toString()
 
         task = try {
-            Json.decodeFromString(Task.serializer(), jsonTask)
+            json.decodeFromString(Task.serializer(), jsonTask)
         } catch (e: Exception) {
             Task(
                 "Erreur de décodage",
@@ -94,16 +96,10 @@ class TaskDetailsActivity : AppCompatActivity() {
             else b.setDuration.text = "Définir la durée"
         }
 
-
         if ( task.priority != Priority.NONE) {
-
             b.setPriority.text = task.priority.first
             b.setPriority.setTextColor(ContextCompat.getColor(this, task.priority.second))
-
         } else b.setPriority.text = "Définir la priorité"
-        /*task.priority.let {
-
-        }*/
 
         try {
             b.description.apply {
@@ -149,20 +145,12 @@ class TaskDetailsActivity : AppCompatActivity() {
         fun setDurationDialog(){
             val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
 
-            // I'm using fragment here so I'm using getView() to provide ViewGroup
-            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
-
             val viewInflated: View = LayoutInflater.from(this)
                 .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
-
-            //val input = viewInflated.findViewById<EditText>(R.id.input)
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
 
             val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
             val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
             val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)
-
-            //val hoursPicker2 = viewInflated.findViewById<NumberPickerView>(R.id.hours2)
 
             builder.apply {
                 setView(viewInflated)
@@ -278,8 +266,8 @@ class TaskDetailsActivity : AppCompatActivity() {
 
         fun showPriorityDialog() {
             val viewInflated: View = LayoutInflater.from(this).inflate(R.layout.choose_priority, window.decorView.rootView as ViewGroup?, false)
-            val newBuilder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
-            newBuilder.apply {
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+            builder.apply {
                 setView(viewInflated)
                 setTitle("Définir la Priorité")
                 setCancelable(false)
@@ -430,7 +418,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             // texte "Déplacer vers :
 
             @Suppress("UNCHECKED_CAST")
-            val userListsSerialized = Json.encodeToString(userLists.toList() as? List<Pair<String, String>>)
+            val userListsSerialized = json.encodeToString(userLists.toList() as? List<Pair<String, String>>)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")
         }
@@ -476,7 +464,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         task.title = b.title.text.toString()
         task.description = b.description.text.toString()
 
-        return Json.encodeToString(Task.serializer(), task)
+        return json.encodeToString(Task.serializer(), task)
     }
 
     private fun generateResult(): Intent {

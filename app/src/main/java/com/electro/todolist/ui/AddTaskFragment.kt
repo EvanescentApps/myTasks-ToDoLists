@@ -3,7 +3,6 @@ package com.electro.todolist.ui
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +12,13 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import com.electro.todolist.R
 import com.electro.todolist.data.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import kotlin.random.Random.Default.nextInt
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,7 +109,7 @@ class AddTaskFragment : BottomSheetDialogFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         bottomSheetBehavior.peekHeight = bottomSheetInternal.height
-        coordinatorLayout.parent.requestLayout();
+        coordinatorLayout.parent.requestLayout()
 
 
         super.onViewCreated(view, savedInstanceState)
