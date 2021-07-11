@@ -1,5 +1,6 @@
 package com.electro.todolist.ui
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -216,6 +217,7 @@ class FlowActivity : AppCompatActivity() {
                     }
                     b.leaveFlow.visibility = View.VISIBLE
 
+                    b.doneAnimation.playAnimation()
                     // TODO : START LOTTIE ANIMATION
                 }, 700)
             }

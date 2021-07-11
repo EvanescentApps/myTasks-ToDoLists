@@ -162,17 +162,18 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/doneAnimation"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="320dp"
+                android:layout_height="320dp"
                 android:layout_alignStart="@+id/progressTime"
                 android:layout_alignTop="@+id/progressTime"
                 android:layout_alignEnd="@+id/progressTime"
                 android:layout_alignBottom="@+id/progressTime"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
+                android:elevation="16dp"
                 app:lottie_rawRes="@raw/check_done_light"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true" />
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false" />
 
         </RelativeLayout>
     </LinearLayout>
@@ -221,6 +222,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_arrow_back_ios_new_black_24dp"
-        app:tint="@color/textContentPrimary" />
+        app:tint="@color/textContentPrimary"
+        android:contentDescription="Revenir à l'accueil" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
