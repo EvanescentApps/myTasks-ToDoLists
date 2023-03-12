@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AuthActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ToolbarTheme"
+            app:fontFamily="@font/lexend_bold"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="@string/signinpage_title" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:background="@color/background"
+        android:clipToPadding="false"
+        android:gravity="top"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:id="@+id/textViewy"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="18dp"
+            android:gravity="center"
+            android:text="@string/connexion_un_compte"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:alpha="0.7"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/why_connect"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewy" />
+
+        <!--   app:layout_constraintBottom_toTopOf="@+id/infoCard"-->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/educ"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
+            android:padding="14dp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="ninja.json"
+            app:lottie_loop="true"
+            app:lottie_repeatMode="reverse"
+            app:lottie_speed="1" />
+
+        <!--  <TextView
+            android:id="@+id/google_why"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="La connexion avec Google est recommandée, pour accèder aux classements et à Google Play Jeux"
+            android:textColorLink="@color/textColorAccent"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/with_google" />-->
+
+        <!--<androidx.cardview.widget.CardView
+            android:id="@+id/infoCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="8dp"
+
+            app:cardBackgroundColor="@color/background"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/with_google">
+
+            <LinearLayout
+                android:id="@+id/warnLeaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="8dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    android:id="@+id/infoText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:alpha="0.8"
+                    android:gravity="center_horizontal"
+                    android:text="@string/warn_google_account_needed"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>-->
+
+        <Button
+            android:id="@+id/with_google"
+            style="@style/StyledButton"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:backgroundTint="@color/floatingAddButton"
+            android:drawableLeft="@drawable/ic_google_ico_variant1"
+            android:drawablePadding="8dp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="18dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:text="@string/google_signin"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/with_mail"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        <Button
+            android:id="@+id/with_mail"
+            style="@style/StyledButton"
+            android:layout_height="54dp"
+            android:layout_centerInParent="true"
+            android:alpha="0.8"
+            android:backgroundTint="@color/floatingAddButton"
+            android:drawableLeft="@drawable/ic_email_black_24dp"
+            android:drawablePadding="8dp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="18dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="@string/email_signin"
+            android:textAllCaps="false"
+            android:textSize="17sp"
+            app:backgroundTint="@color/floatingAddButton"
+            app:layout_constraintBottom_toTopOf="@id/no_connexion"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+        <!--<Button
+            android:id="@+id/connexion"
+            style="@style/StyledButton"
+            android:text="Me Connecter"
+            app:backgroundTint="#FF835D"
+            app:layout_constraintBottom_toTopOf="@id/no_connexion"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />-->
+
+        <!--<Button
+            android:id="@+id/oldButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:padding="8dp"
+            android:text="Pas maintenant"
+            android:textColor="#601600"
+            android:layout_marginStart="12dp"
+            android:alpha="0.8"
+            android:background="@drawable/pop_bg"
+            android:layout_marginBottom="6dp"
+            android:layout_marginEnd="12dp"
+            android:textSize="26sp"
+            android:theme="@style/infosText"
+            app:backgroundTint="#FF9B7D"
+            app:layout_constraintBottom_toTopOf="@id/test_btn_design"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />-->
+
+        <Button
+            android:id="@+id/no_connexion"
+            style="@style/StyledButton"
+            android:layout_height="54dp"
+            android:layout_marginBottom="4dp"
+            android:alpha="0.8"
+            android:gravity="center"
+
+            android:padding="2dp"
+            android:text="@string/later_signin"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            app:backgroundTint="@color/floatingAddButton"
+            app:layout_constraintBottom_toTopOf="@id/legal_infos"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- android:layout_marginBottom="10dp"-->
+
+        <TextView
+            android:id="@+id/legal_infos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/tos_confidentiality"
+            android:textColorLink="@color/fabText"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/snackBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

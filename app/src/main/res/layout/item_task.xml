@@ -26,7 +26,7 @@
             android:layout_marginEnd="22dp"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="0dp"
-            android:alpha="0.7"
+
             android:buttonTint="@color/checkbox"
             android:gravity="center"
             android:scaleX="1.3"
@@ -47,11 +47,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:alpha="0.8"
                 android:ellipsize="end"
                 android:maxLines="3"
                 android:text="Préparer la version Release"
-                android:textColor="?android:attr/textColor"
+                android:textColor="@color/textContent"
                 android:textSize="18sp"
                 app:fontFamily="@font/lexend_semibold" />
 
@@ -60,12 +59,11 @@
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.6"
                 android:paddingBottom="0dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="Traquer les bugs, vérifier la compatibilité, et les fonctionnalités"
-                android:textColor="?android:attr/textColor"
+                android:textColor="@color/descriptionContent"
                 app:fontFamily="@font/lexend_semibold" />
 
 

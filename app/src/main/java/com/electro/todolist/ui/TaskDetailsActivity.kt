@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.RadioGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -96,7 +95,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             else b.setDuration.text = "Définir la durée"
         }
 
-        if ( task.priority != Priority.NONE) {
+        if (task.priority != Priority.NONE) {
             b.setPriority.text = task.priority.first
             b.setPriority.setTextColor(ContextCompat.getColor(this, task.priority.second))
         } else b.setPriority.text = "Définir la priorité"
@@ -108,7 +107,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                 Linkify.addLinks(this, Linkify.WEB_URLS)
                 addTextChangedListener(
                     afterTextChanged = {
-                        if (it != null) {
+                        it?.let{
                             Linkify.addLinks(it, Linkify.WEB_URLS)
                         }
                     }
@@ -130,7 +129,6 @@ class TaskDetailsActivity : AppCompatActivity() {
                 result: ActivityResult ->
 
             if (result.resultCode == Activity.RESULT_OK) {
-
                 result.data?.let {
                     if (it.hasExtra("done")) {
                         if (it.getBooleanExtra("done", false)) {
@@ -418,7 +416,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             // texte "Déplacer vers :
 
             @Suppress("UNCHECKED_CAST")
-            val userListsSerialized = json.encodeToString(userLists.toList() as? List<Pair<String, String>>)
+            val userListsSerialized = json.encodeToString(userLists as SerialListObject)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")
         }
@@ -505,6 +503,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         super.onStop()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         finish()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)

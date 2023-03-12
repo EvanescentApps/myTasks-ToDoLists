@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parentLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.6"
+        android:background="?attr/selectableItemBackground"
+        android:text="@string/passer"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- <TextView
+         android:id="@+id/subtext"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+
+         android:layout_marginTop="38dp"
+         android:gravity="center_horizontal"
+         android:paddingLeft="14dp"
+         android:paddingRight="14dp"
+         android:text="@string/des_jeux_des_exercices_et_des_cours_gratuits"
+         android:textColor="#601600"
+         android:textSize="27sp"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/header" />-->
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.35">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animation"
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:layout_marginEnd="35dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="eclair_load.json"
+            app:lottie_loop="true"
+            app:lottie_repeatMode="reverse"
+            app:lottie_speed="3.3" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:alpha="0.8"
+            android:gravity="center"
+            android:paddingStart="22dp"
+            android:paddingLeft="22dp"
+            android:paddingEnd="22dp"
+            android:paddingRight="22dp"
+            android:text="Chargement des données sauvegardées"
+            android:textColor="#601600"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/animation" />
+
+    </LinearLayout>
+
+    <!--<com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="45dp"
+        app:layout_constraintVertical_bias="0.25"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="eclair_load.json"
+        app:lottie_loop="true"
+        app:lottie_repeatMode="reverse"
+        app:lottie_speed="2.0" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:alpha="0.8"
+        android:gravity="center"
+        android:paddingStart="22dp"
+        android:paddingLeft="22dp"
+        android:paddingEnd="22dp"
+        android:paddingRight="22dp"
+        android:text="Préparation des questions personnalisées..."
+        android:textColor="#601600"
+        android:textSize="24sp"
+
+        app:layout_constraintTop_toBottomOf="@+id/animation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.2" />-->
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/action_subscribe"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/button_rounded"
+        android:elevation="16dp"
+        android:fontFamily="@font/lexend_semibold"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:text="@string/je_suis_pret"
+        android:textColor="#D9601600"
+        android:textSize="34sp"
+        android:visibility="gone"
+        app:backgroundTint="#F9C7A2"
+        app:elevation="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- <Button
+        android:id="@+id/demarrer"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/material_rounded_button"
+        android:fontFamily="@font/fredoka_one"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Démarrer"
+        android:textColor="@color/textColor"
+        android:textSize="30sp"
+        android:theme="@style/mainButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

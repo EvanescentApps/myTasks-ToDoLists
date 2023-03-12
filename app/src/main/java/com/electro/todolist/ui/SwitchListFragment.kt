@@ -1,7 +1,6 @@
 package com.electro.todolist.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,29 +8,42 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.Keep
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.electro.todolist.ListsItemTouchCallback
 import com.electro.todolist.R
 import com.electro.todolist.data.TasksRepository
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 data class ListObject(
     val id: String,
     val title : String,
-    val isCurrentSelected: Boolean = false
+    val isCurrentSelected: Boolean = false,
+    val position : Int
+)
+
+@Keep
+@Serializable
+data class SerialListObject(
+    val id: String,
+    val title : String,
+    val position : Int
 )
 
 class ChangeListFragment : BottomSheetDialogFragment() {
 
     //private val Context.dataStore by preferencesDataStore(name = "settings")
 
-    private lateinit var listAdapter : ItemAdapter
+    private lateinit var listAdapter : ListsAdapter
     private var currentListSelected : Int = 0
 
     override fun onCreateView(
@@ -42,7 +54,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         return inflater.inflate(R.layout.bottom_sheet_lists, container, false)
     }
 
-    fun newListAdded(){
+    private fun newListAdded(){
         listAdapter.notifyItemInserted(currentListSelected + 1)
     }
 
@@ -58,7 +70,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         //bottomSheetBehavior.peekHeight = bottomSheetInternal.height
-        coordinatorLayout.parent.requestLayout();
+        coordinatorLayout.parent.requestLayout()
 
         val tasksRepository = TasksRepository.getInstance(requireActivity())
         val recyclerList = view.findViewById<RecyclerView>(R.id.all_lists)
@@ -70,25 +82,31 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         requireArguments().getString("list")?.let { string ->
             listOfPairs = Json.decodeFromString(string)
 
-            listOfPairs.forEach { pair ->
+            listOfPairs.forEachIndexed { index,  pair ->
                 listOfAllLists.add(
-                    ListObject(pair.first, pair.second, (pair.first == currentList)
+                    ListObject(pair.first, pair.second, (pair.first == currentList), index
                     )
                 )
             }
         }
 
-        if (listOfAllLists.isNullOrEmpty()) {
+        if (listOfAllLists.isEmpty()) {
             dismissAllowingStateLoss()
             Toast.makeText(requireContext(),"Aucune liste créée", Toast.LENGTH_SHORT).show()
         }
 
-        listAdapter = ItemAdapter(listOfAllLists)
+        listAdapter = ListsAdapter(listOfAllLists, requireActivity(), this)
 
         currentList?.let {
             recyclerList?.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = listAdapter
+
+
+                //itemTouchHelper.attachToRecyclerView(null)
+                val itemTouchHelperCallback = ListsItemTouchCallback(listAdapter, this.context)
+                val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+                itemTouchHelper.attachToRecyclerView(recyclerList)
             }
         } ?: run {
             Toast.makeText(requireActivity(), "Aucune liste sélectionnée...", Toast.LENGTH_SHORT).show()
@@ -152,35 +170,35 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         val text: TextView = itemView.findViewById(R.id.text)
     }
 
-    private inner class ItemAdapter(private val mList: ArrayList<ListObject>) : //private val mItemCount: Int,
+    /*private inner class ItemAdapter(private val mList: ArrayList<ListObject>) : //private val mItemCount: Int,
         RecyclerView.Adapter<ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(LayoutInflater.from(parent.context), parent)
         }
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.text.text = mList[position].title
+        override fun onBindViewHolder(holder: ViewHolder, adapterPosition: Int) {
+            holder.text.text = mList[holder.bindingAdapterPosition].title
 
 
-            if (mList[position].isCurrentSelected) {
+            if (mList[holder.bindingAdapterPosition].isCurrentSelected) {
                 holder.linearLayout.setBackgroundResource(R.drawable.list_item_bg_selected)
-                currentListSelected = position
+                currentListSelected = holder.bindingAdapterPosition
             }
 
             holder.itemView.setOnClickListener {
                 if (requireActivity() is TasksActivity) {
-                    (requireActivity() as TasksActivity).changeList(mList[position].id)
+                    (requireActivity() as TasksActivity).changeList(mList[holder.bindingAdapterPosition].id)
                 } else if (requireActivity() is TaskDetailsActivity) {
                     // TODO : SWITCH TASK TO SELECTED LIST
-                    Log.i("Switch","Switching task to selected list : ${mList[position].title}")
+                    Log.i("Switch","Switching task to selected list : ${mList[holder.bindingAdapterPosition].title}")
                 }
                 dismissAllowingStateLoss()
             }
         }
 
         override fun getItemCount(): Int = mList.size
-    }
+    }*/
 
     companion object {
 

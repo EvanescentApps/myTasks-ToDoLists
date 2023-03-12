@@ -13,6 +13,11 @@
     <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
 
+    <string name="why_connect">Tu pourras sauvegarder ta progression et la retrouver sur d\'autres appareils.</string>
+    <string name="je_suis_pret">je suis prêt !</string>
+
+    <string name="tos_confidentiality">En continuant, tu acceptes les <u>Conditions d\'utilisation</u> et les <u>Règles de confidentialité</u>.</string>
+
     <!-- Sync Preferences -->
     <string name="sync_title">Synchroniser les tâches</string>
     <string name="attachment_title">Download incoming attachments</string>
@@ -50,4 +55,13 @@
     <string name="how_to_leave_flow">Pour quitter le Flow, appuie sur Retour\n(seulement si c\'est nécessaire)</string>
     <string name="button_timer">Bouton modifier le temps</string>
     <string name="button_play_pause">Bouton Pause ou Reprendre</string>
+    <string name="user_pic">Photo de profil</string>
+    <string name="username_example">MegaWizard</string>
+    <string name="email_example">thewizard42@mathoo.ml</string>
+    <string name="connexion_un_compte">Me connecter à un compte</string>
+    <string name="google_signin">Se connecter avec Google</string>
+    <string name="email_signin">Se connecter par E-mail</string>
+    <string name="later_signin">Se connecter plus tard</string>
+    <string name="signinpage_title">Connexion (étape facultative)</string>
+    <string name="passer">Passer</string>
 </resources>

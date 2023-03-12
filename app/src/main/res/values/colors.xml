@@ -28,9 +28,13 @@
 
     <color name="colorPrimary">#F1F3FF</color>
 
+    <color name="chipBackground">#DCDFFF</color>
+
     <color name="flowBackground">#F1F3FF</color>
 
-    <color name="textContent">#0A0043</color>
+    <color name="textContent">#CC0A0043</color>
+    <color name="descriptionContent">#9A0A0043</color>
+
     <color name="textContentPrimary">#CC0A0043</color>
     <color name="textContentSecondary">#990A0043</color>
 
@@ -38,7 +42,7 @@
 
     <color name="lightPurple">#CC0A0043</color>
 
-    <color name="checkbox">#DF0A0043</color>
+    <color name="checkbox">#9F0A0043</color>
 
     <color name="purpleLight2">#B7C1F8</color>
 

@@ -59,8 +59,8 @@
         tools:targetApi="n_mr1">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="maths.multix"
-            android:targetClass="maths.multix.SettingsActivity" />
+            android:targetPackage="com.electro.todolist"
+            android:targetClass="com.electro.todolist.SettingsActivity" />
         &lt;!&ndash; If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. &ndash;&gt;

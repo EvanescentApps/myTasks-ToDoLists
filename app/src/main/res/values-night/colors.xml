@@ -6,6 +6,7 @@
     <color name="colorPrimary">@color/purpleDark</color>
 
     <color name="textContent">@color/eyeWhite</color>
+    <color name="descriptionContent">#99FFFFFF</color>
 
     <color name="textContentPrimary">#BFFFFFFF</color>
     <color name="textContentSecondary">#9AFFFFFF</color>
@@ -13,6 +14,8 @@
     <color name="iconTint">#E6FFFFFF</color>
 
     <color name="pureWhite">#FFFFFF</color>
+
+    <color name="chipBackground">#3335A8</color>
 
     <color name="fabText">@color/iconTint</color>
 
@@ -30,7 +33,7 @@
 
     <color name="eyeWhite">#CCFFFFFF</color>
 
-    <color name="checkbox">#E6FFFFFF</color>
+    <color name="checkbox">#9FFFFFFF</color>
 
     <color name="taskTresImportant">#FF0000</color>
     <color name="taskImportant">#FF803C</color>

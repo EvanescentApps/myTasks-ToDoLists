@@ -81,7 +81,7 @@ class BottomFragment : BottomSheetDialogFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         //bottomSheetBehavior.peekHeight = bottomSheetInternal.height
-        coordinatorLayout.parent.requestLayout();
+        coordinatorLayout.parent.requestLayout()
 
         val tasksRepository = TasksRepository(requireActivity())
         val recyclerList = view.findViewById<RecyclerView>(R.id.list)

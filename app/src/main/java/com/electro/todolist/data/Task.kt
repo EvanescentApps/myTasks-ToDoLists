@@ -11,6 +11,8 @@ import kotlin.random.Random
 @Serializable
 class Priority {
     companion object {
+
+        // TODO : Store the strings as Ints
         val VERY_HIGH = Pair("Très important", R.color.taskTresImportant)
         val HIGH = Pair("Important", R.color.taskImportant)
         val URGENT = Pair("Très urgent !", R.color.taskUrgent)

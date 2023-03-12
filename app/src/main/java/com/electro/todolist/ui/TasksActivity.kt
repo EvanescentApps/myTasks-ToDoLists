@@ -124,15 +124,18 @@ class TasksActivity : AppCompatActivity() {
         scrollToTask(0)
         adapter.notifyItemChanged(0)
 
+        Log.e("tasks",tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
     fun getCurrentListName(): String = tasksRepository.currentListName
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun addAllTasks(listToAdd: ArrayList<Task>) {
         tasks.addAll(listToAdd)
         adapter.notifyDataSetChanged()
 
+        Log.e("tasks",tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -140,6 +143,7 @@ class TasksActivity : AppCompatActivity() {
         b.includeRecycler.tasksRecyclerview.smoothScrollToPosition(position)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun deleteAllDoneTasks() {
         val tasksToRemove = ArrayList<Task>()
         tasks.forEach { task ->
@@ -155,6 +159,7 @@ class TasksActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
         selectedListEditor.apply()
 
+        Log.e("tasks",tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -177,6 +182,7 @@ class TasksActivity : AppCompatActivity() {
                 scrollToTask(index)
             }.show()
 
+        Log.e("tasks",tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -286,14 +292,14 @@ class TasksActivity : AppCompatActivity() {
 
         // ArrayList<Task> created by the Object Class Task
         //tasks = allTasksList // as ArrayList<Task>
-
-        setEmptyState(tasks.isNullOrEmpty())
+        Log.e("tasks",tasks.toString())
+        setEmptyState(tasks.isEmpty())
 
         if (emptyState) {
             val settingsPrefs = getSharedPreferences("settings", MODE_PRIVATE)
             val firstStart = settingsPrefs.getBoolean("firstStart", true)
 
-            if (tasks.isNullOrEmpty() && firstStart) {
+            if (tasks.isEmpty() && firstStart) {
                 tasks.addAll(Task.emptyState())
                 settingsPrefs.edit().putBoolean("firstStart", false).apply()
             }
@@ -316,10 +322,10 @@ class TasksActivity : AppCompatActivity() {
         b = ActivityTasksBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        getIntFlow(COUNTER).asLiveData().observe(this, {
+        getIntFlow(COUNTER).asLiveData().observe(this) {
             Log.e("INT", "$it")
             //Toast.makeText(this, "$it", Toast.LENGTH_SHORT).show()
-        })
+        }
 
         try {
             GlobalScope.launch(Dispatchers.IO) {
@@ -433,13 +439,13 @@ class TasksActivity : AppCompatActivity() {
         tasks.sortWith { o1, o2 -> o1.done.compareTo(o2.done) }
 
         //tasks = allTasksList
-
-        setEmptyState(tasks.isNullOrEmpty())
+        Log.e("tasks",tasks.toString())
+        setEmptyState(tasks.isEmpty())
 
         val settingsPrefs = getSharedPreferences("settings", MODE_PRIVATE)
         val firstStart = settingsPrefs.getBoolean("firstStart", true)
 
-        if (tasks.isNullOrEmpty() && firstStart) {
+        if (tasks.isEmpty() && firstStart) {
             tasks.addAll(Task.emptyState())
 
             settingsPrefs.edit().putBoolean("firstStart", false).apply()
@@ -618,6 +624,7 @@ class TasksActivity : AppCompatActivity() {
         Log.i("onStop", "Ordered list saved")
     }
 
+    @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
     @SuppressLint("ShowToast")
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
@@ -681,9 +688,12 @@ class TasksActivity : AppCompatActivity() {
 
                 if (task.done) {
 
-                    val newPosition = tasks.size - 1
+                    val placeEnd = true
+                    val newPosition = if (placeEnd) tasks.size - 1 else 0
                     tasks.removeAt(position)
-                    tasks.add(tasks.size, task)
+
+                    val addPlace = if (placeEnd) tasks.size else 0
+                    tasks.add(addPlace, task)
 
                     adapter.notifyItemMoved(position, newPosition)
 

@@ -1,4 +1,3 @@
 package com.electro.todolist.data
 
-class ListRepository {
-}
+class ListRepository

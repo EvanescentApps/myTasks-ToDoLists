@@ -14,6 +14,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.electro.todolist.ui.SerialListObject
 import com.electro.todolist.ui.TasksActivity
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -42,7 +43,14 @@ class TasksRepository(private val activity: Activity) {
     //var listOfIds = userListGroup.values.toList() //arrayListOf("List 1","List 2","List 3")
     //var userLists : List<Pair<String,String>> = (userListGroup.toList()) as List<Pair<String,String>>
 
+
     fun getListGroup(): MutableMap<String, *> = getListGroupPrefs().all
+
+    fun getListGroupNew(): List<SerialListObject>? {
+        return getAllLists()?.map {
+            SerialListObject(it.id, it.title, it.position)
+        }
+    }
 
     fun timestampToDuration(timestamp : Long): String {
 
@@ -119,6 +127,31 @@ class TasksRepository(private val activity: Activity) {
     }
 
     fun getListGroupPrefs() : SharedPreferences = activity.getSharedPreferences("allLists", AppCompatActivity.MODE_PRIVATE)
+
+    fun getAllLists(): ArrayList<SerialListObject>? = getListGroupPrefs().getString("listsSerialized", null)?.let { Json.decodeFromString(it) }
+
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun putNewListsNew() {
+
+        val serialLists = arrayListOf(
+            SerialListObject(
+                "list1", "Mes tâches", 0
+            ),
+            SerialListObject(
+                "list2", "Aujourd'hui", 1
+            ),
+            SerialListObject(
+                "list3", "Demain", 2
+            ))
+
+        val listsSerialized = Json.encodeToString(serialLists)
+
+        getListGroupPrefs().edit().apply {
+            putString("listsSerialized", listsSerialized)
+            putString("defaultList","list1")
+        }.apply()
+    }
 
     @Suppress("MemberVisibilityCanBePrivate")
     fun putNewLists() {

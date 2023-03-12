@@ -3,7 +3,7 @@ package com.electro.todolist.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
+import android.graphics.Paint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +25,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.*
 
 class TasksAdapter(
     val mTasks: MutableList<Task>,
@@ -59,6 +57,7 @@ class TasksAdapter(
         }
     }
 
+
     private fun onCheck(position: Int) {
 
         val taskDone = mTasks[position] // We get the task
@@ -70,9 +69,13 @@ class TasksAdapter(
 
         Handler(Looper.getMainLooper()).postDelayed(
             {
-                val newPosition = mTasks.size - 1
+                val placeEnd = true
+                val newPosition = if (placeEnd) mTasks.size - 1 else 0
+
                 mTasks.removeAt(position)
-                mTasks.add(mTasks.size, taskDone)
+
+                val addPlace = if (placeEnd) mTasks.size else 0
+                mTasks.add(addPlace, taskDone)
                 //notifyItemMoved(position,newPosition)
                 notifyItemRemoved(position)
                 notifyItemRangeChanged(position, newPosition + 1)
@@ -99,6 +102,7 @@ class TasksAdapter(
                         notifyItemRangeChanged(position, newPosition + 1)
                     }.show()
 
+
             }, 100 // value in milliseconds
         )
     }
@@ -115,7 +119,6 @@ class TasksAdapter(
 
         if (side == ItemTouchHelper.LEFT) { //<<
             Log.i("Swipe","DELETE")
-
             tasksActivity.deleteItem(viewHolder.bindingAdapterPosition)
             //mTasks.removeAt(viewHolder.bindingAdapterPosition)
 
@@ -170,13 +173,29 @@ class TasksAdapter(
 
         checkbox.isChecked = task.done
 
+        if (task.done) {
+            with(viewHolder) {
+                arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
+                    it.alpha = 0.65F
+                }
+            }
+            viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            with(viewHolder) {
+                arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
+                    it.alpha = 1F
+                }
+            }
+            viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
+
         val timestamp = task.date
         if (timestamp != null) {
             viewHolder.dateChip.visibility = View.VISIBLE
 
             val dateText = TasksRepository.getInstance(tasksActivity).timestampToDate(timestamp)
 
-            if ( !dateText.isNullOrBlank())
+            if (dateText.isNotBlank())
                 viewHolder.dateChip.text = dateText
             else
                 viewHolder.dateChip.visibility = View.GONE
@@ -198,7 +217,7 @@ class TasksAdapter(
 
             val durationText = TasksRepository.getInstance(tasksActivity).timestampToDuration(durationTimestamp)
 
-            if ( !durationText.isNullOrBlank()) viewHolder.durationChip.text = durationText
+            if (durationText.isNotBlank()) viewHolder.durationChip.text = durationText
             else viewHolder.durationChip.visibility = View.GONE
 
         } else viewHolder.durationChip.visibility = View.GONE
@@ -207,12 +226,25 @@ class TasksAdapter(
 
             task.done = checkbox.isChecked
             Log.i("task", "Checked item ${viewHolder.bindingAdapterPosition}")
-            if (checkbox.isChecked) {
+            if (checkbox.isChecked) onCheck(viewHolder.bindingAdapterPosition)
 
-                onCheck(viewHolder.bindingAdapterPosition)
-                //(context as ScrollingActivity).removeItem(viewHolder.adapterPosition) ///////*****
-            }
             tasksActivity.setTaskDone(task, checkbox.isChecked)
+
+            if (checkbox.isChecked) {
+                with(viewHolder) {
+                    arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
+                        it.alpha = 0.65F
+                    }
+                }
+                viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                with(viewHolder) {
+                    arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
+                        it.alpha = 1F
+                    }
+                }
+                viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
         }
 
         // Set onclick listener for the whole item, to show details fragment
@@ -224,9 +256,8 @@ class TasksAdapter(
             // Push it to a bundle
             val intent = Intent(mContext, TaskDetailsActivity::class.java)
 
-            var taskJson: String
             //Json.encodeToString
-            taskJson = Json.encodeToString(item)
+            val taskJson: String = Json.encodeToString(item)
 
             Log.i("Item clicked", taskJson)
 
@@ -242,9 +273,8 @@ class TasksAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return mTasks.size
-    }
+    override fun getItemCount(): Int = mTasks.size
+
 
     fun setSwipeRefresh(b: Boolean = true) {
         tasksActivity.setSwipeRefreshEnabled(b)

@@ -1,6 +1,5 @@
 package com.electro.todolist.ui
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -16,9 +15,7 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.NumberPicker
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import com.electro.todolist.R
 import com.electro.todolist.databinding.ActivityFlowBinding
@@ -122,29 +119,59 @@ class FlowActivity : AppCompatActivity() {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         //binding.dummyButton.setOnTouchListener(delayHideTouchListener)
+        val motivation = listOf(
+            "Reste motivé(e), c'est bientôt fini !",
+            "C'est parti ! Hâte de voir le résultat ?",
+            "« Vis comme si tu devais mourir demain, apprends comme si tu devais vivre toujours. », Gandhi.",
+            "« Le succès n'est pas final, l'échec n'est pas fatal. C'est le courage de continuer qui compte. », Winston Churchill.",
+            "« Tout est possible à qui rêve, ose, travaille et n'abandonne jamais. », Xavier Dolan.",
+            "« La seule limite à notre épanouissement de demain sera nos doutes d'aujourd'hui. », Franklin Delano Roosevelt.",
+            "« Ceux qui ne font rien ne se trompent jamais. », Théodore de Banville.",
+            "« Je ne perds jamais. Soit je gagne, soit j'apprends. », Nelson Mandela.",
+            "« Vous ne pouvez pas être ce gamin qui reste figé en haut du toboggan en réfléchissant. Vous devez glisser. », Tina Fey.",
+            "« J'ai appris il y a longtemps qu'il y a quelque chose de pire que de rater l'objectif : ne pas passer à l'action. », Mia Hamm.",
+            "« Un jour, tu te réveilleras et tu n'auras plus le temps de faire ce que tu voulais faire. Fais-le donc maintenant. », Paulo Coelho.",
+            "« En suivant le chemin qui s'appelle plus tard, nous arrivons sur la place qui s'appelle jamais. », Sénèque.",
+            "« Plus tard, il sera trop tard. Notre vie, c'est maintenant. », Jacques Prévert.",
+            "« Dans 20 ans, tu seras plus déçu par les choses que tu n'as pas faites que par celles que tu auras faites. Alors, sors des sentiers battus. Mets les voiles. Explore. Rêve. Découvre. », Mark Twain.",
+            "« Prends le temps de réfléchir, mais lorsque c'est le moment de passer à l'action, cesse de penser et vas-y. », Andrew Jackson.",
+            "« Croyez en vos rêves et ils se réaliseront peut-être. Croyez en vous et ils se réaliseront sûrement. », Martin Luther King.",
+            "« Le succès, c'est vous aimer vous-même, c'est aimer ce que vous faites et c'est aimer comment vous le faites. », Maya Angelou.",
+            "« Tu ne sais jamais à quel point tu es fort, jusqu'au jour où être fort reste ta seule option. », Bob Marley.",
+            "« Il y a au fond de vous de multiples petites étincelles de potentialités ; elles ne demandent qu'un souffle pour s'enflammer en de magnifiques réussites. », Wilferd Arlan Peterson.",
+            "« Soyez vous-même, tous les autres sont déjà pris. », Oscar Wilde.",
+            "« Le but de la vie, ce n'est pas l'espoir de devenir parfait, c'est la volonté d'être toujours meilleur. », Ralph Waldo Emerson.",
+            "« Il n'y a qu'une façon d'échouer, c'est d'abandonner avant d'avoir réussi. », Georges Clemenceau.",
+            "« Il y a plus de courage que de talent dans la plupart des réussites. », Félix Leclerc.",
+            "« Ce n'est pas grave si vous avancez lentement, du moment que vous ne vous arrêtez pas. », Confucius.",
+            "« La gloire n'est pas de ne jamais tomber, mais de se relever chaque fois que l'on tombe. », Confucius.",
+            "« Le succès n'est pas final. L'échec n'est pas fatal. C'est le courage de continuer qui compte. », Winston Churchill.",
+            "« Il faut viser la lune, parce qu'au moins, si vous échouez, vous finirez dans les étoiles. », Oscar Wilde.",
+            "« La sagesse suprême est d'avoir des rêves assez grands pour ne pas les perdre du regard tandis qu'on les poursuit. », William Faulkner.",
+            "« Les meilleures choses qui arrivent dans le monde de l'entreprise ne sont pas le résultat du travail d'un seul homme. C'est le travail de toute une équipe. », Steve Jobs.",
+            "« Certains veulent que ça arrive, d'autres aimeraient que ça arrive et quelques-uns font en sorte que ça arrive. », Michael Jordan.",
+            "« La réussite appartient à tout le monde. C'est au travail d'équipe qu'en revient le mérite. », Franck Piccard.",
+            "« Aucun de nous ne sait ce que nous savons tous, ensemble. », Euripide.",
+            "« Se réunir est un début, rester ensemble est un progrès, travailler ensemble est la réussite. », Henry Ford.",
+            "« L'excellence ne résulte pas d'une impulsion isolée, mais d'une succession de petits éléments qui sont réunis. », Vincent Van Gogh."
+        )
 
-        val string1 = "Reste motivé(e), c'est bientôt fini !"
-        val string2 = "C'est parti ! Hâte de voir le résultat ?"
 
-        val motivation = listOf(string1, string2)
+        // Task & Flow duration in seconds
 
-        val taskDurationSec =
-            intent.getIntExtra("taskDuration", 900) // Task & Flow duration in seconds
-
-        taskDurationMillis = taskDurationSec * 1000
+        taskDurationMillis = intent.getIntExtra("taskDuration", 900) * 1000
 
         val taskTitle = intent.getStringExtra("taskTitle")
 
         b.taskTitle.text = taskTitle
-        b.motivText.text = motivation[Random.nextInt(motivation.size)]
+        b.motivText.text = motivation.random()
 
         timeLeft = taskDurationMillis.toLong()
         // TODO : pass as an argument in intent bundle
 
         updateTimer(timeLeft)
 
-        setTimer(taskDurationSec)
-
+        setTimer(taskDurationMillis / 1000)
     }
 
     fun updateTimer(timeLeftMillis: Long) {
@@ -202,7 +229,9 @@ class FlowActivity : AppCompatActivity() {
                         val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
                         val r: Ringtone = RingtoneManager.getRingtone(applicationContext, notification)
                         r.play()
-                    } catch (e: Exception) { e.printStackTrace() }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
                     b.progressTime.apply {
                         trackColor = Color.parseColor("#00CD00")
@@ -216,7 +245,10 @@ class FlowActivity : AppCompatActivity() {
                         finish()
                     }
                     b.leaveFlow.visibility = View.VISIBLE
-
+                    b.countdownTextView.visibility = View.GONE
+                    b.totalTime.visibility = View.GONE
+                    b.playPause.visibility = View.GONE
+                    b.modifyTimer.visibility = View.GONE
                     b.doneAnimation.playAnimation()
                     // TODO : START LOTTIE ANIMATION
                 }, 700)
@@ -225,9 +257,115 @@ class FlowActivity : AppCompatActivity() {
         mCountDownTimer.start()
     }
 
-    fun modifyTimer(variation: Int = 0) {
+    private fun setDurationDialog(currentTaskDuration: Int) {
+
+        pause()
+        val elapsed = taskDurationMillis - timeLeft
+
+
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+
+        val viewInflated: View = LayoutInflater.from(this)
+            .inflate(R.layout.choose_duration, window.decorView.rootView as ViewGroup?, false)
+
+        val hoursPicker = viewInflated.findViewById<NumberPicker>(R.id.hours)
+        val minutesPicker = viewInflated.findViewById<NumberPicker>(R.id.minutes)
+        val secondsPicker = viewInflated.findViewById<NumberPicker>(R.id.seconds)
+
+        builder.apply {
+            setView(viewInflated)
+            setTitle("Modifier la Durée")
+            setMessage("Définissez une durée pour cette tâche")
+            setCancelable(false)
+
+            setPositiveButton(
+                R.string.ok
+            ) { dialog, _ ->
+                dialog.dismiss()
+
+                val hoursPicked = hoursPicker.value
+                val minutesPicked = minutesPicker.value
+                val secondsPicked = secondsPicker.value
+
+                var durationText = ""
+                if (hoursPicked != 0) {
+                    durationText += "${hoursPicked}h"
+                }
+                if (minutesPicked != 0) {
+                    val space = if (durationText.isNotEmpty()) " " else ""
+                    durationText += "${space}${minutesPicked} min"
+                }
+                if (secondsPicked != 0) {
+                    val space = if (durationText.isNotEmpty()) " " else ""
+                    durationText += "${space}${secondsPicked}s"
+                }
+
+                val timeDurationSeconds = hoursPicked * 3600 + minutesPicked * 60 + secondsPicked
+                val timeDurationMillis = timeDurationSeconds * 1000
+
+                taskDurationMillis = timeDurationMillis
+                timeLeft = taskDurationMillis - elapsed
+                updateTimer(timeLeft)
+                b.progressTime.apply {
+                    isIndeterminate = false
+                    max = taskDurationMillis / 100
+                    progress = (elapsed / 100).toInt()
+                }
+                play()
+
+
+                if (durationText.isNotBlank()) b.totalTime.text = "Total $durationText"
+            }
+
+            setNegativeButton(
+                R.string.cancel
+            ) { dialog, _ ->
+                dialog.cancel()
+                play()
+            }
+
+            show()
+
+            val secondsDuration = currentTaskDuration % 60
+            val minutesDuration = (currentTaskDuration / 60) % 60
+            val hoursDuration: Int = (currentTaskDuration / 3600) % 24
+
+            hoursPicker.apply {
+                minValue = 0
+                maxValue = 48
+                value = hoursDuration
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    textSize = 100f
+                    textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                }
+            }
+
+            minutesPicker.apply {
+                minValue = 0
+                maxValue = 59
+                value = minutesDuration
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    textSize = 100f
+                    textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                }
+            }
+
+            secondsPicker.apply {
+                minValue = 0
+                maxValue = 59
+                value = secondsDuration
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    textSize = 100f
+                    textColor = ContextCompat.getColor(this.context, R.color.textContent)
+                }
+            }
+        }
 
     }
+
 
     @SuppressLint("SetTextI18n")
     private fun setTimer(taskDurationSec: Int) {
@@ -249,7 +387,7 @@ class FlowActivity : AppCompatActivity() {
         var textTimeTotal = ""
         if (minutes < 10) textTimeTotal += "0"
         textTimeTotal += "${minutes}:"
-        if (seconds < 10)  textTimeTotal += "0"
+        if (seconds < 10) textTimeTotal += "0"
         textTimeTotal += "$seconds"
 
         b.totalTime.text = "Total $textTimeTotal"
@@ -259,9 +397,10 @@ class FlowActivity : AppCompatActivity() {
         b.playPause.setOnClickListener {
             if (isPaused) play() else pause()
         }
-        b.modifyTimer.setOnClickListener {
 
-            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+        b.modifyTimer.setOnClickListener {
+            setDurationDialog(taskDurationMillis / 1000)
+            /*val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
             builder.apply {
                 setTitle("Fonctionnalité en cours de développement")
                 setMessage("Cette fonctionnalité n'est pas disponible pour l'instant, ce sera pour une prochaine mise à jour.")
@@ -269,7 +408,7 @@ class FlowActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }
                 show()
-            }
+            }*/
 
             /*val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
             val viewInflated: View = LayoutInflater.from(this)
@@ -433,6 +572,7 @@ class FlowActivity : AppCompatActivity() {
     }
 
     //var doubleBack = 0
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
 
         if (!finished) {

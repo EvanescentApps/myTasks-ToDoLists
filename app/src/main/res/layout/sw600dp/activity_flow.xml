@@ -57,7 +57,7 @@
             android:paddingEnd="8dp"
             android:text="Titre de la tâche"
             android:textColor="@color/textContent"
-            android:textSize="32sp"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
         <TextView
@@ -162,8 +162,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/doneAnimation"
-                android:layout_width="350dp"
-                android:layout_height="350dp"
+                android:layout_width="320dp"
+                android:layout_height="320dp"
                 android:layout_alignStart="@+id/progressTime"
                 android:layout_alignTop="@+id/progressTime"
                 android:layout_alignEnd="@+id/progressTime"
@@ -171,8 +171,6 @@
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:elevation="16dp"
-                android:scaleX="1.3"
-                android:scaleY="1.3"
                 app:lottie_rawRes="@raw/check_done_light"
                 app:lottie_autoPlay="false"
                 app:lottie_loop="false" />
