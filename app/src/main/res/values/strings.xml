@@ -64,4 +64,5 @@
     <string name="later_signin">Se connecter plus tard</string>
     <string name="signinpage_title">Connexion (étape facultative)</string>
     <string name="passer">Passer</string>
+    <string name="utilisateur">Utilisateur</string>
 </resources>

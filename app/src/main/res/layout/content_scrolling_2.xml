@@ -80,6 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="0dp"
         android:clipToPadding="false"
+        android:clipChildren="false"
         android:paddingBottom="100dp"
         android:backgroundTint="?attr/backgroundColor"
         android:background="?attr/backgroundColor"

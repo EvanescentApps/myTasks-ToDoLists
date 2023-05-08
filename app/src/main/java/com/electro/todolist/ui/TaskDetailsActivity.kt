@@ -27,6 +27,7 @@ import com.electro.todolist.databinding.ActivityTaskDetailsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -408,15 +409,22 @@ class TaskDetailsActivity : AppCompatActivity() {
         }
 
         b.bottomAppBar.setNavigationOnClickListener {
+            Timber.tag("Navigation").e("pressed")
             val userLists = tasksRepository.getListGroup()
 
+            Timber.e(userLists.toString())
+
+            //val goodList = userLists?.filter { it.id!= "defaultList" }
             if (userLists.containsKey("defaultList")) { userLists.remove("defaultList") }
 
+            val newList = userLists.map { Pair(it.key, it.value) }//toMutableList()
+            //Timber.e(goodList.toString())
             // TODO : SET "CHANGE LIST" MODE WITH DIFFERENT INTERFACE
             // texte "Déplacer vers :
 
-            @Suppress("UNCHECKED_CAST")
-            val userListsSerialized = json.encodeToString(userLists as SerialListObject)
+
+
+            val userListsSerialized = json.encodeToString(newList as List<Pair<String, String>>)
             ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
                 .show(supportFragmentManager, "dialog")
         }
@@ -424,7 +432,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         b.bottomAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.delete -> {
-                    Log.e("Delete", "pressed")
+                    Timber.tag("Delete").e("pressed")
                     delete = true
                     finish()
                     true

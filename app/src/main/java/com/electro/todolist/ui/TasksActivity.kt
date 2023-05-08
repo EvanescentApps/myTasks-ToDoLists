@@ -3,7 +3,6 @@ package com.electro.todolist.ui
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -46,12 +45,12 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 
 class TasksActivity : AppCompatActivity() {
@@ -124,7 +123,7 @@ class TasksActivity : AppCompatActivity() {
         scrollToTask(0)
         adapter.notifyItemChanged(0)
 
-        Log.e("tasks",tasks.toString())
+        Timber.tag("tasks").e(tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -135,7 +134,7 @@ class TasksActivity : AppCompatActivity() {
         tasks.addAll(listToAdd)
         adapter.notifyDataSetChanged()
 
-        Log.e("tasks",tasks.toString())
+        Timber.tag("tasks").e(tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -159,7 +158,7 @@ class TasksActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
         selectedListEditor.apply()
 
-        Log.e("tasks",tasks.toString())
+        Timber.tag("tasks").e(tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -170,7 +169,7 @@ class TasksActivity : AppCompatActivity() {
 
         adapter.notifyItemRemoved(index)
         tasks.removeAt(index)
-        Log.e("Activity", "Delete item at $index")
+        Timber.tag("Activity").e("Delete item at %s", index)
 
         Snackbar.make(b.activity, "Tâche supprimée", Snackbar.LENGTH_LONG)
             .setAnchorView(b.fab)
@@ -182,7 +181,7 @@ class TasksActivity : AppCompatActivity() {
                 scrollToTask(index)
             }.show()
 
-        Log.e("tasks",tasks.toString())
+        Timber.tag("tasks").e(tasks.toString())
         setEmptyState(tasks.isEmpty())
     }
 
@@ -196,7 +195,7 @@ class TasksActivity : AppCompatActivity() {
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
         Collections.swap(tasks, fromPosition, toPosition)
-        Log.i("Activity position", "from: $fromPosition to: $toPosition")
+        Timber.tag("Activity position").i("from: " + fromPosition + " to: " + toPosition)
     }
 
     fun setTaskDone(task: Task, done: Boolean = true) {
@@ -221,7 +220,7 @@ class TasksActivity : AppCompatActivity() {
 
         b.toolbarLayout.title = tasksRepository.getListGroup()[newSelectedList].toString()
 
-        Log.i("List", "Changed to ${tasksRepository.currentListName}")
+        Timber.tag("List").i("Changed to %s", tasksRepository.currentListName)
         selectedListContent = getSharedPreferences(tasksRepository.currentListName, MODE_PRIVATE)
         selectedListEditor = selectedListContent.edit()
 
@@ -272,8 +271,9 @@ class TasksActivity : AppCompatActivity() {
 
         tasks = selectedListContent.all.map { entry ->
             selectedListContent.getString(entry.key, null)?.let { taskJson ->
-                try { json.decodeFromString(Task.serializer(), taskJson) }
-                catch (e: Exception) {
+                try {
+                    json.decodeFromString(Task.serializer(), taskJson)
+                } catch (e: Exception) {
                     e.printStackTrace()
                     try {
                         val parsedJson = Gson().fromJson(taskJson, JsonObject::class.java)
@@ -292,7 +292,7 @@ class TasksActivity : AppCompatActivity() {
 
         // ArrayList<Task> created by the Object Class Task
         //tasks = allTasksList // as ArrayList<Task>
-        Log.e("tasks",tasks.toString())
+        Timber.tag("tasks").e(tasks.toString())
         setEmptyState(tasks.isEmpty())
 
         if (emptyState) {
@@ -323,18 +323,18 @@ class TasksActivity : AppCompatActivity() {
         setContentView(b.root)
 
         getIntFlow(COUNTER).asLiveData().observe(this) {
-            Log.e("INT", "$it")
+            Timber.tag("INT").e(it.toString())
             //Toast.makeText(this, "$it", Toast.LENGTH_SHORT).show()
         }
 
         try {
             GlobalScope.launch(Dispatchers.IO) {
                 val wifiManager =
-                    applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
                 val localIP = formatIpAddress(wifiManager.connectionInfo.ipAddress)
                 val publicIP = getPublicIPAddress()?.trim()
 
-                Log.i("IP ADDRESS", "Local IP : $localIP - Public IP : $publicIP")
+                Timber.tag("IP ADDRESS").i("Local IP : " + localIP + " - Public IP : " + publicIP)
 
                 launch(Dispatchers.Main) {
                     //Toast.makeText(this@TasksActivity, "Ip address : $localIP ip2 : $publicIP", Toast.LENGTH_SHORT).show()
@@ -361,7 +361,7 @@ class TasksActivity : AppCompatActivity() {
 
         b.toolbar.title = listClean[tasksRepository.currentListName].toString()
 
-        Log.i("Selected List", "${tasksRepository.currentListName} selected among $listClean")
+        Timber.tag("Selected List").i(tasksRepository.currentListName + " selected among " + listClean)
 
         selectedListContent = getSharedPreferences(tasksRepository.currentListName, MODE_PRIVATE)
         selectedListEditor = selectedListContent.edit()
@@ -439,7 +439,7 @@ class TasksActivity : AppCompatActivity() {
         tasks.sortWith { o1, o2 -> o1.done.compareTo(o2.done) }
 
         //tasks = allTasksList
-        Log.e("tasks",tasks.toString())
+        Timber.tag("tasks").e(tasks.toString())
         setEmptyState(tasks.isEmpty())
 
         val settingsPrefs = getSharedPreferences("settings", MODE_PRIVATE)
@@ -610,7 +610,7 @@ class TasksActivity : AppCompatActivity() {
         super.onStop()
 
         // save the last opened list
-        Log.i("Lists", "DefaultList : ${tasksRepository.currentListName}")
+        Timber.tag("Lists").i("DefaultList : %s", tasksRepository.currentListName)
         tasksRepository.getListGroupPrefs().edit().putString("defaultList", tasksRepository.currentListName).apply()
 
         // TODO : DO THIS WORK ASYNC
@@ -621,7 +621,7 @@ class TasksActivity : AppCompatActivity() {
             selectedListEditor.putString(task.creationDate.toString(), Json.encodeToString(task))
         }
         selectedListEditor.apply()
-        Log.i("onStop", "Ordered list saved")
+        Timber.tag("onStop").i("Ordered list saved")
     }
 
     @Deprecated("Deprecated in Java")
@@ -631,9 +631,9 @@ class TasksActivity : AppCompatActivity() {
 
         b.bottomAppBar.performShow()
 
-        Log.e("Activity Result", "We got a result !")
+        Timber.tag("Activity Result").e("We got a result !")
 
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) { // File created, write it
+        if (requestCode == 1 && resultCode == RESULT_OK) { // File created, write it
             // The result data contains a URI for the document or directory that
             // the user selected.
             resultData?.data?.also { uri ->
@@ -647,7 +647,7 @@ class TasksActivity : AppCompatActivity() {
                 tasksRepository.writeTaskListTofile(tasksRepository.currentListName, uri)
                 // Perform operations on the document using its URI.
             }
-        } else if (requestCode == 2 && resultCode == Activity.RESULT_OK) { // File imported
+        } else if (requestCode == 2 && resultCode == RESULT_OK) { // File imported
             resultData?.data?.also { uri ->
 
                 val newList = tasksRepository.readTextContent(uri)
@@ -656,7 +656,7 @@ class TasksActivity : AppCompatActivity() {
                 parsedTasks.sortWith { o1, o2 -> o1.position.compareTo(o2.position) }
                 parsedTasks.sortWith { o1, o2 -> o1.done.compareTo(o2.done) }
 
-                Log.i("Import", "List imported and read successfully : $parsedTasks")
+                Timber.tag("Import").i("List imported and read successfully : %s", parsedTasks)
 
                 tasksRepository.createList("Liste Importée", false) // AUTO SWITCH TO IT OK
                 addAllTasks(parsedTasks)
@@ -670,7 +670,7 @@ class TasksActivity : AppCompatActivity() {
                 // create tasksRepository.addAllTasks(listToAdd) ??
                 // Perform operations on the document using its URI.
             }
-        } else if (requestCode == 500 && resultCode == Activity.RESULT_OK && resultData != null) { // Task modified
+        } else if (requestCode == 500 && resultCode == RESULT_OK && resultData != null) { // Task modified
             //Toast.makeText(this, "Tâche Modifiée", Toast.LENGTH_SHORT).show()
             val position = resultData.getIntExtra("position", -1)
             val taskJson = resultData.getStringExtra("returnTask")
@@ -710,8 +710,8 @@ class TasksActivity : AppCompatActivity() {
                         }.show()
                 }
                 adapter.notifyItemChanged(position)
-            } else Log.e("DATA", "Position or TaskJson is null on result")
-        } else Log.e("RESULT", "Unknown request code")
+            } else Timber.tag("DATA").e("Position or TaskJson is null on result")
+        } else Timber.tag("RESULT").e("Unknown request code")
 
         super.onActivityResult(requestCode, resultCode, resultData)
     }
@@ -737,7 +737,7 @@ class TasksActivity : AppCompatActivity() {
                     urlConnection.disconnect()
                 }
             } catch (e: IOException) {
-                Log.e("Public IP: ", e.message!!)
+                Timber.tag("Public IP: ").e(e.message!!)
             }
             null
         }

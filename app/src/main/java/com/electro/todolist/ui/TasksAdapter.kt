@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -23,11 +22,13 @@ import com.electro.todolist.data.TasksRepository
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.varunest.sparkbutton.SparkButton
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 
 class TasksAdapter(
-    val mTasks: MutableList<Task>,
+    private val mTasks: MutableList<Task>,
     private val context: Context,
     private val activity : Activity
 ) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
@@ -36,15 +37,15 @@ class TasksAdapter(
 
     private val tasksActivity = activity as TasksActivity
 
-    val logEnabled = false
+    private val logEnabled = false
 
     fun moveItem(from: Int, to: Int) {
 
         if (logEnabled) {
             val titlesBefore = arrayListOf<String>()
             mTasks.forEach { titlesBefore.add(it.title) }
-            Log.d("Adapter position", "from: $from to: $to")
-            Log.i("b4 mTs", Json.encodeToString(titlesBefore))
+            Timber.tag("Adapter position").d("from: %s to: %f", from, to)
+            Timber.tag("b4 mTs").i(Json.encodeToString(titlesBefore))
         }
 
         tasksActivity.swapItems(from, to)
@@ -53,7 +54,7 @@ class TasksAdapter(
         if (logEnabled) {
             val titlesOnly = arrayListOf<String>()
             mTasks.forEach { titlesOnly.add(it.title) }
-            Log.i("mTasks", Json.encodeToString(titlesOnly))
+            Timber.tag("mTasks").i(Json.encodeToString(titlesOnly))
         }
     }
 
@@ -65,7 +66,7 @@ class TasksAdapter(
         //val taskToJson = Json.encodeToString(taskDone) // Converted to Json for storage
         //listEdit.putString(taskDone.creationDate.toString(), taskToJson).apply()
 
-        Log.e("Activity", "Remove item at $position, size after removed : ${mTasks.size}")
+        Timber.tag("Activity").e("Remove item at " + position + ", size after removed : " + mTasks.size)
 
         Handler(Looper.getMainLooper()).postDelayed(
             {
@@ -87,7 +88,7 @@ class TasksAdapter(
                 )
                     .setAnchorView(context.findViewById<FloatingActionButton>(R.id.fab))
                     .setAction("Annuler") {
-                        Log.e("Action", "Suppression annulée")
+                        Timber.tag("Action").e("Suppression annulée")
                         taskDone.done = false
                         //listEdit.putString(taskDone.creationDate.toString(), Gson().toJson(taskDone)).apply()
 
@@ -118,14 +119,14 @@ class TasksAdapter(
     fun onSwipe(viewHolder: RecyclerView.ViewHolder, side: Int) {
 
         if (side == ItemTouchHelper.LEFT) { //<<
-            Log.i("Swipe","DELETE")
+            Timber.tag("Swipe").i("DELETE")
             tasksActivity.deleteItem(viewHolder.bindingAdapterPosition)
             //mTasks.removeAt(viewHolder.bindingAdapterPosition)
 
             //notifyItemRangeChanged(position,mTasks.size)
         } else if (side == ItemTouchHelper.RIGHT) { // >>
 
-            Log.i("Swipe","Swipe SET DONE, Checked item ${viewHolder.bindingAdapterPosition}")
+            Timber.tag("Swipe").i("Swipe SET DONE, Checked item %s", viewHolder.bindingAdapterPosition)
 
             val task: Task = mTasks[viewHolder.bindingAdapterPosition]
             task.done = true
@@ -139,7 +140,8 @@ class TasksAdapter(
 
         val titleTextView: TextView = itemView.findViewById(R.id.title)
         val descriptionTextView: TextView = itemView.findViewById(R.id.description)
-        val checkbox: CheckBox = itemView.findViewById(R.id.checkbox)
+        //val checkbox: CheckBox = itemView.findViewById(R.id.checkbox)
+        val newCheckBox: SparkButton = itemView.findViewById(R.id.new_checkbox)
         val dateChip : Chip = itemView.findViewById(R.id.date_chip)
         val priorityChip : Chip = itemView.findViewById(R.id.priority_chip)
         val durationChip : Chip = itemView.findViewById(R.id.duration_chip)
@@ -157,9 +159,9 @@ class TasksAdapter(
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
         val titleTasktextView2 = viewHolder.titleTextView
-        val checkbox = viewHolder.checkbox
+        //val checkbox = viewHolder.checkbox
         val descriptionTaskTextView2 = viewHolder.descriptionTextView
-
+        val newCheckbox = viewHolder.newCheckBox
         val task: Task = mTasks[viewHolder.bindingAdapterPosition]
         titleTasktextView2.text = task.title //set title to item
         //descriptionTaskTextView2.text = task.description
@@ -171,18 +173,19 @@ class TasksAdapter(
             descriptionTaskTextView2.visibility = View.VISIBLE
         }
 
-        checkbox.isChecked = task.done
+        //checkbox.isChecked = task.done
+        newCheckbox.isChecked = task.done
 
         if (task.done) {
             with(viewHolder) {
-                arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
+                arrayListOf(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, newCheckbox).forEach {
                     it.alpha = 0.65F
                 }
             }
             viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
             with(viewHolder) {
-                arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
+                arrayListOf(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, newCheckbox).forEach {
                     it.alpha = 1F
                 }
             }
@@ -222,29 +225,38 @@ class TasksAdapter(
 
         } else viewHolder.durationChip.visibility = View.GONE
 
-        checkbox.setOnClickListener {
+        newCheckbox.setOnClickListener {
+            if (!newCheckbox.isChecked) newCheckbox.playAnimation()
 
-            task.done = checkbox.isChecked
-            Log.i("task", "Checked item ${viewHolder.bindingAdapterPosition}")
-            if (checkbox.isChecked) onCheck(viewHolder.bindingAdapterPosition)
+            newCheckbox.isChecked = !newCheckbox.isChecked
 
-            tasksActivity.setTaskDone(task, checkbox.isChecked)
+            task.done = newCheckbox.isChecked
 
-            if (checkbox.isChecked) {
+            fun setAlpha(alpha: Float) {
                 with(viewHolder) {
-                    arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
-                        it.alpha = 0.65F
+                    arrayListOf(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, newCheckbox).forEach {
+                        it.alpha = alpha
                     }
                 }
-                viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            } else {
-                with(viewHolder) {
-                    arrayListOf<View>(titleTextView, dateChip,durationChip, priorityChip, descriptionTaskTextView2, checkbox).forEach {
-                        it.alpha = 1F
-                    }
-                }
-                viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             }
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                Timber.tag("task").i("Checked item %s", viewHolder.bindingAdapterPosition)
+
+                if (newCheckbox.isChecked) onCheck(viewHolder.bindingAdapterPosition)
+
+                tasksActivity.setTaskDone(task, newCheckbox.isChecked)
+
+                if (newCheckbox.isChecked) {
+                    setAlpha(0.65F)
+                    viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    setAlpha(1F)
+                    viewHolder.titleTextView.paintFlags = viewHolder.titleTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
+            }, 600)
+
+
         }
 
         // Set onclick listener for the whole item, to show details fragment
@@ -259,7 +271,7 @@ class TasksAdapter(
             //Json.encodeToString
             val taskJson: String = Json.encodeToString(item)
 
-            Log.i("Item clicked", taskJson)
+            Timber.tag("Item clicked").i(taskJson)
 
             val currentList = (activity as TasksActivity).getCurrentListName()
 
