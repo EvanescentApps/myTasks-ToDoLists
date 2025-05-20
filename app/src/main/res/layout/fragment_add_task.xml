@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:clipToPadding="false"
     android:clipChildren="false"
-    tools:context=".ui.AddTaskFragment">
+    tools:context=".ui.fragments.AddTaskFragment">
 
         <EditText
             android:layout_width="match_parent"

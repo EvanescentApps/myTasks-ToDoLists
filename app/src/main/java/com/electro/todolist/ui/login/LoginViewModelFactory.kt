@@ -3,7 +3,7 @@ package com.electro.todolist.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.electro.todolist.data.LoginDataSource
-import com.electro.todolist.data.LoginRepository
+import com.electro.todolist.data.repository.LoginRepository
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

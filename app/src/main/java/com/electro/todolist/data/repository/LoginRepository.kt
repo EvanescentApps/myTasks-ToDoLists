@@ -1,5 +1,12 @@
-package com.electro.todolist.data
+/*
+ * Copyright (c) 2025. myTasks © 2021 by Evan Cocain is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International. (A Creative Commons License)
+ * Created and published by Evan Cocain (as Electro Inc.)
+ */
 
+package com.electro.todolist.data.repository
+
+import com.electro.todolist.data.LoginDataSource
+import com.electro.todolist.data.Result
 import com.electro.todolist.data.model.LoggedInUser
 
 /**

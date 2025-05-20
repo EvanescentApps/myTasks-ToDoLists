@@ -1,4 +1,9 @@
-package com.electro.todolist.ui
+/*
+ * Copyright (c) 2025. myTasks © 2021 by Evan Cocain is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International. (A Creative Commons License)
+ * Created and published by Evan Cocain (as Electro Inc.)
+ */
+
+package com.electro.todolist.ui.details
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -8,7 +13,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.util.Linkify
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,16 +24,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import com.electro.todolist.R
-import com.electro.todolist.data.Priority
-import com.electro.todolist.data.Task
-import com.electro.todolist.data.TasksRepository
+import com.electro.todolist.data.model.Priority
+import com.electro.todolist.data.model.Task
+import com.electro.todolist.data.repository.TasksRepository
+import com.electro.todolist.data.timestampToDate
+import com.electro.todolist.data.timestampToDuration
 import com.electro.todolist.databinding.ActivityTaskDetailsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.content.edit
+import com.electro.todolist.ui.FlowActivity
+import com.electro.todolist.ui.fragments.ChangeListFragment
 
 
 class TaskDetailsActivity : AppCompatActivity() {
@@ -62,7 +70,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        val tasksRepository = TasksRepository.getInstance(this)
+        val tasksRepository = TasksRepository.getInstance(this.applicationContext)
         tasksRepository.getDefaultList()
 
         delete = false
@@ -71,7 +79,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         currentList = intent.getStringExtra("currentList").toString()
 
         task = try {
-            json.decodeFromString(Task.serializer(), jsonTask)
+            json.decodeFromString<Task>(jsonTask)
         } catch (e: Exception) {
             Task(
                 "Erreur de décodage",
@@ -85,13 +93,13 @@ class TaskDetailsActivity : AppCompatActivity() {
         b.description.setText(task.description)
 
         task.date?.let {
-            val dateText = tasksRepository.timestampToDate(it)
+            val dateText = timestampToDate(it)
             if (dateText.isNotBlank()) b.setTime.text = dateText
             else b.setTime.text = "Ajouter date/heure"
         }
 
         task.duration?.let {
-            val durationText = tasksRepository.timestampToDuration(it)
+            val durationText = timestampToDuration(it)
             if (durationText.isNotBlank()) b.setDuration.text = durationText
             else b.setDuration.text = "Définir la durée"
         }
@@ -115,7 +123,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                 )
             }
         } catch (e: Exception) {
-            Log.e("Clickable links", "Error : ${e.stackTrace}")
+            Timber.tag("Clickable links").e("Error : ${e.stackTrace}")
         }
 
         // HANDLE THE CASE WHEN TASK IS DONE
@@ -410,22 +418,8 @@ class TaskDetailsActivity : AppCompatActivity() {
 
         b.bottomAppBar.setNavigationOnClickListener {
             Timber.tag("Navigation").e("pressed")
-            val userLists = tasksRepository.getListGroup()
 
-            Timber.e(userLists.toString())
-
-            //val goodList = userLists?.filter { it.id!= "defaultList" }
-            if (userLists.containsKey("defaultList")) { userLists.remove("defaultList") }
-
-            val newList = userLists.map { Pair(it.key, it.value) }//toMutableList()
-            //Timber.e(goodList.toString())
-            // TODO : SET "CHANGE LIST" MODE WITH DIFFERENT INTERFACE
-            // texte "Déplacer vers :
-
-
-
-            val userListsSerialized = json.encodeToString(newList as List<Pair<String, String>>)
-            ChangeListFragment.newInstance(tasksRepository.currentListName, userListsSerialized)
+            ChangeListFragment.newInstance()
                 .show(supportFragmentManager, "dialog")
         }
 
@@ -453,7 +447,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     true
                 }
                 R.id.done -> {
-                    Log.e("Done", "pressed")
+                    Timber.tag("Done").e("pressed")
                     task.done = true
                     isNewDone = true
                     finish()
@@ -470,7 +464,7 @@ class TaskDetailsActivity : AppCompatActivity() {
         task.title = b.title.text.toString()
         task.description = b.description.text.toString()
 
-        return json.encodeToString(Task.serializer(), task)
+        return json.encodeToString<Task>(task)
     }
 
     private fun generateResult(): Intent {
@@ -499,12 +493,13 @@ class TaskDetailsActivity : AppCompatActivity() {
     override fun onStop() {
 
         Thread {
-            Log.e("OnStop", "Stopping")
-            Log.e("TASK", updatedTaskJson())
+            Timber.tag("OnStop").e("Stopping")
+            Timber.tag("TASK").e(updatedTaskJson())
 
             if (!delete) {
-                getSharedPreferences(currentList, MODE_PRIVATE).edit()
-                    .putString(task.creationDate.toString(), updatedTaskJson()).apply()
+                getSharedPreferences(currentList, MODE_PRIVATE).edit {
+                    putString(task.creationDate.toString(), updatedTaskJson())
+                }
             }
 
         }.start()

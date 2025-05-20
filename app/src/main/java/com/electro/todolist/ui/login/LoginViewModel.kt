@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import com.electro.todolist.data.LoginRepository
+import com.electro.todolist.data.repository.LoginRepository
 import com.electro.todolist.data.Result
 
 import com.electro.todolist.R

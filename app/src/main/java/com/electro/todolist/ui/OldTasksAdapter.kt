@@ -1,41 +1,41 @@
 package com.electro.todolist.ui
 
-import android.app.Activity
+/*
+
 import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.R
 import com.electro.todolist.data.Priority
 import com.electro.todolist.data.Task
-import com.electro.todolist.data.TasksRepository
+import com.electro.todolist.data.timestampToDate
+import com.electro.todolist.data.timestampToDuration
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.varunest.sparkbutton.SparkButton
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
-class TasksAdapter(
+class OldTasksAdapter(
+    // Initial data can be an empty list, as it will be updated by LiveData
     private val mTasks: MutableList<Task>,
-    private val context: Context,
-    private val activity : Activity
-) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
+    private val mContext: Context,
+    private val tasksActivity : TasksActivity
+) : RecyclerView.Adapter<OldTasksAdapter.ViewHolder>() {
 
-    private var mContext: Context = context
 
-    private val tasksActivity = activity as TasksActivity
 
     private val logEnabled = false
 
@@ -108,6 +108,8 @@ class TasksAdapter(
         )
     }
 
+*/
+/*
     fun deleteItemOnAdapter(position: Int) {
         tasksActivity.deleteItem(position)
         mTasks.removeAt(position)
@@ -115,8 +117,11 @@ class TasksAdapter(
         //notifyItemRemoved(position)
         //notifyItemRangeChanged(position,mTasks.size)
     }
+*//*
 
-    fun onSwipe(viewHolder: RecyclerView.ViewHolder, side: Int) {
+
+    */
+/*fun onSwipe(viewHolder: RecyclerView.ViewHolder, side: Int) {
 
         if (side == ItemTouchHelper.LEFT) { //<<
             Timber.tag("Swipe").i("DELETE")
@@ -133,6 +138,23 @@ class TasksAdapter(
 
             onCheck(viewHolder.bindingAdapterPosition)
             tasksActivity.setTaskDone(task, true)
+        }
+    }*//*
+
+
+    fun onSwipe(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        if (direction == ItemTouchHelper.LEFT) { // For "delete" swipe
+            tasksActivity.onTaskSwiped(viewHolder, direction)
+        } else if (direction == ItemTouchHelper.RIGHT) { // For "set done" swipe
+            Timber.tag("Swipe").i("Swipe SET DONE, Checked item %s", viewHolder.bindingAdapterPosition)
+
+            val task = adapter.getTaskAt(viewHolder.bindingAdapterPosition)
+            if (task != null) {
+                tasksActivity.setTaskDone(task, true) // Call Activity method to update task in ViewModel
+            }
+            // After setting done, you might want to remove the item from its current position
+            // and have the ViewModel's LiveData push the updated list (with sorting if done tasks move to end).
+            // For now, let's just trigger the VM update and rely on LiveData.
         }
     }
 
@@ -196,7 +218,7 @@ class TasksAdapter(
         if (timestamp != null) {
             viewHolder.dateChip.visibility = View.VISIBLE
 
-            val dateText = TasksRepository.getInstance(tasksActivity).timestampToDate(timestamp)
+            val dateText = timestampToDate(timestamp)
 
             if (dateText.isNotBlank())
                 viewHolder.dateChip.text = dateText
@@ -218,7 +240,7 @@ class TasksAdapter(
         if (durationTimestamp != null) {
             viewHolder.durationChip.visibility = View.VISIBLE
 
-            val durationText = TasksRepository.getInstance(tasksActivity).timestampToDuration(durationTimestamp)
+            val durationText = timestampToDuration(durationTimestamp)
 
             if (durationText.isNotBlank()) viewHolder.durationChip.text = durationText
             else viewHolder.durationChip.visibility = View.GONE
@@ -268,20 +290,31 @@ class TasksAdapter(
             // Push it to a bundle
             val intent = Intent(mContext, TaskDetailsActivity::class.java)
 
-            //Json.encodeToString
-            val taskJson: String = Json.encodeToString(item)
+            try {
+                // Serialize the task
+                val taskJson: String = Json.encodeToString<Task>(item)
+                Timber.tag("Item clicked").i(taskJson)
 
-            Timber.tag("Item clicked").i(taskJson)
+                val currentList = (tasksActivity as TasksActivity).getCurrentListName()
 
-            val currentList = (activity as TasksActivity).getCurrentListName()
+                intent.putExtra("currentTask", taskJson)
+                intent.putExtra("currentList", currentList)
+                intent.putExtra("position", viewHolder.bindingAdapterPosition)
 
-            intent.putExtra("currentTask", taskJson)
-            intent.putExtra("currentList", currentList)
-            //Toast.makeText(tasksActivity, "current list namer ${TasksRepository.getInstance(tasksActivity).currentListName}",Toast.LENGTH_SHORT).show()
-            intent.putExtra("position", viewHolder.bindingAdapterPosition)
+                tasksActivity.startActivityForResult(intent, 500)
+                tasksActivity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
 
-            tasksActivity.startActivityForResult(intent, 500)
-            tasksActivity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Timber.e(e, "Erreur lors de la sérialisation ou de l'ouverture de l'activité")
+
+                Toast.makeText(
+                    tasksActivity,
+                    "Erreur : impossible d'ouvrir la tâche 😓",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
         }
     }
 
@@ -292,4 +325,4 @@ class TasksAdapter(
         tasksActivity.setSwipeRefreshEnabled(b)
     }
 
-}
+}*/

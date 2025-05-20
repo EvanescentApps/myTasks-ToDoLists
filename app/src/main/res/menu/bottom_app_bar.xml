@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.electro.todolist.ui.TasksActivity">
+    tools:context="com.electro.todolist.ui.home.TasksActivity">
     <!--<item
         android:id="@+id/menu"
         android:title="Menu"

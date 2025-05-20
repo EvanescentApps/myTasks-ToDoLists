@@ -14,8 +14,7 @@
         <item name="android:textColorPrimary">@color/textContent</item>
         <item name="android:textColorSecondary">@color/textContent</item>
         <item name="android:colorForeground">@color/textContent</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:windowLightStatusBar" >true</item>
         <item name="fontFamily">@font/lexend_semibold</item>
         <item name="backgroundColor">@color/background</item>
         <item name="font">@font/lexend_semibold</item>
@@ -54,8 +53,7 @@
     </style>
 
     <style name="BottomSheetStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@android:color/transparent
-        </item>
+
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowSoftInputMode">adjustResize</item>

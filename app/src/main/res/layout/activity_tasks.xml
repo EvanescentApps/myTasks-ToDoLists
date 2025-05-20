@@ -7,7 +7,10 @@
     android:layout_height="match_parent"
     android:background="?attr/backgroundColor"
     android:fitsSystemWindows="true"
-    tools:context=".ui.TasksActivity">
+    app:statusBarBackground="@color/colorPrimary"
+    tools:context=".ui.home.TasksActivity">
+    <!--
+-->
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -15,6 +18,7 @@
         android:layout_height="wrap_content"
         android:elevation="6dp"
         android:fitsSystemWindows="true"
+        app:statusBarForeground="?attr/colorPrimary"
         android:theme="@style/Theme.Todolist.AppBarOverlay">
         <!--@dimen/app_bar_height-->
 
@@ -26,9 +30,10 @@
              android:fitsSystemWindows="true"
              android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
              app:contentScrim="@color/colorPrimary"
-
              app:layout_scrollFlags="exitUntilCollapsed|scroll"
-             app:toolbarId="@+id/toolbar">
+            app:statusBarScrim="@color/colorPrimary"
+             app:toolbarId="@+id/toolbar"><!--            app:statusBarScrim="#FFEB3B"
+-->
 
         <!--scroll|exitUntilCollapsed-->
 

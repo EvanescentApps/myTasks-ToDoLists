@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2025. myTasks © 2021 by Evan Cocain is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International. (A Creative Commons License)
+ * Created and published by Evan Cocain (as Electro Inc.)
+ */
+
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package com.electro.todolist.data
+package com.electro.todolist.data.model
 
 import androidx.annotation.Keep
 import com.electro.todolist.R
@@ -36,7 +41,6 @@ data class Task(
     var duration : Long? = null
     // Timestamp lastEdit or lastSync ?
 ) {
-
     companion object {
         private const val alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 

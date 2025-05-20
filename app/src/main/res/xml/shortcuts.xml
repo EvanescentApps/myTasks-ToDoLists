@@ -18,7 +18,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.electro.todolist"
-            android:targetClass="com.electro.todolist.ui.TasksActivity" >
+            android:targetClass="com.electro.todolist.ui.home.TasksActivity" >
 
             <extra android:name="shortcut" android:value="add" />
 

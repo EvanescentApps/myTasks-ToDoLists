@@ -12,7 +12,6 @@
         <item name="backgroundColor">@color/background</item>
         <item name="colorOnSecondary">@color/pureBlack</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/purpleDark</item>
         <item name="android:windowBackground">@drawable/splash</item>
         <item name="fontFamily">@font/lexend_semibold</item>
         <item name="android:textColorPrimary">@color/textContent</item>
