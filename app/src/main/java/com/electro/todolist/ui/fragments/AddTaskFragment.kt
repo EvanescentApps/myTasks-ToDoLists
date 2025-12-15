@@ -52,7 +52,7 @@ class AddTaskFragment : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Set the style for the BottomSheet.
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetStyle)
+        setStyle(STYLE_NORMAL, R.style.BottomSheetStyle)
     }
 
     override fun onCreateView(

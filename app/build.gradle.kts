@@ -3,8 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.gms.google-services")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.0-RC"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
 
 }
 
@@ -13,7 +13,7 @@ extra["kotlin_version"] = "2.1.20"
 
 android {
     namespace = "com.electro.todolist"
-    compileSdk = 35
+    compileSdk = 36
 
 
     testOptions {
@@ -102,8 +102,8 @@ dependencies {
     androidTestImplementation("com.google.truth:truth:1.4.5") // Optional: More readable assertions
 
 
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx:22.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     implementation("com.github.varunest:sparkbutton:1.0.6")
@@ -119,7 +119,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("androidx.datastore:datastore-preferences:1.1.6")
     implementation("com.firebaseui:firebase-ui-auth:9.1.1")
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx:23.2.1")
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.annotation:annotation:1.9.1")
