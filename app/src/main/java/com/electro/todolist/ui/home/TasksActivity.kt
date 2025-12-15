@@ -212,6 +212,16 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         tasksViewModel.changeList(newSelectedListId)
     }
 
+    private fun onTaskClicked(task: Task, position: Int) {
+        val intent = Intent(this, TaskDetailsActivity::class.java).apply {
+            putExtra("currentTask", Json.encodeToString(task))
+            putExtra("currentList", tasksViewModel.getCurrentListNameForUI())
+            putExtra("position", position)
+        }
+        taskDetailsLauncher.launch(intent)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+    }
+
     @SuppressLint("CommitPrefEdits", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -220,20 +230,8 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         setContentView(b.root)
 
 
+        logIpAddresses()
 
-        // IP address lookup (fine to keep here if it's purely informational and not business logic)
-        try {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val wifiManager =
-                    applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                @Suppress("DEPRECATION") // formatIpAddress is deprecated, but common for older APIs
-                val localIP = formatIpAddress(wifiManager.connectionInfo.ipAddress)
-                val publicIP = getPublicIPAddress()?.trim()
-                Timber.tag("IP ADDRESS").i("Local IP : %s - Public IP : %s", localIP, publicIP)
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error getting IP address")
-        }
 
         // --- Initialize RecyclerView and Adapter ---
         adapter = TasksAdapter(
@@ -242,9 +240,8 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
             onTaskChecked = { task, isChecked ->
                 tasksViewModel.setTaskDone(task, isChecked)
             },
-            onTaskSwipedToDelete = { task, originalPosition ->
-                showUndoSnackbar(task, originalPosition) // Show Snackbar here, then call ViewModel's deleteTask on Snackbar dismissal
-            },
+            onTaskSwipedToDelete = ::showUndoSnackbar // Show Snackbar here, then call ViewModel's deleteTask on Snackbar dismissal
+            ,
             onTaskSwipedToDone = { task ->
                 tasksViewModel.setTaskDone(task, true) // Mark as done
             },
@@ -252,18 +249,8 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 // This callback from adapter's onDropCompleted
                 tasksViewModel.swapItems(from, to) // Persist the new order
             },
-            onTaskClicked = { task, position ->
-                val intent = Intent(this, TaskDetailsActivity::class.java).apply {
-                    putExtra("currentTask", Json.encodeToString(task))
-                    putExtra("currentList", tasksViewModel.getCurrentListNameForUI()) // Get current list name from ViewModel
-                    putExtra("position", position)
-                }
-                taskDetailsLauncher.launch(intent)
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            },
-            onEmptyStateChanged = { isEmpty ->
-                setEmptyState(isEmpty)
-            }
+            onTaskClicked = ::onTaskClicked,
+            onEmptyStateChanged = ::setEmptyState
         )
 
         // Permettre le scroll (et le swipe refresh) même quand on touche l'état vide
@@ -312,9 +299,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
             AddTaskFragment.newInstance()
                 .show(supportFragmentManager, "dialog")
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                tasksViewModel.onAddTaskClicked() // Consider moving this DataStore interaction to ViewModel
-            }
+            tasksViewModel.onAddTaskClicked()
         }
 
         b.includeRecycler.addTask.setOnClickListener {
@@ -450,6 +435,24 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun logIpAddresses() {
+        try {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
+
+                @Suppress("DEPRECATION")
+                val ipAddress = wifiManager.connectionInfo.ipAddress
+                val localIP = java.net.InetAddress.getByAddress(
+                    java.nio.ByteBuffer.allocate(4).order(java.nio.ByteOrder.LITTLE_ENDIAN).putInt(ipAddress).array()
+                ).hostAddress
+                val publicIP = getPublicIPAddress()?.trim() // Assure-toi que cette fonction existe ou est accessible
+                Timber.tag("IP ADDRESS").i("Local IP : %s - Public IP : %s", localIP, publicIP)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting IP address")
         }
     }
 }
