@@ -1,49 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <style name="Widget.Theme.Todolist.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">@color/black_overlay</item>
+        <item name="android:background">?attr/colorPrimaryVariant</item>
     </style>
 
-    <style name="Widget.Theme.Todolist.ButtonBar.Fullscreen" parent="">
-        <item name="android:background">@color/black_overlay</item>
-        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    <style name="Widget.Theme.Todolist.ButtonBar.Fullscreen" parent="Widget.AppCompat.ButtonBar">
+        <item name="android:background">?attr/colorSurfaceVariant</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="ThemeOverlay.App.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
         <item name="android:fontFamily">@font/lexend_bold</item>
+        <item name="fontFamily">@font/lexend_bold</item>
     </style>
 
-    <style name="ToolbarTheme" parent="AppTheme.AppBarOverlay">
-        <item name="android:fontFamily">@font/lexend_bold</item>
+    <style name="Widget.App.Toolbar" parent="ThemeOverlay.App.AppBarOverlay">
     </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+    <style name="ThemeOverlay.App.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
         <item name="android:fontFamily">@font/lexend_semibold</item>
+        <item name="fontFamily">@font/lexend_semibold</item>
     </style>
 
     <style name="StyledButton" parent="Widget.MaterialComponents.Button">
-        <item name="android:layout_marginLeft">12dp</item>
-        <item name="android:layout_marginStart">12dp</item>
-        <item name="android:layout_marginRight">12dp</item>
-        <item name="android:layout_marginEnd">12dp</item>
-        <item name="android:layout_marginBottom">2dp</item>
         <item name="android:textSize">26sp</item>
-        <item name="android:textColor">@color/textContent
-        </item>    <!--	<item name="background">@drawable/pop_bg</item> -->
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">bottom</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
-        <item name="android:paddingTop">13dp</item>
-        <item name="android:paddingBottom">13dp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="rippleColor">?attr/colorSecondaryVariant</item>
+        <item name="iconTint">?attr/colorOnPrimary</item>
         <item name="shapeAppearance">@style/RoundedButtonShapeAppearance</item>
     </style>
 
-
     <style name="RoundedButtonShapeAppearance">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerRadius">16dp</item>
         <item name="cornerSize">16dp</item>
     </style>
+
+    <style name="Widget.App.Button.AlertDialog" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/md_theme_light_primary</item>
+        <item name="background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@color/md_theme_light_surface</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="checkbox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/checkbox_checked</item>
+        <item name="android:textColorSecondary">@color/md_theme_light_onSurface</item>
+    </style>
+
+
+    <style name="Widget.App.Checkbox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/checkbox_checked</item>
+        <item name="android:textColorSecondary">@color/md_theme_light_onSurface</item>
+    </style>
+
+    <style name="ThemeOverlay.Todolist.FullscreenContainer" parent="">
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+    </style>
+
+    <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">@color/md_theme_light_surface</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorControlNormal">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+    </style>
+
+    <style name="MaterialAlertDialog_rounded" parent="MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="dialogCornerRadius">22dp</item>
+    </style>
+
+    <style name="DialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">22dp</item>
+    </style>
+
+    <style name="MaterialTimePicker" parent="ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="android:background">@color/md_theme_light_surface</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorControlNormal">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorControlActivated">@color/md_theme_light_primary</item>
+        <item name="android:textColorPrimary">@color/md_theme_light_onSurface</item>
+        <item name="textColorAlertDialogListItem">@color/md_theme_light_onSurface</item>
+        <item name="iconTint">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+    </style>
+
+    <style name="MyDialogTheme" parent="MaterialTimePicker">
+        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
+        <item name="dialogCornerRadius">22dp</item>
+    </style>
+
 </resources>

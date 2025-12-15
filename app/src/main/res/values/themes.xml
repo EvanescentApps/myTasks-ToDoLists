@@ -1,145 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.Todolist" parent="Theme.MaterialComponents.Light">
+    <!-- Base application theme for the light theme.
+         Inherits from Theme.MaterialComponents.Light.NoActionBar as you manage your own toolbar. -->
+    <style name="Theme.Todolist" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorPrimaryVariant">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
 
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimary</item>
-        <item name="colorOnPrimary">@color/textContent</item>
-        <item name="colorAccent">@color/textContent</item>
-        <item name="colorSecondary">@color/textContentPrimary</item>
-        <item name="colorSecondaryVariant">@color/textContentPrimary</item>
-        <item name="colorOnSecondary">@color/textContent</item>
-        <item name="labelStyle">@color/iconTint</item>
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorSecondaryVariant">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
 
-        <item name="android:textColorPrimary">@color/textContent</item>
-        <item name="android:textColorSecondary">@color/textContent</item>
-        <item name="android:colorForeground">@color/textContent</item>
-        <item name="android:windowLightStatusBar" >true</item>
-        <item name="fontFamily">@font/lexend_semibold</item>
-        <item name="backgroundColor">@color/background</item>
-        <item name="font">@font/lexend_semibold</item>
-        <item name="android:textColor">@color/textContent</item>
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
 
-        <!-- <item name="android:fontFamily">@font/lexend</item>-->
-        <!--<item name="fontWeight">600</item>-->
-        <item name="android:windowBackground">@drawable/splash</item>
-        <item name="fullscreenBackgroundColor">@color/flowBackground</item>
-        <item name="fullscreenTextColor">@color/textContent</item>
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
 
-        <item name="colorOnSurface">@color/textContent</item>
-        <item name="buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/positiveButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/positiveButtonStyle</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
 
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@color/md_theme_light_onSurface</item>
+        <item name="android:textColorSecondary">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="android:textColor">@color/md_theme_light_onSurface</item>
 
-
+        <item name="android:statusBarColor">@color/md_theme_light_background</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:navigationBarColor">@color/md_theme_light_surface</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+
+        <item name="android:fontFamily">@font/lexend_semibold</item>
+        <item name="fontFamily">@font/lexend_semibold</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
+
+        <item name="android:windowBackground">@drawable/splash</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button.AlertDialog</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button.AlertDialog</item>
     </style>
 
-    <style name="positiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
-
-        <item name="android:textColor">@color/textContent</item>
-        <item name="android:solidColor">#E65100</item>
-        <item name="background">?attr/selectableItemBackground</item>
-        <item name="colorAccent">#652400</item>
-    </style>
-
-    <style name="Theme.Todolist.NoActionBar">
+    <style name="Theme.Todolist.NoActionBar" parent="Theme.Todolist">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
-    <style name="BottomSheetStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
-
-        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowSoftInputMode">adjustResize</item>
-    </style>
-
-    <style name="Theme.Todolist.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:textColor">@color/titleLabel</item>
-        <item name="android:textColorPrimary">@color/titleLabel</item>
-    </style>
-
-    <style name="Theme.Todolist.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:textColorPrimary">@color/textContent</item>
-        <item name="android:textColorSecondary">@color/textContent</item>
-        <item name="android:colorForeground">@color/textContent</item>
-        <item name="android:textColor">@color/textContent</item>
-    </style>
-
-    <style name="checkbox" parent="Theme.MaterialComponents.DayNight">
-        <item name="colorAccent">@color/checkbox</item>
-        <item name="android:textColorSecondary">@color/checkbox</item>
-        <item name="checkedIconTint">@color/checkbox</item>
-    </style>
-
-    <!-- ALTERNATIVE THEMES -->
-
     <style name="Theme.Todolist.Fullscreen" parent="Theme.Todolist">
         <item name="android:actionBarStyle">@style/Widget.Theme.Todolist.ActionBar.Fullscreen</item>
         <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@null</item>
-    </style>
-
-    <style name="ThemeOverlay.Todolist.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/flowBackground</item>
-        <item name="fullscreenTextColor">@color/textContentSecondary</item>
-    </style>
-
-    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="backgroundColor">@color/background</item>
-        <item name="android:textColor">@color/lightPurple</item>
-        <item name="background">@color/background</item>
-
-        <item name="android:background">@color/background</item>
-
-    </style>
-
-    <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
-        <item name="backgroundColor">@color/background</item>
-        <item name="android:textColor">@color/textContent</item>
-        <item name="background">@color/background</item>
-        <item name="android:background">@color/background</item>
-        <item name="colorOnSurface">@color/textContent</item>
-        <item name="colorControlNormal">@color/textContentSecondary</item>
-        <item name="buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/positiveButtonStyle</item>
-        <!--<item name="android:buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>-->
-        <item name="buttonBarButtonStyle">@style/positiveButtonStyle</item>
-        <item name="android:buttonBarButtonStyle">@style/positiveButtonStyle</item>
-    </style>
-
-    <style name="MaterialAlertDialog_rounded" parent="MaterialAlertDialog">
-        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
-        <item name="dialogCornerRadius">22dp</item>
-    </style>
-
-    <style name="DialogCorners">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">22dp</item>
-    </style>
-
-    <style name="MaterialTimePicker" parent="ThemeOverlay.MaterialComponents.Dialog">
-        <item name="colorControlNormal">@color/background</item>
-        <item name="colorControlActivated">@color/textContentPrimary</item>
-        <item name="textColorAlertDialogListItem">@color/textContentPrimary</item>
-        <item name="colorAccent">@color/textContent</item>
-        <item name="android:textColorPrimary">@color/textContentPrimary</item>
-        <item name="iconTint">@color/iconTint</item>
-        <item name="buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/positiveButtonStyle</item>
-        <!--<item name="android:buttonBarPositiveButtonStyle">@style/positiveButtonStyle</item>-->
-        <item name="buttonBarButtonStyle">@style/positiveButtonStyle</item>
-        <item name="android:buttonBarButtonStyle">@style/positiveButtonStyle</item>
-    </style>
-
-    <style name="MyDialogTheme" parent="MaterialTimePicker">
-        <item name="shapeAppearanceOverlay">@style/DialogCorners</item>
-        <item name="dialogCornerRadius">22dp</item>
-    </style>
+        <item name="android:windowBackground">@null</item> </style>
 
 </resources>

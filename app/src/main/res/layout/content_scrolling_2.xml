@@ -24,7 +24,7 @@
     android:orientation="vertical"
     android:clipToPadding="false"
     android:layout_height="match_parent"
-    android:background="?attr/backgroundColor"
+    android:background="@color/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_tasks">
 
@@ -82,8 +82,8 @@
         android:clipToPadding="false"
         android:clipChildren="false"
         android:paddingBottom="100dp"
-        android:backgroundTint="?attr/backgroundColor"
-        android:background="?attr/backgroundColor"
+        android:backgroundTint="@color/background"
+        android:background="@color/background"
         tools:itemCount="2"
         tools:listitem="@layout/item_task" />
 

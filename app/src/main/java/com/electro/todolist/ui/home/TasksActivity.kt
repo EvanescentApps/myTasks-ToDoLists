@@ -60,6 +60,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
+import androidx.core.view.isVisible
 
 // Constants for request codes (now using Activity Result API, but keeping for reference if needed elsewhere)
 // For export/import, we'll use the new Activity Result API, which doesn't rely on these explicit request codes.
@@ -278,7 +279,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                     val view = b.includeRecycler.emptyTasks
                     // Only animate if empty state is visible
-                    if (view.visibility == View.VISIBLE) {
+                    if (view.isVisible) {
                         view.animate()
                             .setInterpolator(AccelerateDecelerateInterpolator())
                             .setDuration(500L)
