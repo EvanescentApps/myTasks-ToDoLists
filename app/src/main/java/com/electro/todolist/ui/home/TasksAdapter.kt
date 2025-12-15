@@ -16,7 +16,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.electro.todolist.R
 import com.electro.todolist.data.model.Priority
@@ -28,15 +30,17 @@ import com.varunest.sparkbutton.SparkButton
 import timber.log.Timber
 
 class TasksAdapter(
-    private var currentTasks: MutableList<Task>,
     private val context: Context,
     private val onTaskChecked: (Task, Boolean) -> Unit,
     private val onTaskSwipedToDelete: (Task, Int) -> Unit,
     private val onTaskSwipedToDone: (Task) -> Unit,
-    private val onTaskMoved: (Int, Int) -> Unit, // This callback triggers ViewModel update
+    private val onListOrderChanged: ((List<Task>) -> Unit)? = null,
     private val onTaskClicked: (Task, Int) -> Unit,
     private val onEmptyStateChanged: (Boolean) -> Unit
-) : RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
+) : ListAdapter<Task, TasksAdapter.ViewHolder>(TaskDiffCallback()) {
+
+    private var dragList: MutableList<Task>? = null
+    private var isDragging = false
 
     /**
      * Updates the adapter's internal list with new data from the ViewModel.
@@ -44,17 +48,18 @@ class TasksAdapter(
      */
     @SuppressLint("NotifyDataSetChanged")
     fun updateTasks(newTasks: List<Task>) {
-        currentTasks.clear()
-        currentTasks.addAll(newTasks)
-        notifyDataSetChanged()
-        onEmptyStateChanged(newTasks.isEmpty())
+        // submitList calcule les différences en arrière-plan
+        submitList(newTasks) {
+            // Callback optionnel une fois la liste mise à jour
+            onEmptyStateChanged(newTasks.isEmpty())
+        }
     }
 
     /**
      * Retrieves a Task at a given position. Used by ItemTouchHelperCallback.
      */
     fun getTaskAt(position: Int): Task? {
-        return if (position >= 0 && position < currentTasks.size) currentTasks[position] else null
+        return if (position >= 0 && position < itemCount) getItem(position) else null
     }
 
     /**
@@ -63,14 +68,18 @@ class TasksAdapter(
      * @return The removed task, so it can be passed to the ViewModel for potential undo.
      */
     fun removeTaskAt(position: Int): Task? {
-        if (position >= 0 && position < currentTasks.size) {
-            val removedTask = currentTasks.removeAt(position)
-            notifyItemRemoved(position)
-            onEmptyStateChanged(currentTasks.isEmpty())
-            return removedTask
+        if (position >= 0 && position < itemCount) {
+            val item = getItem(position)
+            val currentListMutable = currentList.toMutableList()
+            currentListMutable.removeAt(position)
+
+            submitList(currentListMutable)
+            onEmptyStateChanged(currentListMutable.isEmpty())
+            return item
         }
         return null
     }
+
 
     /**
      * Handles the visual movement of items during drag-and-drop.
@@ -78,33 +87,63 @@ class TasksAdapter(
      * The actual data reordering is saved by the ViewModel after drop completion.
      */
     fun onItemMove(fromPosition: Int, toPosition: Int) {
-        if (fromPosition < 0 || fromPosition >= currentTasks.size ||
-            toPosition < 0 || toPosition >= currentTasks.size) {
-            Timber.e("onItemMove: Invalid positions. From: $fromPosition, To: $toPosition, List size: ${currentTasks.size}")
-            return
+        // Initialize the temporary list on the first move
+        if (dragList == null) {
+            dragList = currentList.toMutableList()
+            isDragging = true
         }
-        // Perform the swap in the adapter's internal list for visual feedback
-        val movedItem = currentTasks.removeAt(fromPosition)
-        currentTasks.add(toPosition, movedItem)
-        notifyItemMoved(fromPosition, toPosition)
-        Timber.d("Adapter visually moved item from $fromPosition to $toPosition")
-        // IMPORTANT: onTaskMoved is NOT called here. It's called after the drag finishes.
+
+        // Swap items in the temporary list
+        // Note: We use dragList!! because we just initialized it above
+        if (fromPosition < dragList!!.size && toPosition < dragList!!.size) {
+            java.util.Collections.swap(dragList!!, fromPosition, toPosition)
+            // Visually notify the adapter that an item moved (without refreshing the whole list)
+            notifyItemMoved(fromPosition, toPosition)
+        }
     }
 
     /**
      * Called when the drag-and-drop operation is completed (user lifts finger).
      * This is where the ViewModel should be informed to persist the new order.
      */
-    fun onDropCompleted(fromPosition: Int, toPosition: Int) {
-        onTaskMoved(fromPosition, toPosition) // Trigger callback to ViewModel for persistence
-        Timber.d("TasksAdapter: Drag-and-drop completed. Notifying ViewModel about move from $fromPosition to $toPosition")
+    fun onDropCompleted() { // Plus de paramètres from/to
+        dragList?.let { newList ->
+            // 1. On fige l'état visuel avec submitList pour être propre
+            submitList(newList.toList())
+
+            // 2. On prévient l'activité qu'il faut sauvegarder TOUTE la liste
+            // Vous devez ajouter ce callback au constructeur, voir étape 4
+            onListOrderChanged?.invoke(newList.toList())
+        }
+        // Reset la liste temporaire
+        dragList = null
+        isDragging = false
+
+        Timber.d("TasksAdapter: Drag-and-drop completed. List saved.")
+    }
+
+    // Surcharge submitList pour bloquer les mises à jour pendant le drag
+    override fun submitList(list: List<Task>?, commitCallback: Runnable?) {
+        if (isDragging) {
+            // Si on est en train de drag, on IGNORE les mises à jour venant du ViewModel
+            // pour éviter que la liste saute sous le doigt
+            return
+        }
+        super.submitList(list, commitCallback)
+    }
+
+    // Surcharge aussi la version sans callback pour être sûr
+    override fun submitList(list: List<Task>?) {
+        if (isDragging) return
+        super.submitList(list)
     }
 
     /**
      * Returns the current list of tasks held by the adapter in their current visual order.
      * Used by ItemTouchHelperCallback to get the final order after a drag-and-drop.
      */
-    fun getTasks(): List<Task> = currentTasks
+    fun getTasks(): List<Task> = currentList
+
 
     /**
      * Handles swipe actions and delegates them to the appropriate callbacks.
@@ -115,7 +154,7 @@ class TasksAdapter(
             Timber.e("onSwipe: Invalid position received.")
             return
         }
-        val swipedTask = currentTasks[position]
+        val swipedTask = getItem(position)
 
         when (direction) {
             ItemTouchHelper.LEFT -> { // Swipe to Delete
@@ -151,7 +190,7 @@ class TasksAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val task: Task = currentTasks[position]
+        val task: Task = getItem(position)
 
         viewHolder.titleTextView.text = task.title
         if (task.description.isNullOrBlank()) {
@@ -222,5 +261,21 @@ class TasksAdapter(
         }
     }
 
-    override fun getItemCount(): Int = currentTasks.size
+    // Dans TasksAdapter
+    public override fun getItem(position: Int): Task {
+        return super.getItem(position)
+    }
+
+}
+
+class TaskDiffCallback : DiffUtil.ItemCallback<Task>() {
+    override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
+        // On compare les IDs uniques (changez 'uid' par votre vraie clé primaire si différent, ex: 'id')
+        return oldItem.uid == newItem.uid
+    }
+
+    override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
+        // On compare tout le contenu (data class fait ça très bien avec equals())
+        return oldItem == newItem
+    }
 }

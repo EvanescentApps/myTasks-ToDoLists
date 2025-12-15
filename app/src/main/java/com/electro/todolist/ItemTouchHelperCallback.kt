@@ -217,14 +217,14 @@ class ItemTouchHelperCallback(adapter: TasksAdapter, context: Context) : ItemTou
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        // This method is called when the interaction (swipe or drag) is over.
-        // It's the ideal place to notify the ViewModel about the final position.
-        val currentPosition = viewHolder.bindingAdapterPosition
-        if (initialFromPosition != -1 && currentPosition != -1 && initialFromPosition != currentPosition) {
-            mAdapter.onDropCompleted(initialFromPosition, currentPosition)
-        }
-        initialFromPosition = -1 // Reset for next drag operation
-        reset = true // Unused property, consider removing if not performing a specific reset
+
+        // On appelle simplement onDropCompleted sans arguments.
+        // L'adapter sait déjà si une liste temporaire (dragList) existe ou non.
+        (recyclerView.adapter as? TasksAdapter)?.onDropCompleted()
+
+        // On reset les variables de suivi (optionnel, mais propre)
+        initialFromPosition = -1
+        reset = true
     }
 }
 

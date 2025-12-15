@@ -81,6 +81,12 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         }
     }
 
+    fun updateTasksOrder(newOrderedList: List<Task>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tasksRepository.saveTaskPositions(newOrderedList)
+        }
+    }
+
     fun updateTask(originalTask: Task, updatedTask: Task) {
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.updateTask(originalTask, updatedTask)

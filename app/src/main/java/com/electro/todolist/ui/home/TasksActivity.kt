@@ -75,9 +75,6 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     private lateinit var b: ActivityTasksBinding
     private lateinit var itemTouchHelperCallback: ItemTouchHelperCallback
     private lateinit var itemTouchHelper: ItemTouchHelper
-/*
-    private lateinit var scrollListener: RecyclerView.OnScrollListener
-*/
 
 
 
@@ -235,7 +232,6 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
 
         // --- Initialize RecyclerView and Adapter ---
         adapter = TasksAdapter(
-            currentTasks = mutableListOf(), // Start with empty list
             context = this,
             onTaskChecked = { task, isChecked ->
                 tasksViewModel.setTaskDone(task, isChecked)
@@ -245,9 +241,8 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
             onTaskSwipedToDone = { task ->
                 tasksViewModel.setTaskDone(task, true) // Mark as done
             },
-            onTaskMoved = { from, to ->
-                // This callback from adapter's onDropCompleted
-                tasksViewModel.swapItems(from, to) // Persist the new order
+            onListOrderChanged = { newTaskList ->
+                tasksViewModel.updateTasksOrder(newTaskList)
             },
             onTaskClicked = ::onTaskClicked,
             onEmptyStateChanged = ::setEmptyState
@@ -388,40 +383,22 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     // --- End BottomFragmentActions Implementation ---
 
 
-    private fun getPublicIPAddress(): String? {
-        var value: String? = null
-        val es = Executors.newSingleThreadExecutor()
-        val result = es.submit<String?> {
-            try {
-                val url = URL("https://api.my-ip.io/ip.txt")
-                val urlConnection = url.openConnection() as HttpURLConnection
-                try {
-                    val `in`: InputStream = BufferedInputStream(urlConnection.inputStream)
-                    val r = BufferedReader(InputStreamReader(`in`))
-                    val total = StringBuilder()
-                    var line: String?
-                    while (r.readLine().also { line = it } != null) {
-                        total.append(line).append('\n')
-                    }
-                    urlConnection.disconnect()
-                    return@submit total.toString()
-                } finally {
-                    urlConnection.disconnect()
-                }
-            } catch (e: IOException) {
-                Timber.tag("Public IP: ").e(e.message ?: "Unknown IOException")
+    // Une vraie fonction suspendante, propre et sans thread manuel
+    private suspend fun getPublicIPAddress(): String? = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        try {
+            val url = URL("https://api.my-ip.io/ip.txt")
+            (url.openConnection() as HttpURLConnection).run {
+                requestMethod = "GET"
+                connectTimeout = 5000
+                readTimeout = 5000
+                inputStream.bufferedReader().use { it.readText() }
             }
+        } catch (e: Exception) {
+            Timber.tag("Public IP").e(e, "Error fetching public IP")
             null
         }
-        try {
-            value = result.get()
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        } finally {
-            es.shutdown()
-        }
-        return value
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_scrolling, menu)
@@ -448,7 +425,8 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 val localIP = java.net.InetAddress.getByAddress(
                     java.nio.ByteBuffer.allocate(4).order(java.nio.ByteOrder.LITTLE_ENDIAN).putInt(ipAddress).array()
                 ).hostAddress
-                val publicIP = getPublicIPAddress()?.trim() // Assure-toi que cette fonction existe ou est accessible
+
+                val publicIP = getPublicIPAddress()?.trim()
                 Timber.tag("IP ADDRESS").i("Local IP : %s - Public IP : %s", localIP, publicIP)
             }
         } catch (e: Exception) {
