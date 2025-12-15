@@ -65,7 +65,9 @@ import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 
 // DataStore for settings (consider if this should be part of a SettingsViewModel/Repository)
+/*
 val Context.dataStoreSettings: DataStore<Preferences> by preferencesDataStore(name = "settings")
+*/
 
 class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement the interface
 
@@ -154,31 +156,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     }
 
 
-    @Suppress("unused")
-    private suspend fun save(key: String, value: String) {
-        val dataStoreKey = stringPreferencesKey(key)
-        dataStoreSettings.edit { settings ->
-            settings[dataStoreKey] = value
-        }
-    }
 
-    @Suppress("PropertyName")
-    val COUNTER = intPreferencesKey("counter")
-
-    @Suppress("unused")
-    suspend fun incrementCounter() {
-        dataStoreSettings.edit { settings ->
-            val currentCounterValue = settings[COUNTER] ?: 0
-            settings[COUNTER] = currentCounterValue + 1
-        }
-    }
-
-    private fun getIntFlow(KEY: Preferences.Key<Int>): Flow<Int> {
-        return dataStoreSettings.data
-            .map { preferences ->
-                preferences[KEY] ?: 0
-            }
-    }
 
     fun scrollToTask(position: Int) {
         b.includeRecycler.tasksRecyclerview.smoothScrollToPosition(position)
@@ -241,10 +219,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         b = ActivityTasksBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // Observe DataStore counter (consider moving this to ViewModel if it affects UI)
-        getIntFlow(COUNTER).asLiveData().observe(this) {
-            Timber.tag("INT").e("Counter: $it")
-        }
+
 
         // IP address lookup (fine to keep here if it's purely informational and not business logic)
         try {
@@ -338,7 +313,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 .show(supportFragmentManager, "dialog")
 
             lifecycleScope.launch(Dispatchers.IO) {
-                incrementCounter() // Consider moving this DataStore interaction to ViewModel
+                tasksViewModel.onAddTaskClicked() // Consider moving this DataStore interaction to ViewModel
             }
         }
 
@@ -366,6 +341,11 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         fun showListsBottomSheet() {
             ChangeListFragment.newInstance()
                 .show(supportFragmentManager, "dialog")
+        }
+
+        tasksViewModel.counter.observe(this) { count ->
+            // L'Activity ne fait que mettre à jour l'UI
+            Timber.tag("INT").e("Counter from ViewModel: $count")
         }
 
         // Click listeners for showing the ChangeListFragment

@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.electro.todolist.data.model.SerialListObject
 import com.electro.todolist.data.model.Task
@@ -23,6 +24,19 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
     // --- LiveData for Tasks and UI State (Existing) ---
     private val _tasks = MutableLiveData<List<Task>>()
     val tasks: LiveData<List<Task>> = _tasks
+
+
+
+    // Exposer le compteur à l'Activity via le ViewModel
+    val counter: LiveData<Int> = tasksRepository.counterFlow.asLiveData()
+
+    // L'action est déclenchée depuis le ViewModel
+    fun onAddTaskClicked() { // Renommez selon l'action
+        viewModelScope.launch {
+            tasksRepository.incrementCounter()
+        }
+    }
+
 
     private val _isEmptyStateEnabled = MutableLiveData<Boolean>()
     val isEmptyStateEnabled: LiveData<Boolean> = _isEmptyStateEnabled

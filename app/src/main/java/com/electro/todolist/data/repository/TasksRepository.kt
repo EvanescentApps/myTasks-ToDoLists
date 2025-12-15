@@ -13,19 +13,66 @@ import android.net.Uri
 import android.util.DisplayMetrics
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit // Extension function for SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.electro.todolist.data.manager.FileManager
 import com.electro.todolist.data.manager.ListManager
 import com.electro.todolist.data.model.SerialListObject
 import com.electro.todolist.data.model.Task
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
+private val Context.dataStoreSettings: DataStore<Preferences> by preferencesDataStore(name = "settings")
 open class TasksRepository private constructor(private val context: Context) {
+
+    private val applicationContext = context.applicationContext
 
     private val listManager: ListManager = ListManager(context)
     private val fileManager: FileManager = FileManager(context)
 
     private val json = Json { ignoreUnknownKeys = true }
+
+
+    private val COUNTER_KEY = intPreferencesKey("counter")
+
+    // --- LOGIQUE DATASTORE DÉPLACÉE ICI ---
+
+    // Définir les clés ici pour qu'elles soient privées au Repository
+    // Une fonction publique pour que le ViewModel puisse observer
+    val counterFlow: Flow<Int> = applicationContext.dataStoreSettings.data
+        .map { preferences ->
+            preferences[COUNTER_KEY] ?: 0
+        }
+
+    // Une fonction publique pour que le ViewModel puisse demander une action
+    suspend fun incrementCounter() {
+        applicationContext.dataStoreSettings.edit { settings ->
+            val currentCounterValue = settings[COUNTER_KEY] ?: 0
+            settings[COUNTER_KEY] = currentCounterValue + 1
+        }
+    }
+
+    @Suppress("unused")
+    private suspend fun save(key: String, value: String) {
+        val dataStoreKey = stringPreferencesKey(key)
+        applicationContext.dataStoreSettings.edit { settings ->
+            settings[dataStoreKey] = value
+        }
+    }
+
+    @Suppress("unused")
+    private fun getIntFlow(KEY: Preferences.Key<Int>): Flow<Int> {
+        return applicationContext.dataStoreSettings.data
+            .map { preferences ->
+                preferences[KEY] ?: 0
+            }
+    }
 
     // --- Task-related Operations ---
 
