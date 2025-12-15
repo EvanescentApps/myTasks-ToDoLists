@@ -1,105 +1,45 @@
-# ToDoList
-
-An Android (Kotlin) project for a simple task management (To‑Do) application.
+# ToDoList Android App Documentation
 
 ## Overview
+ToDoList is an Android task management app that combines classic list views with drag-and-drop reordering, swipe gestures, import/export utilities, and optional Firebase-backed authentication. The app is built with Kotlin, AndroidX ViewBinding, and a mix of traditional Views plus limited Jetpack Compose UI elements.
 
-This repository contains a sample To‑Do app built with Kotlin and Gradle (Kotlin DSL). The `app/` module holds the Android application source code, resources, and signing configuration.
+## Core Features
+- **Task management**: Create, edit, complete, and delete tasks within the currently selected list. Task ordering is persisted after drag-and-drop operations and can be bulk-cleaned by removing completed items.【F:app/src/main/java/com/electro/todolist/data/repository/TasksRepository.kt†L37-L156】
+- **Multi-list support**: Users can work with multiple task lists, with defaults created on first launch and the last opened list remembered for convenience. Lists support creation, rename, deletion, and position tracking.【F:app/src/main/java/com/electro/todolist/data/manager/ListManager.kt†L13-L107】【F:app/src/main/java/com/electro/todolist/data/repository/TasksRepository.kt†L158-L200】
+- **File import/export**: The Tasks screen registers Activity Result launchers to export tasks to a document URI and import tasks from a chosen file, providing user feedback for each action.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L84-L108】
+- **Gestures and quick actions**: Swipe-to-delete with undo, smooth scrolling to specific items, and drag-to-reorder interactions are wired to the ViewModel for persistence and analytics logging.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L135-L188】
+- **User authentication**: FirebaseUI-based sign-in flows (Google, email, optional anonymous) with custom layouts and onboarding hooks are defined in `AuthActivity` to gate entry to the main experience.【F:app/src/main/java/com/electro/todolist/AuthActivity.kt†L39-L95】
+- **Settings and theme hooks**: A `DataStore` instance backs lightweight settings (e.g., counters) within `TasksActivity`, and `ThemeManager` plus `SettingsActivity` provide the surface for additional preferences and theming controls.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L77-L134】【F:app/src/main/java/com/electro/todolist/ThemeManager.kt†L9-L64】
 
-## Key structure
+## Architecture and Code Organization
+- **Activities & Fragments**: `TasksActivity` hosts the primary task list UI and coordinates fragments such as `AddTaskFragment`, `ChangeListFragment`, and bottom sheets for quick actions. `TaskDetailsActivity` handles per-task editing, while `AuthActivity` gates sign-in and `SettingsActivity` exposes preferences.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L42-L189】【F:app/src/main/java/com/electro/todolist/ui/details/TaskDetailsActivity.kt†L17-L164】【F:app/src/main/java/com/electro/todolist/AuthActivity.kt†L39-L95】
+- **ViewModels**: `TasksViewModel` (and its factory) orchestrate task loading, drag/drop persistence, and import/export flows against the repositories. The login package mirrors this pattern with `LoginViewModel` and `LoginResult` types for Firebase authentication state handling.【F:app/src/main/java/com/electro/todolist/ui/home/TasksViewModel.kt†L17-L196】【F:app/src/main/java/com/electro/todolist/ui/home/TasksViewModelFactory.kt†L8-L37】【F:app/src/main/java/com/electro/todolist/ui/login/LoginViewModel.kt†L15-L94】
+- **Repositories & Managers**: `TasksRepository` wraps task CRUD, drag/drop position persistence, and bulk deletion. `ListRepository` leverages `ListManager` to store metadata for lists and track the last opened list. `FileManager` supplies import/export helpers leveraged from the ViewModel layer.【F:app/src/main/java/com/electro/todolist/data/repository/TasksRepository.kt†L23-L200】【F:app/src/main/java/com/electro/todolist/data/repository/ListRepository.kt†L8-L87】【F:app/src/main/java/com/electro/todolist/data/manager/FileManager.kt†L11-L94】
+- **Data Models**: Tasks are serialized via Kotlinx Serialization (`Task`, `SerialListObject`) and stored in SharedPreferences per-list, while lightweight user representations exist for authentication flows (`LoggedInUser`, `LoggedInUserView`).【F:app/src/main/java/com/electro/todolist/data/model/Task.kt†L8-L91】【F:app/src/main/java/com/electro/todolist/data/model/SerialListObject.kt†L3-L34】【F:app/src/main/java/com/electro/todolist/ui/login/LoggedInUserView.kt†L3-L14】
+- **UI Components**: RecyclerView adapters (`TasksAdapter`, `ListsAdapter`, `OldTasksAdapter`) provide list rendering and handle interactions like swipe callbacks. Compose is selectively used in `TasksCompose.kt` for modern UI previews/material components.【F:app/src/main/java/com/electro/todolist/ui/home/TasksAdapter.kt†L12-L227】【F:app/src/main/java/com/electro/todolist/ui/home/ListsAdapter.kt†L11-L129】【F:app/src/main/java/com/electro/todolist/ui/home/TasksCompose.kt†L1-L74】
 
-- `app/` — main Android module
-  - `src/main/` — app source code and resources
-  - `build.gradle.kts` — module Gradle configuration
-  - `google-services.json` — Firebase configuration (present)
-  - `todolistapp.jks` — keystore used for signing (present)
-- Top-level Gradle files: `build.gradle.kts`, `settings.gradle`
+## Build and Run
+1. **Prerequisites**: Android Studio Jellyfish or later, JDK 17, and Android SDK 35. Gradle Wrapper is included.
+2. **Configure Firebase**: A `google-services.json` file is already present under `app/`. Ensure your Firebase project settings align with the bundled configuration if you rotate keys or analytics IDs.
+3. **Build**: `./gradlew assembleDebug` will compile the app with Compose and ViewBinding enabled.【F:app/build.gradle.kts†L57-L118】
+4. **Run**: Install the generated APK on an emulator or device running Android 6.0 (API 23) or newer.【F:app/build.gradle.kts†L33-L40】
+5. **Tests**: Run unit and instrumentation tests with `./gradlew test` and `./gradlew connectedAndroidTest` respectively. JUnit 4 is configured for unit tests, with Espresso and AndroidX Test for instrumented coverage.【F:app/build.gradle.kts†L116-L118】
 
-## Prerequisites
+## Data Persistence and Serialization
+- **SharedPreferences per list**: Each task list is stored in its own SharedPreferences file keyed by list ID. Tasks are serialized as JSON using Kotlinx Serialization, sorted by completion status and position upon retrieval, and updated in place for CRUD operations.【F:app/src/main/java/com/electro/todolist/data/repository/TasksRepository.kt†L37-L120】
+- **List metadata**: Lists are saved as serialized `SerialListObject` collections in a shared `allLists` preference file with the last opened list tracked separately. Default lists are created when no data exists.【F:app/src/main/java/com/electro/todolist/data/manager/ListManager.kt†L13-L107】
+- **Settings store**: `DataStore` preferences power lightweight counters and can be expanded for user-facing settings such as theme selection or feature flags.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L77-L134】
+- **File import/export**: Import/export flows leverage the SAF (Storage Access Framework) via Activity Result contracts, delegating the actual serialization work to `TasksViewModel` and `FileManager` for persistence. Appropriate permission flags are captured when exporting to retain URI access.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L84-L108】【F:app/src/main/java/com/electro/todolist/data/manager/FileManager.kt†L11-L94】
 
-- JDK 11 or newer (or the JDK version required by your Android Gradle Plugin)
-- Android Studio (recommended recent stable version)
-- Gradle wrapper is included (`./gradlew`)
+## UI/UX Notes
+- Swipe-to-delete shows a Snackbar anchored to the floating action button with an undo option before final deletion, ensuring non-destructive gestures.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L135-L157】
+- Empty state visibility is toggled automatically when no tasks exist, and a smooth scroll helper is available for programmatic navigation to a specific item.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L135-L188】
+- Drag-and-drop ordering is mediated by `ItemTouchHelperCallback`, with updates persisted through the ViewModel to the repository layer.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L166-L188】【F:app/src/main/java/com/electro/todolist/data/repository/TasksRepository.kt†L106-L120】
 
-## Open the project
+## Short-Term Improvement Ideas
+- **Secure signing artifacts**: Keystore paths and passwords are hardcoded in `app/build.gradle.kts`; move them to environment variables or Gradle properties and keep keystores out of the repository to avoid credential leaks.【F:app/build.gradle.kts†L18-L44】
+- **Align Compose toolchain**: The Compose compiler extension (1.8.1) does not match the applied Kotlin plugin version (2.1.20) and Compose plugin version (2.2.0-RC); upgrade to a consistent, stable Compose BOM to reduce runtime/compiler mismatch risks.【F:app/build.gradle.kts†L1-L108】
+- **Centralize settings management**: Settings-related `DataStore` helpers live directly inside `TasksActivity`; refactor into a dedicated SettingsViewModel or repository to simplify lifecycle management and testing.【F:app/src/main/java/com/electro/todolist/ui/home/TasksActivity.kt†L77-L134】
+- **Replace SharedPreferences with Room**: Tasks and lists are serialized manually in SharedPreferences. Migrating to Room would improve schema safety, query flexibility, and migration paths while retaining Kotlinx Serialization for backups/imports.【F:app/src/main/java/com/electro/todolist/data/repository/TasksRepository.kt†L37-L156】【F:app/src/main/java/com/electro/todolist/data/manager/ListManager.kt†L13-L107】
+- **Modernize authentication flow**: `AuthActivity` relies on `startActivityForResult` and deprecated patterns; migrating to Activity Result APIs and separating sync/onboarding responsibilities would reduce complexity and ease maintenance.【F:app/src/main/java/com/electro/todolist/AuthActivity.kt†L39-L95】
 
-1. Open Android Studio and choose "Open an existing project". Select the repository root (the folder that contains `settings.gradle`).
-2. Let Android Studio sync the Gradle project and download dependencies.
-
-## Useful commands (fish shell)
-
-- Assemble debug APK:
-
-```fish
-./gradlew :app:assembleDebug
-```
-
-- Assemble release APK (signed if `todolistapp.jks` is configured in `app/build.gradle.kts`):
-
-```fish
-./gradlew :app:assembleRelease
-```
-
-- Run unit tests:
-
-```fish
-./gradlew test
-```
-
-- Run instrumented Android tests on a connected device/emulator:
-
-```fish
-./gradlew connectedAndroidTest
-```
-
-- Run lint for the `app` module:
-
-```fish
-./gradlew :app:lint
-```
-
-- Refresh dependencies (useful when facing unresolved dependency issues):
-
-```fish
-./gradlew --refresh-dependencies
-```
-
-## Signing / Keystore
-
-The repository contains a `todolistapp.jks` keystore at the project root. Check `app/build.gradle.kts` for the signing configuration. Important security notes:
-
-- Do not commit passwords or secret values in plaintext. Prefer reading keystore passwords from environment variables or a secure secrets store in CI.
-- If you intend to publish a different key, update the signing config and keystore accordingly.
-
-## Firebase / External services
-
-A `app/google-services.json` file is present. If the app uses Firebase services (Analytics, Auth, Firestore, etc.), make sure the project settings in the Firebase console match the package name and SHA keys used for debug/release builds.
-
-## Important resources
-
-- App launcher icons and adaptive icon files live under `app/src/main/res/mipmap-*` and `app/src/main/res/drawable`.
-- Check `app/src/main/AndroidManifest.xml` for declared activities and permissions.
-
-## Troubleshooting
-
-- Gradle sync issues: try `./gradlew --refresh-dependencies` or in Android Studio use File > Invalidate Caches / Restart.
-- Keystore errors: verify the keystore password and alias, or provide them via environment variables (recommended for CI).
-- Build errors referencing missing SDKs or build tools: install the required Android SDK and build tools via the SDK Manager in Android Studio.
-
-## Contributing
-
-Contributions are welcome. Please open an issue to discuss larger changes before sending a pull request. Keep PRs focused and include a short description of the change and any testing instructions.
-
-## License
-
-No license file is included in this repository. If you plan to publish or share the code, add a `LICENSE` file (for example MIT) and document any third‑party libraries and their licenses.
-
----
-
-Next steps I can help with (pick any):
-- Add a `LICENSE` file (e.g. MIT).
-- Add a GitHub Actions workflow to build the app and run tests on push/PR.
-- Create a `CONTRIBUTING.md` with contribution guidelines and a code of conduct.
-- Translate the README into another language (bilingual README).
-
-Tell me which of these (or other) additions you want and I will add them.
