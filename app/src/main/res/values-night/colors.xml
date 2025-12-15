@@ -1,91 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="purpleDark">#9E9BFF</color>
+    <color name="textContentPrimary">#C3BBF3</color>
+    <color name="textContent">#E6E1E5</color>
+    <color name="background">#121212</color>
+    <color name="pureBlack">#000000</color>
+    <color name="flowBackground">#1D1B20</color>
+    <color name="iconTint">#E6E1E5</color>
+    <color name="textContentSecondary">#CAC4CF</color>
 
-    <color name="floatingAddButton">#1A00A0</color>
-    <color name="addIconTint">#AAB8FF</color>
-    <color name="colorPrimary">@color/purpleDark</color>
+    <color name="fab_background">@color/purpleDark</color>
+    <color name="fab_icon_tint">@color/pureBlack</color>
+    <color name="checkbox_checked">@color/purpleDark</color>
+    <color name="checkbox_unchecked">@color/textContentSecondary</color>
+    <color name="text_done_task">#00CD00</color>
+    <color name="toolbar_separator">@color/purpleDark</color>
 
-    <color name="textContent">@color/eyeWhite</color>
-    <color name="descriptionContent">#99FFFFFF</color>
+    <color name="priority_very_important">#FF0000</color>
+    <color name="priority_important">#FF803C</color>
+    <color name="priority_urgent">#FF0046</color>
+    <color name="priority_not_urgent">#099100</color>
+    <color name="priority_optional">#066600</color>
 
-    <color name="textContentPrimary">#BFFFFFFF</color>
-    <color name="textContentSecondary">#9AFFFFFF</color>
-
-    <color name="iconTint">#E6FFFFFF</color>
-
-    <color name="pureWhite">#FFFFFF</color>
-
-    <color name="chipBackground">#3335A8</color>
-
-    <color name="fabText">@color/iconTint</color>
-
-    <color name="purpleLight">#9682FF</color>
-    <color name="purpleDark">#000C64</color>
-
-    <color name="separatorToolbar">#475DFF</color>
-
-    <color name="background">@color/eyeCustomGrey</color>
-    <color name="backgroundSelected">#2A2037</color>
-
-    <color name="backgroundRipple">#553DC6</color>
-
-    <color name="eyeCustomGrey">#1F1B24</color>
-
-    <color name="eyeWhite">#CCFFFFFF</color>
-
-    <color name="checkbox">#9FFFFFFF</color>
-
-    <color name="taskTresImportant">#FF0000</color>
-    <color name="taskImportant">#FF803C</color>
-    <color name="taskUrgent">#FF0046</color>
-    <color name="taskPasUrgent">#B3FF74</color>
-    <color name="taskFacultative">#C8FFCD</color>
-
-    <color name="iconTintFab">#E6FFFFFF</color>
-    <color name="fabBg">#191B67</color>
-
-</resources> <!--69B4BC-->
-
-<!--
-<color name="header_white">#80DEEA</color>
-    <color name="fab">#B2EBF2</color>
-    <color name="teal_200">#C5EDFF</color>
-    <color name="teal_700">#C5EDFF</color>
-    <color name="checkbox">#2C696F</color>
-    <color name="checkbox2">#2C696F</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <color name="violet">#6200EA</color>
-
-<color name="header_white">#D9BDFF</color>
-    <color name="fab">#BFA2FF</color>
-    <color name="teal_200">#C5EDFF</color>
-    <color name="teal_700">#C5EDFF</color>
-    <color name="checkbox">#704EB9</color>
-    <color name="checkbox2">#704EB9</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <color name="violet">#6200EA</color>
-
-<color name="header_white">#C1ECFF</color>
-    <color name="fab">#97DFFF</color>
-    <color name="teal_200">#C5EDFF</color>
-    <color name="teal_700">#C5EDFF</color>
-    <color name="checkbox">#124861</color>
-    <color name="checkbox2">#DF124861</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <color name="violet">#49FFFE</color>
-
-
-<color name="header_white">#C1ECFF</color>
-    <color name="fab">#A4E3FF</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#49FFFE</color>
-    <color name="checkbox">#006695</color>
-    <color name="checkbox2">#005278</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>-->
+    <color name="pure_white">#FFFFFF</color> <color name="black_overlay">#66FFFFFF</color>
+    <color name="backgroundSelected">#49454E</color>
+    <color name="colorPrimary">@color/purpleDark</color> <color name="backgroundRipple">#20C3BBF3</color> <color name="checkbox">@color/purpleDark</color> <color name="floatingAddButton">@color/purpleDark</color> <color name="fabText">@color/pureBlack</color>             <color name="separatorToolbar">#49454E</color> <color name="chipBackground">#4423AA</color>   <color name="purpleLight">#4423AA</color>      <color name="fabBg">@color/purpleDark</color> <color name="addIconTint">@color/pureBlack</color> <color name="purpleLight2">#48416F</color>     <color name="descriptionContent">#CAC4CF</color> </resources>

@@ -5,7 +5,7 @@
     android:id="@+id/activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/backgroundColor"
+    android:background="@color/background"
     android:fitsSystemWindows="true"
     app:statusBarBackground="@color/colorPrimary"
     tools:context=".ui.home.TasksActivity">
@@ -18,15 +18,15 @@
         android:layout_height="wrap_content"
         android:elevation="6dp"
         android:fitsSystemWindows="true"
-        app:statusBarForeground="?attr/colorPrimary"
-        android:theme="@style/Theme.Todolist.AppBarOverlay">
+        app:statusBarForeground="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.App.AppBarOverlay">
         <!--@dimen/app_bar_height-->
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
              android:id="@+id/toolbar_layout"
              android:layout_width="match_parent"
              android:layout_height="@dimen/app_bar_height"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colorPrimary"
              android:fitsSystemWindows="true"
              android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
              app:contentScrim="@color/colorPrimary"
@@ -44,7 +44,7 @@
 
             android:fontFamily="@font/lexend_semibold"
             app:layout_collapseMode="pin"
-            app:popupTheme="@style/Theme.Todolist.PopupOverlay"
+            app:popupTheme="@style/ThemeOverlay.App.PopupOverlay"
             app:title="Mes tâches"
             app:titleTextColor="@color/iconTint">
 
@@ -106,7 +106,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?attr/colorPrimary"
+        android:background="@color/colorPrimary"
         app:fabCradleRoundedCornerRadius="16dp"
         app:fabCradleVerticalOffset="0dp"
         app:hideOnScroll="true"

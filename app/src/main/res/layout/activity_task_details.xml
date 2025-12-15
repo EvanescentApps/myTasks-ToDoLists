@@ -20,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:fitsSystemWindows="true"
-        android:theme="@style/Theme.Todolist.AppBarOverlay">
+        android:theme="@style/ThemeOverlay.App.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -30,7 +30,7 @@
             app:layout_collapseMode="pin"
             app:menu="@menu/bottom_app_bar"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:popupTheme="@style/Theme.Todolist.PopupOverlay"
+            app:popupTheme="@style/ThemeOverlay.App.PopupOverlay"
             app:title="Modifier une tâche"
             app:titleTextColor="@color/iconTint" />
 

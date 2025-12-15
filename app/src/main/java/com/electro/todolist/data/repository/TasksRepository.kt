@@ -20,7 +20,7 @@ import com.electro.todolist.data.model.Task
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
-class TasksRepository private constructor(private val context: Context) {
+open class TasksRepository private constructor(private val context: Context) {
 
     private val listManager: ListManager = ListManager(context)
     private val fileManager: FileManager = FileManager(context)
@@ -199,7 +199,7 @@ class TasksRepository private constructor(private val context: Context) {
      */
     fun deleteList(listId: String) {
         // First, delete the SharedPreferences file for the tasks within this list
-        context.getSharedPreferences(listId, AppCompatActivity.MODE_PRIVATE).edit().clear().apply()
+        context.getSharedPreferences(listId, AppCompatActivity.MODE_PRIVATE).edit { clear() }
         Timber.d("Cleared tasks from SharedPreferences for list ID: $listId")
 
         // Then, delete the list entry itself from the ListManager

@@ -18,11 +18,11 @@ class Priority {
     companion object {
 
         // TODO : Store the strings as Ints
-        val VERY_HIGH = Pair("Très important", R.color.taskTresImportant)
-        val HIGH = Pair("Important", R.color.taskImportant)
-        val URGENT = Pair("Très urgent !", R.color.taskUrgent)
-        val FACULTATIVE = Pair("Facultatif", R.color.taskFacultative) // C8FFCD
-        val NOT_URGENT = Pair("Pas urgent", R.color.taskPasUrgent) // B3FF74
+        val VERY_HIGH = Pair("Très important", R.color.priority_very_important)
+        val HIGH = Pair("Important", R.color.priority_important)
+        val URGENT = Pair("Très urgent !", R.color.priority_urgent)
+        val FACULTATIVE = Pair("Facultatif", R.color.priority_optional) // C8FFCD
+        val NOT_URGENT = Pair("Pas urgent", R.color.priority_not_urgent) // B3FF74
         val NONE = Pair("Indéfini", R.color.textContent)
     }
 }
