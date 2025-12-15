@@ -5,6 +5,7 @@
 
 package com.electro.todolist.ui.home
 
+import android.R.attr.data
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
@@ -63,11 +64,6 @@ import java.util.concurrent.Executors
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 
-// Constants for request codes (now using Activity Result API, but keeping for reference if needed elsewhere)
-// For export/import, we'll use the new Activity Result API, which doesn't rely on these explicit request codes.
-// However, the 500 for TaskDetailsActivity still uses startActivityForResult, so we keep that pattern for now.
-const val REQUEST_CODE_TASK_DETAILS = 500
-
 // DataStore for settings (consider if this should be part of a SettingsViewModel/Repository)
 val Context.dataStoreSettings: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -111,6 +107,52 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
             Timber.tag("Tasks from file").i("File opening cancelled by user.")
         }
     }
+
+
+    private val taskDetailsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val data = result.data!!
+
+            b.bottomAppBar.performShow()
+
+            Timber.tag("Activity Result").e("Received result for Task Details Activity")
+
+            val position = data.getIntExtra("position", -1)
+            val taskJson = data.getStringExtra("returnTask")
+            val deleteBool = data.getBooleanExtra("delete", false)
+
+            if (position == -1 || taskJson.isNullOrBlank()) {
+                Timber.tag("DATA").e("Position or TaskJson is null on result Task Details Activity")
+                return@registerForActivityResult
+            }
+
+            val originalTasks = tasksViewModel.tasks.value // Get current tasks from LiveData
+            if (originalTasks == null || position >= originalTasks.size || position < 0) {
+                Timber.tag("DATA").e("Invalid position $position or tasks list empty/too small for request, from Task Details Activity")
+                return@registerForActivityResult
+            }
+
+            val originalTaskInList = originalTasks[position] // Get the original task based on position
+
+            if (deleteBool) {
+                tasksViewModel.deleteTask(originalTaskInList) // Tell ViewModel to delete the task
+            } else { // Update task
+                val updatedTask = Json.decodeFromString<Task>(taskJson) // Parse the updated task
+
+                tasksViewModel.updateTask(originalTaskInList, updatedTask) // ViewModel method to handle updates
+
+                // If task was marked done, show specific Snackbar (UI-specific)
+                if (updatedTask.done) {
+                    Snackbar.make(findViewById(R.id.activity), "Tâche terminée", Snackbar.LENGTH_LONG)
+                        .setAnchorView(findViewById<FloatingActionButton>(R.id.fab))
+                        .setAction("Annuler") {
+                            tasksViewModel.setTaskDone(updatedTask, false) // Undo done state
+                        }.show()
+                }
+            }
+        }
+    }
+
 
     @Suppress("unused")
     private suspend fun save(key: String, value: String) {
@@ -241,7 +283,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                     putExtra("currentList", tasksViewModel.getCurrentListNameForUI()) // Get current list name from ViewModel
                     putExtra("position", position)
                 }
-                startActivityForResult(intent, REQUEST_CODE_TASK_DETAILS)
+                taskDetailsLauncher.launch(intent)
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             },
             onEmptyStateChanged = { isEmpty ->
@@ -346,59 +388,6 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         // The ViewModel should ideally observe changes to tasks and save automatically.
     }
 
-    @Deprecated("Deprecated in Java")
-    @SuppressLint("ShowToast")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        b.bottomAppBar.performShow()
-
-        Timber.tag("Activity Result").e("Received result for request: $requestCode")
-
-        if (resultCode != RESULT_OK || data == null) {
-            Timber.tag("Activity Result").e("Result not OK or data is null for request $requestCode")
-            return
-        }
-
-        when (requestCode) {
-            REQUEST_CODE_TASK_DETAILS -> { // Task modified/deleted from TaskDetailsActivity
-                val position = data.getIntExtra("position", -1)
-                val taskJson = data.getStringExtra("returnTask")
-                val deleteBool = data.getBooleanExtra("delete", false)
-
-                if (position == -1 || taskJson.isNullOrBlank()) {
-                    Timber.tag("DATA").e("Position or TaskJson is null on result for request $REQUEST_CODE_TASK_DETAILS")
-                    return
-                }
-
-                val originalTasks = tasksViewModel.tasks.value // Get current tasks from LiveData
-                if (originalTasks == null || position >= originalTasks.size || position < 0) {
-                    Timber.tag("DATA").e("Invalid position $position or tasks list empty/too small for request $REQUEST_CODE_TASK_DETAILS")
-                    return
-                }
-
-                val originalTaskInList = originalTasks[position] // Get the original task based on position
-
-                if (deleteBool) {
-                    tasksViewModel.deleteTask(originalTaskInList) // Tell ViewModel to delete the task
-                } else { // Update task
-                    val updatedTask = Json.decodeFromString<Task>(taskJson) // Parse the updated task
-
-                    tasksViewModel.updateTask(originalTaskInList, updatedTask) // ViewModel method to handle updates
-
-                    // If task was marked done, show specific Snackbar (UI-specific)
-                    if (updatedTask.done) {
-                        Snackbar.make(findViewById(R.id.activity), "Tâche terminée", Snackbar.LENGTH_LONG)
-                            .setAnchorView(findViewById<FloatingActionButton>(R.id.fab))
-                            .setAction("Annuler") {
-                                tasksViewModel.setTaskDone(updatedTask, false) // Undo done state
-                            }.show()
-                    }
-                }
-            }
-            else -> Timber.tag("RESULT").e("Unknown request code: $requestCode")
-        }
-    }
 
     // --- Implementation of BottomFragmentActions ---
     override fun onRenameList(listId: String, newName: String) {
