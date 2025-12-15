@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Material dark palette -->
+    <color name="md_theme_dark_primary">#C6C5FF</color>
+    <color name="md_theme_dark_onPrimary">#1B0061</color>
+    <color name="md_theme_dark_primaryContainer">#3E3F6E</color>
+    <color name="md_theme_dark_onPrimaryContainer">#E1E0FF</color>
+
+    <color name="md_theme_dark_secondary">#C3BBF3</color>
+    <color name="md_theme_dark_onSecondary">#1B0061</color>
+    <color name="md_theme_dark_secondaryContainer">#514778</color>
+    <color name="md_theme_dark_onSecondaryContainer">#E8E0FF</color>
+
+    <color name="md_theme_dark_tertiary">#ACA4CC</color>
+    <color name="md_theme_dark_onTertiary">#201634</color>
+    <color name="md_theme_dark_tertiaryContainer">#443C58</color>
+    <color name="md_theme_dark_onTertiaryContainer">#E5DEFF</color>
+
+    <color name="md_theme_dark_background">#121212</color>
+    <color name="md_theme_dark_onBackground">#E6E1E5</color>
+    <color name="md_theme_dark_surface">#1D1B20</color>
+    <color name="md_theme_dark_onSurface">#E6E1E5</color>
+    <color name="md_theme_dark_surfaceVariant">#49454E</color>
+    <color name="md_theme_dark_onSurfaceVariant">#CAC4CF</color>
+    <color name="md_theme_dark_outline">#948F99</color>
+
+    <color name="md_theme_dark_error">#FFB4AB</color>
+    <color name="md_theme_dark_onError">#690005</color>
+    <color name="md_theme_dark_errorContainer">#93000A</color>
+    <color name="md_theme_dark_onErrorContainer">#FFDAD6</color>
+
+    <!-- Legacy palette used across the app -->
     <color name="purpleDark">#9E9BFF</color>
     <color name="textContentPrimary">#C3BBF3</color>
     <color name="textContent">#E6E1E5</color>
@@ -9,12 +39,12 @@
     <color name="iconTint">#E6E1E5</color>
     <color name="textContentSecondary">#CAC4CF</color>
 
-    <color name="fab_background">@color/purpleDark</color>
-    <color name="fab_icon_tint">@color/pureBlack</color>
-    <color name="checkbox_checked">@color/purpleDark</color>
-    <color name="checkbox_unchecked">@color/textContentSecondary</color>
+    <color name="fab_background">@color/md_theme_dark_primary</color>
+    <color name="fab_icon_tint">@color/md_theme_dark_onPrimary</color>
+    <color name="checkbox_checked">@color/md_theme_dark_primary</color>
+    <color name="checkbox_unchecked">@color/md_theme_dark_outline</color>
     <color name="text_done_task">#00CD00</color>
-    <color name="toolbar_separator">@color/purpleDark</color>
+    <color name="toolbar_separator">@color/md_theme_dark_primary</color>
 
     <color name="priority_very_important">#FF0000</color>
     <color name="priority_important">#FF803C</color>
@@ -22,6 +52,20 @@
     <color name="priority_not_urgent">#099100</color>
     <color name="priority_optional">#066600</color>
 
-    <color name="pure_white">#FFFFFF</color> <color name="black_overlay">#66FFFFFF</color>
+    <color name="pure_white">#FFFFFF</color>
+    <color name="black_overlay">#66FFFFFF</color>
     <color name="backgroundSelected">#49454E</color>
-    <color name="colorPrimary">@color/purpleDark</color> <color name="backgroundRipple">#20C3BBF3</color> <color name="checkbox">@color/purpleDark</color> <color name="floatingAddButton">@color/purpleDark</color> <color name="fabText">@color/pureBlack</color>             <color name="separatorToolbar">#49454E</color> <color name="chipBackground">#4423AA</color>   <color name="purpleLight">#4423AA</color>      <color name="fabBg">@color/purpleDark</color> <color name="addIconTint">@color/pureBlack</color> <color name="purpleLight2">#48416F</color>     <color name="descriptionContent">#CAC4CF</color> </resources>
+
+    <color name="colorPrimary">@color/md_theme_dark_primary</color>
+    <color name="backgroundRipple">#20C3BBF3</color>
+    <color name="checkbox">@color/md_theme_dark_primary</color>
+    <color name="floatingAddButton">@color/md_theme_dark_primary</color>
+    <color name="fabText">@color/md_theme_dark_onPrimary</color>
+    <color name="separatorToolbar">#49454E</color>
+    <color name="chipBackground">#4423AA</color>
+    <color name="purpleLight">#4423AA</color>
+    <color name="fabBg">@color/md_theme_dark_primary</color>
+    <color name="addIconTint">@color/md_theme_dark_onPrimary</color>
+    <color name="purpleLight2">#48416F</color>
+    <color name="descriptionContent">#CAC4CF</color>
+</resources>
