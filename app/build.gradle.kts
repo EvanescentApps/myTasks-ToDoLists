@@ -116,7 +116,6 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("com.google.code.gson:gson:2.13.2")
     implementation("androidx.datastore:datastore-preferences:1.1.6")
     implementation("com.firebaseui:firebase-ui-auth:9.1.1")
     implementation("com.google.firebase:firebase-auth-ktx:23.2.1")

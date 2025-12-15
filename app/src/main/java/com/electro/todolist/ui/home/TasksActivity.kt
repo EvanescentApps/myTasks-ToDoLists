@@ -61,11 +61,15 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
 import androidx.core.view.isVisible
+import androidx.datastore.core.DataStore
 
 // Constants for request codes (now using Activity Result API, but keeping for reference if needed elsewhere)
 // For export/import, we'll use the new Activity Result API, which doesn't rely on these explicit request codes.
 // However, the 500 for TaskDetailsActivity still uses startActivityForResult, so we keep that pattern for now.
 const val REQUEST_CODE_TASK_DETAILS = 500
+
+// DataStore for settings (consider if this should be part of a SettingsViewModel/Repository)
+val Context.dataStoreSettings: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement the interface
 
@@ -73,10 +77,11 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     private lateinit var b: ActivityTasksBinding
     private lateinit var itemTouchHelperCallback: ItemTouchHelperCallback
     private lateinit var itemTouchHelper: ItemTouchHelper
+/*
     private lateinit var scrollListener: RecyclerView.OnScrollListener
+*/
 
-    // DataStore for settings (consider if this should be part of a SettingsViewModel/Repository)
-    private val Context.dataStoreSettings by preferencesDataStore(name = "settings")
+
 
     val tasksViewModel: TasksViewModel by viewModels {
         TasksViewModelFactory(TasksRepository.getInstance(this.applicationContext))
@@ -240,9 +245,15 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             },
             onEmptyStateChanged = { isEmpty ->
-                setEmptyState(isEmpty) // Your existing method in TasksActivity
+                setEmptyState(isEmpty)
             }
         )
+
+        // Permettre le scroll (et le swipe refresh) même quand on touche l'état vide
+        b.includeRecycler.emptyTasks.setOnTouchListener { _, event ->
+            // On transfère l'événement tactile directement à la RecyclerView
+            b.includeRecycler.tasksRecyclerview.dispatchTouchEvent(event)
+        }
 
         b.includeRecycler.tasksRecyclerview.adapter = adapter
         b.includeRecycler.tasksRecyclerview.layoutManager = LinearLayoutManager(this)
@@ -270,32 +281,6 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 .show()
         }
         // --- End LiveData Observation ---
-
-        // Scroll listener for empty state animation
-        scrollListener = object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    val view = b.includeRecycler.emptyTasks
-                    // Only animate if empty state is visible
-                    if (view.isVisible) {
-                        view.animate()
-                            .setInterpolator(AccelerateDecelerateInterpolator())
-                            .setDuration(500L)
-                            .translationY(-view.height.toFloat()) // Animate off screen
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    super.onAnimationEnd(animation)
-                                    view.visibility = View.GONE
-                                    view.translationY = 0F // Reset translation for next time
-                                }
-                            })
-                    }
-                }
-            }
-        }
-        b.includeRecycler.tasksRecyclerview.addOnScrollListener(scrollListener)
 
         b.swipeRefresh.isEnabled = false // Disable swipe refresh initially
         b.swipeRefresh.setOnRefreshListener {
