@@ -2,15 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.electro.todolist.ui.home.TasksActivity">
+    tools:context="com.evanescent.mytasks.ui.home.TasksActivity">
     <!--<item
         android:id="@+id/menu"
         android:title="Menu"
         android:icon="@drawable/ic_menu_black_24dp"
         app:showAsAction="always" />-->
     <item
+        android:id="@+id/action_language"
+        android:title="Langue"
+        android:icon="@drawable/ic_baseline_language_24"
+        app:showAsAction="always"
+        app:iconTint="@color/iconTint" />
+    <item
         android:id="@+id/contextItem"
-        android:title="Context Menu"
+        android:title="Options"
         app:iconTint="@color/iconTint"
         android:icon="@drawable/ic_more_vert_24px"
         app:showAsAction="always" />

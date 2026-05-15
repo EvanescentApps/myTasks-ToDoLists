@@ -27,16 +27,16 @@
     java.lang.Object readResolve();
 }
 
--keepclasseswithmembers class com.electro.todolist.* {
+-keepclasseswithmembers class com.evanescent.mytasks.* {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keep,includedescriptorclasses class com.electro.todolist.**$$serializer { *; }
+-keep,includedescriptorclasses class com.evanescent.mytasks.**$$serializer { *; }
 
--keepclassmembers,allowoptimization class com.electro.todolist.** {
+-keepclassmembers,allowoptimization class com.evanescent.mytasks.** {
     *** Companion;
 }
--keepclassmembers,allowoptimization class com.electro.todolist.** {
+-keepclassmembers,allowoptimization class com.evanescent.mytasks.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

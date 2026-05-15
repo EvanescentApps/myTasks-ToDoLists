@@ -54,7 +54,7 @@
     <string name="back_homepage">Revenir à l\'accueil</string>
     <string name="how_to_leave_flow">Pour quitter le Flow, appuie sur Retour\n(seulement si c\'est nécessaire)</string>
     <string name="button_timer">Bouton modifier le temps</string>
-    <string name="button_play_pause">Bouton Pause ou Reprendre</string>
+    <string name="button_play_pause">Bouton Pause ou Repprendre</string>
     <string name="user_pic">Photo de profil</string>
     <string name="username_example">MegaWizard</string>
     <string name="email_example">thewizard42@mathoo.ml</string>
@@ -65,4 +65,16 @@
     <string name="signinpage_title">Connexion (étape facultative)</string>
     <string name="passer">Passer</string>
     <string name="utilisateur">Utilisateur</string>
+
+    <!-- Messages -->
+    <string name="file_saved_success">Fichier sauvegardé avec succès !</string>
+    <string name="export_cancelled">Exportation annulée.</string>
+    <string name="file_imported_success">Fichier importé avec succès !</string>
+    <string name="import_cancelled">Importation annulée.</string>
+    <string name="task_completed">Tâche terminée</string>
+    <string name="task_restored">Tâche rétablie</string>
+    <string name="task_deleted">Tâche supprimée</string>
+    <string name="error_context_menu_no_list">Impossible d\'ouvrir le menu contextuel sans liste sélectionnée.</string>
+    <string name="error_export_no_list">Impossible d\'exporter: nom de liste introuvable.</string>
+    <string name="undo">Annuler</string>
 </resources>

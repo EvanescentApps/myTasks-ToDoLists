@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.electro.todolist",
+  "applicationId": "com.evanescent.mytasks",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 15,
-      "versionName": "2.0 Reborn",
+      "versionCode": 16,
+      "versionName": "2.1",
       "outputFile": "app-release.apk"
     }
   ],

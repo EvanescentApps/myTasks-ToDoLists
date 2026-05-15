@@ -87,6 +87,8 @@
     <style name="ThemeOverlay.Todolist.FullscreenContainer" parent="">
         <item name="android:colorBackground">@color/md_theme_light_background</item>
         <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="fullscreenBackgroundColor">@color/md_theme_light_background</item>
+        <item name="fullscreenTextColor">@color/md_theme_light_onSurfaceVariant</item>
     </style>
 
     <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

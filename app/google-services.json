@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:983328524388:android:248e02800d1fbb43a0f771",
         "android_client_info": {
-          "package_name": "com.electro.todolist"
+          "package_name": "com.evanescent.mytasks"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "983328524388-17tl12elecfa78vjn27ohji9qn8o8nej.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.electro.todolist",
+            "package_name": "com.evanescent.mytasks",
             "certificate_hash": "a96fcab45e658ca0be86a2d5a086083fa0e3888c"
           }
         },

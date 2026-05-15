@@ -59,17 +59,21 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/addTask"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
+            android:layout_marginTop="16dp"
+            android:paddingStart="24dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="12dp"
             android:text="@string/add_task_empty"
-            android:layout_marginTop="8dp"
             android:textAllCaps="false"
-            app:cornerRadius="8dp"
-            android:backgroundTint="@color/backgroundRipple"
-            android:textColor="@color/textContentPrimary"/>
+            android:textColor="@color/md_theme_light_primary"
+            android:textSize="18sp"
+            app:backgroundTint="@color/purpleLight"
+            app:cornerRadius="16dp"
+            app:rippleColor="@color/backgroundRipple" />
 
         <!--previously it was BGTINT purpleLight2-->
     </LinearLayout>

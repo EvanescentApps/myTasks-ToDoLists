@@ -1,19 +1,18 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21"
-
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
-extra["kotlin_version"] = "2.1.20"
+extra["kotlin_version"] = "2.3.21"
 
 
 android {
-    namespace = "com.electro.todolist"
-    compileSdk = 36
+    namespace = "com.evanescent.mytasks"
+    compileSdk = 37
 
 
     testOptions {
@@ -28,23 +27,22 @@ android {
             keyAlias = "todolistapp"
             keyPassword = "@OmegaNano4497"
             storePassword = "@OmegaNano4497"
-            storeFile = file("/home/ecocain/StudioProjects/ToDoList/todolistapp.jks")
+            storeFile = file("../todolistapp.jks")
         }
         create("release") {
             keyAlias = "todolistapp"
             keyPassword = "@OmegaNano4497"
             storePassword = "@OmegaNano4497"
-            storeFile = file("/home/ecocain/StudioProjects/ToDoList/todolistapp.jks")
+            storeFile = file("../todolistapp.jks")
         }
     }
 
     defaultConfig {
-        applicationId = "com.electro.todolist"
+        applicationId = "com.evanescent.mytasks"
         minSdk = 23
-        targetSdk = 36
-        versionCode = 15
-        versionName = "2.0 Reborn"
-        multiDexEnabled = true
+        targetSdk = 37
+        versionCode = 16
+        versionName = "2.1"
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -65,19 +63,20 @@ android {
     buildFeatures {
         viewBinding = true
         compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.8.1" // Compatible avec Kotlin 2.1.20
+        buildConfig = true
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    compileSdkMinor = 0
+    buildToolsVersion = "37.0.0"
+}
 
-    kotlinOptions {
-        jvmTarget = "17"
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -97,7 +96,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestImplementation("androidx.test:rules:1.7.0")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.7.0") // For RecyclerView testing
-    androidTestImplementation("org.mockito:mockito-android:5.20.0") // If you need mocks in instrumented tests
+    androidTestImplementation("org.mockito:mockito-android:5.20.0") // If need mocks in instrumented tests
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0") // For LiveData testing in instrumented tests
     androidTestImplementation("com.google.truth:truth:1.4.5") // Optional: More readable assertions
 
@@ -106,7 +105,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx:22.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
-    implementation("com.github.varunest:sparkbutton:1.0.6")
+    implementation("at.connyduck.sparkbutton:sparkbutton:4.2.0")
     implementation("com.airbnb.android:lottie:6.7.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
 
@@ -114,17 +113,26 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.datastore:datastore-preferences:1.1.6")
     implementation("com.firebaseui:firebase-ui-auth:9.1.1")
     implementation("com.google.firebase:firebase-auth-ktx:23.2.1")
-    implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.annotation:annotation:1.9.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
     implementation("com.github.LelouBil:PronoteLib:0.4.2")
+
+    // Room
+    val roomVersion = "2.8.4"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.59.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.59.2")
 
     // Jetpack Compose
     implementation("androidx.activity:activity-compose:1.10.1")

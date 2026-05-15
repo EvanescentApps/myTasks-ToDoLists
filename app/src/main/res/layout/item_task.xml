@@ -36,7 +36,7 @@
             android:theme="@style/checkbox"
             app:buttonTint="@color/checkbox" />
 
-    <com.varunest.sparkbutton.SparkButton
+    <at.connyduck.sparkbutton.SparkButton
         android:id="@+id/new_checkbox"
         android:layout_width="42dp"
         android:layout_height="42dp"
@@ -48,11 +48,11 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="16dp"
-        app:sparkbutton_activeImage="@drawable/round_check_circle_24"
-        app:sparkbutton_iconSize="32dp"
-        app:sparkbutton_inActiveImage="@drawable/outline_radio_button_unchecked_24"
-        app:sparkbutton_primaryColor="@color/checkbox"
-        app:sparkbutton_secondaryColor="@color/purpleLight2" />
+        app:activeImage="@drawable/round_check_circle_24"
+        app:iconSize="32dp"
+        app:inactiveImage="@drawable/outline_radio_button_unchecked_24"
+        app:primaryColor="@color/checkbox"
+        app:secondaryColor="@color/purpleLight2" />
 
         <LinearLayout
             android:layout_width="match_parent"
