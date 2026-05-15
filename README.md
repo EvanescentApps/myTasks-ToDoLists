@@ -1,4 +1,4 @@
-# ToDoList · Gestionnaire de tâches Android
+# myTasks - ToDoList · Gestionnaire de tâches Android
 
 > Application Android de gestion de tâches avec support multi-listes, glisser-déposer, gestes de balayage, import/export de fichiers et authentification Firebase.
 
