@@ -41,8 +41,8 @@ android {
         applicationId = "com.evanescent.mytasks"
         minSdk = 23
         targetSdk = 37
-        versionCode = 16
-        versionName = "2.1"
+        versionCode = 17
+        versionName = "2.2"
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
