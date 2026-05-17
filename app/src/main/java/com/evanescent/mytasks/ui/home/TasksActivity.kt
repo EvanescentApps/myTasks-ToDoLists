@@ -179,9 +179,15 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         b.swipeRefresh.isEnabled = isEnabled
     }
 
-    private fun updateListName(newName: String) {
-        b.toolbarLayout.title = newName
-        b.toolbar.title = newName
+    private fun updateListName(newName: String?) {
+        if (newName.isNullOrBlank()) return
+
+        b.toolbarLayout.post {
+            supportActionBar?.title = newName
+            b.toolbarLayout.title = newName
+            b.toolbar.title = newName
+            this.title = newName
+        }
     }
 
     fun changeList(newSelectedListId: String) {
@@ -204,7 +210,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
 
         b = ActivityTasksBinding.inflate(layoutInflater)
         setContentView(b.root)
-
+        setSupportActionBar(b.toolbar)
 
         logIpAddresses()
 
@@ -241,18 +247,17 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
 
+        // Observe current list name via LiveData strictly for reliability
+        tasksViewModel.currentListName.observe(this) { name ->
+            updateListName(name)
+        }
+
         // --- Observe Flows from ViewModel ---
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     tasksViewModel.tasks.collect { newTasks ->
                         adapter.updateTasks(newTasks)
-                    }
-                }
-
-                launch {
-                    tasksViewModel.currentListName.collect { name ->
-                        updateListName(name)
                     }
                 }
 
@@ -440,4 +445,3 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         }
     }
 }
-

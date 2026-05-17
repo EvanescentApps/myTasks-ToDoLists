@@ -3,6 +3,8 @@ package com.evanescent.mytasks.ui.home
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.evanescent.mytasks.R
@@ -63,8 +65,8 @@ class TasksViewModel @Inject constructor(
     private val _isEmptyStateEnabled = MutableStateFlow(false)
     val isEmptyStateEnabled: StateFlow<Boolean> = _isEmptyStateEnabled.asStateFlow()
 
-    private val _currentListName = MutableStateFlow("")
-    val currentListName: StateFlow<String> = _currentListName.asStateFlow()
+    private val _currentListName = MutableLiveData<String>()
+    val currentListName: LiveData<String> = _currentListName
 
     private val _snackbarEvent = MutableSharedFlow<String>()
     val snackbarEvent: SharedFlow<String> = _snackbarEvent.asSharedFlow()
@@ -281,7 +283,9 @@ class TasksViewModel @Inject constructor(
                 loadAllUserLists() // Refresh all lists to show the updated name
                 // If the current list was renamed, update its displayed name
                 if (tasksRepository.getCurrentListName() == listId) {
-                    _currentListName.value = newName
+                    withContext(Dispatchers.Main) {
+                        _currentListName.value = newName
+                    }
                 }
                 _snackbarEvent.emit(getString(R.string.list_renamed, newName))
             } catch (e: Exception) {
@@ -368,7 +372,6 @@ class TasksViewModel @Inject constructor(
     // if you primarily use Flows. You might keep them for very specific
     // cases where you need a synchronous value, but generally, observe Flows.
     fun getCurrentListNameForUI(): String {
-        return _currentListName.value
+        return _currentListName.value ?: ""
     }
 }
-

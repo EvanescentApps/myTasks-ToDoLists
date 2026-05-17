@@ -45,7 +45,6 @@
             android:fontFamily="@font/lexend_semibold"
             app:layout_collapseMode="pin"
             app:popupTheme="@style/ThemeOverlay.App.PopupOverlay"
-            app:title="Mes tâches"
             app:titleTextColor="@android:color/white">
 
             <androidx.appcompat.widget.AppCompatSpinner
