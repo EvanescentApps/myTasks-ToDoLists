@@ -9,15 +9,9 @@
         android:icon="@drawable/ic_menu_black_24dp"
         app:showAsAction="always" />-->
     <item
-        android:id="@+id/action_language"
-        android:title="Langue"
-        android:icon="@drawable/ic_baseline_language_24"
-        app:showAsAction="always"
-        app:iconTint="@color/iconTint" />
-    <item
         android:id="@+id/contextItem"
-        android:title="Options"
-        app:iconTint="@color/iconTint"
+        android:title="@string/options"
         android:icon="@drawable/ic_more_vert_24px"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:iconTint="?attr/colorOnPrimary" />
 </menu>

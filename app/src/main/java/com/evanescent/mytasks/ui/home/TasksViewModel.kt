@@ -1,15 +1,24 @@
 package com.evanescent.mytasks.ui.home
 
+import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.evanescent.mytasks.R
 import com.evanescent.mytasks.data.model.SerialListObject
 import com.evanescent.mytasks.data.model.Task
+import com.evanescent.mytasks.data.model.TaskList
 import com.evanescent.mytasks.data.repository.TasksRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -19,16 +28,29 @@ import java.util.Collections
 import java.util.Date
 import java.util.Locale
 
-class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel() {
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-    // --- LiveData for Tasks and UI State (Existing) ---
-    private val _tasks = MutableLiveData<List<Task>>()
-    val tasks: LiveData<List<Task>> = _tasks
+@HiltViewModel
+class TasksViewModel @Inject constructor(
+    application: Application,
+    private val tasksRepository: TasksRepository
+) : AndroidViewModel(application) {
 
+    private fun getString(resId: Int, vararg formatArgs: Any): String {
+        return getApplication<Application>().getString(resId, *formatArgs)
+    }
 
+    // --- Flows for Tasks and UI State ---
+    private val _tasks = MutableStateFlow<List<Task>>(emptyList())
+    val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
     // Exposer le compteur à l'Activity via le ViewModel
-    val counter: LiveData<Int> = tasksRepository.counterFlow.asLiveData()
+    val counter: StateFlow<Int> = tasksRepository.counterFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
+    )
 
     // L'action est déclenchée depuis le ViewModel
     fun onAddTaskClicked() { // Renommez selon l'action
@@ -38,21 +60,21 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
     }
 
 
-    private val _isEmptyStateEnabled = MutableLiveData<Boolean>()
-    val isEmptyStateEnabled: LiveData<Boolean> = _isEmptyStateEnabled
+    private val _isEmptyStateEnabled = MutableStateFlow(false)
+    val isEmptyStateEnabled: StateFlow<Boolean> = _isEmptyStateEnabled.asStateFlow()
 
-    private val _currentListName = MutableLiveData<String>()
-    val currentListName: LiveData<String> = _currentListName
+    private val _currentListName = MutableStateFlow("")
+    val currentListName: StateFlow<String> = _currentListName.asStateFlow()
 
-    private val _snackbarEvent = MutableLiveData<String>()
-    val snackbarEvent: LiveData<String> = _snackbarEvent
+    private val _snackbarEvent = MutableSharedFlow<String>()
+    val snackbarEvent: SharedFlow<String> = _snackbarEvent.asSharedFlow()
 
-    // --- NEW: LiveData for ALL Lists ---
-    private val _allLists = MutableLiveData<List<SerialListObject>>()
-    val allLists: LiveData<List<SerialListObject>> = _allLists
+    // --- Flows for ALL Lists ---
+    private val _allLists = MutableStateFlow<List<SerialListObject>>(emptyList())
+    val allLists: StateFlow<List<SerialListObject>> = _allLists.asStateFlow()
 
-    private val _currentListId = MutableLiveData<String>()
-    val currentListId: LiveData<String> = _currentListId // Expose the ID
+    private val _currentListId = MutableStateFlow<String?>(null)
+    val currentListId: StateFlow<String?> = _currentListId.asStateFlow() // Expose the ID
 
     init {
         // Load initial data when the ViewModel is created
@@ -69,12 +91,13 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
             val currentListId = tasksRepository.getCurrentListName()
 
             val loadedTasks = tasksRepository.getTasksForList(currentListId)
+            val listTitle = tasksRepository.getListTitle(currentListId) ?: "Mes tâches"
 
             withContext(Dispatchers.Main) {
                 _tasks.value = loadedTasks
                 _isEmptyStateEnabled.value = loadedTasks.isEmpty()
                 // Update currentListName based on the repository's current list title
-                _currentListName.value = tasksRepository.getListTitle(currentListId)
+                _currentListName.value = listTitle
                 _currentListId.value = currentListId
 
             }
@@ -91,7 +114,9 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.updateTask(originalTask, updatedTask)
             loadTasksForCurrentList() // Reload tasks to reflect the update in the UI
-            _snackbarEvent.postValue("Tâche mise à jour")
+/*
+            _snackbarEvent.emit(getString(R.string.task_updated))
+*/
         }
     }
 
@@ -99,7 +124,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.addTaskAtTop(task)
             loadTasksForCurrentList()
-            _snackbarEvent.postValue("Tâche ajoutée")
+            _snackbarEvent.emit(getString(R.string.task_added))
         }
     }
 
@@ -107,7 +132,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.deleteTask(task)
             loadTasksForCurrentList()
-            _snackbarEvent.postValue("Tâche supprimée")
+            _snackbarEvent.emit(getString(R.string.task_deleted))
         }
     }
 
@@ -115,7 +140,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.setTaskDone(task, done)
             loadTasksForCurrentList()
-            _snackbarEvent.postValue("Tâche mise à jour")
+            _snackbarEvent.emit(getString(R.string.task_updated))
         }
     }
 
@@ -123,13 +148,13 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.addTaskAtTop(task)
             loadTasksForCurrentList()
-            _snackbarEvent.postValue("Tâche restaurée")
+            _snackbarEvent.emit(getString(R.string.task_restored))
         }
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentTasks = _tasks.value?.toMutableList() ?: return@launch
+            val currentTasks = _tasks.value.toMutableList()
             if (fromPosition < 0 || fromPosition >= currentTasks.size ||
                 toPosition < 0 || toPosition >= currentTasks.size) {
                 return@launch // Avoid out of bounds
@@ -139,7 +164,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
             tasksRepository.saveTaskPositions(currentTasks) // Persist the new order
 
             withContext(Dispatchers.Main) {
-                _tasks.value = currentTasks // Update LiveData immediately
+                _tasks.value = currentTasks // Update StateFlow immediately
             }
         }
     }
@@ -148,7 +173,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepository.deleteAllDoneTasksFromCurrentList()
             loadTasksForCurrentList()
-            _snackbarEvent.postValue("Tâches terminées supprimées ✔")
+            _snackbarEvent.emit(getString(R.string.done_tasks_deleted))
         }
     }
 
@@ -160,10 +185,10 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
                 // Ensure tasksRepository.getTasksForList returns the list of tasks, not just the name
                 val tasksToExport = tasksRepository.getTasksForList(tasksRepository.getCurrentListName())
                 tasksRepository.writeTaskListTofile(tasksToExport, uri)
-                _snackbarEvent.postValue("Fichier sauvegardé avec succès !")
+                _snackbarEvent.emit(getString(R.string.file_saved_success))
             } catch (e: Exception) {
                 Timber.e(e, "Error exporting task list to file.")
-                _snackbarEvent.postValue("Erreur lors de l'exportation du fichier.")
+                _snackbarEvent.emit(getString(R.string.error_export_file))
             }
         }
     }
@@ -178,10 +203,10 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
                 // Use the new method to create and switch to the list
                 createAndSwitchToList(newListName, parsedTasks)
 
-                _snackbarEvent.postValue("Liste importée avec succès")
+                _snackbarEvent.emit(getString(R.string.file_imported_success))
             } catch (e: Exception) {
                 Timber.e(e, "Error importing task list from file.")
-                _snackbarEvent.postValue("Erreur lors de l'importation du fichier.")
+                _snackbarEvent.emit(getString(R.string.error_import_file))
             }
         }
     }
@@ -189,23 +214,21 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
     // --- List Management Operations (NEW/Modified) ---
 
     /**
-     * Loads all user-defined lists from the repository and updates _allLists LiveData.
+     * Loads all user-defined lists from the repository and updates _allLists Flow.
      */
     fun loadAllUserLists() {
         viewModelScope.launch(Dispatchers.IO) {
-            val listsMap = tasksRepository.getAllLists() // This returns MutableMap<String, String> (ID to Title)
+            val allLists = tasksRepository.getAllListsObjects()
+            val currentListId = tasksRepository.getCurrentListName()
 
-            // Convert map to a list of SerialListObject
-            val currentListId = tasksRepository.getCurrentListName() // Get current list ID
-
-            val serialListObjects = listsMap.map { entry ->
+            val serialListObjects = allLists.map { list ->
                 SerialListObject(
-                    id = entry.key,
-                    title = entry.value,
-                    position = tasksRepository.getListPosition(entry.key), // Get position from repository
-                    isCurrentSelected = (entry.key == currentListId) // Set selection status
+                    id = list.id,
+                    title = list.title,
+                    position = list.position,
+                    isCurrentSelected = (list.id == currentListId)
                 )
-            }.sortedBy { it.position }.toMutableList() // Sort by position to maintain order
+            }.toMutableList()
 
             withContext(Dispatchers.Main) {
                 _allLists.value = serialListObjects
@@ -242,7 +265,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
                 loadTasksForCurrentList() // Load tasks for the new list
             }
             loadAllUserLists() // Always refresh all lists to show the new one
-            _snackbarEvent.postValue("Liste '$listTitle' créée.")
+            _snackbarEvent.emit(getString(R.string.list_created, listTitle))
         }
     }
 
@@ -258,14 +281,12 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
                 loadAllUserLists() // Refresh all lists to show the updated name
                 // If the current list was renamed, update its displayed name
                 if (tasksRepository.getCurrentListName() == listId) {
-                    withContext(Dispatchers.Main) {
-                        _currentListName.value = newName
-                    }
+                    _currentListName.value = newName
                 }
-                _snackbarEvent.postValue("Liste renommée en '$newName'.")
+                _snackbarEvent.emit(getString(R.string.list_renamed, newName))
             } catch (e: Exception) {
                 Timber.e(e, "Error renaming list: $listId to $newName")
-                _snackbarEvent.postValue("Erreur lors du renommage de la liste.")
+                _snackbarEvent.emit(getString(R.string.error_rename_list))
             }
         }
     }
@@ -277,7 +298,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
      */
     fun reorderLists(fromPosition: Int, toPosition: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentListsMutable = _allLists.value?.toMutableList() ?: return@launch
+            val currentListsMutable = _allLists.value.toMutableList()
             if (fromPosition < 0 || fromPosition >= currentListsMutable.size ||
                 toPosition < 0 || toPosition >= currentListsMutable.size) {
                 return@launch // Avoid out of bounds
@@ -291,7 +312,7 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
             tasksRepository.saveListPositions(currentListsMutable)
 
             withContext(Dispatchers.Main) {
-                _allLists.value = currentListsMutable // Update LiveData immediately
+                _allLists.value = currentListsMutable // Update StateFlow immediately
                 // No Snackbar needed for just a drag-and-drop.
             }
         }
@@ -311,10 +332,10 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
                 }
                 loadTasksForCurrentList() // Reload tasks for the potentially new current list
                 loadAllUserLists() // Refresh all lists to remove the deleted one from UI
-                _snackbarEvent.postValue("Liste supprimée.")
+                _snackbarEvent.emit(getString(R.string.list_deleted))
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting list: $listId")
-                _snackbarEvent.postValue("Erreur lors de la suppression de la liste.")
+                _snackbarEvent.emit(getString(R.string.error_delete_list))
             }
         }
     }
@@ -330,14 +351,24 @@ class TasksViewModel(private val tasksRepository: TasksRepository) : ViewModel()
         loadAllUserLists() // Update all lists to reflect new selection and addition
     }
 
+    /**
+     * Starts the demonstration mode by adding sample tasks to the current list.
+     */
+    fun startDemoMode() {
+        viewModelScope.launch(Dispatchers.IO) {
+            tasksRepository.createDemoData()
+            loadTasksForCurrentList()
+            _snackbarEvent.emit(getString(R.string.demo_mode_activated))
+        }
+    }
+
     // --- Helper Methods (Potentially redundant or to be moved) ---
 
     // getCurrentListNameForUI() and getAllUserListsForUI() might become redundant
-    // if you primarily use LiveData. You might keep them for very specific
-    // cases where you need a synchronous value, but generally, observe LiveData.
+    // if you primarily use Flows. You might keep them for very specific
+    // cases where you need a synchronous value, but generally, observe Flows.
     fun getCurrentListNameForUI(): String {
-        return tasksRepository.getListTitle(tasksRepository.getCurrentListName())
-            ?: "Current List"
+        return _currentListName.value
     }
 }
 

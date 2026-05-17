@@ -51,6 +51,18 @@ data class Task(
         priorityName = pair.first
         priorityColor = pair.second
     }
+
+    fun getPriorityResourceId(): Int {
+        return when(priorityName) {
+            Priority.VERY_HIGH.first -> R.string.priority_very_high
+            Priority.HIGH.first -> R.string.priority_high
+            Priority.URGENT.first -> R.string.priority_urgent
+            Priority.NOT_URGENT.first -> R.string.priority_not_urgent
+            Priority.FACULTATIVE.first -> R.string.priority_optional
+            else -> R.string.priority_none
+        }
+    }
+
     companion object {
         private const val alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 

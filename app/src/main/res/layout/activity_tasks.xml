@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:fitsSystemWindows="true"
     app:statusBarBackground="@color/colorPrimary"
     tools:context=".ui.home.TasksActivity">
     <!--
@@ -32,8 +31,9 @@
              app:contentScrim="@color/colorPrimary"
              app:layout_scrollFlags="exitUntilCollapsed|scroll"
             app:statusBarScrim="@color/colorPrimary"
-             app:toolbarId="@+id/toolbar"><!--            app:statusBarScrim="#FFEB3B"
--->
+            app:expandedTitleTextColor="@android:color/white"
+            app:collapsedTitleTextColor="@android:color/white"
+             app:toolbarId="@+id/toolbar">
 
         <!--scroll|exitUntilCollapsed-->
 
@@ -46,7 +46,7 @@
             app:layout_collapseMode="pin"
             app:popupTheme="@style/ThemeOverlay.App.PopupOverlay"
             app:title="Mes tâches"
-            app:titleTextColor="@color/iconTint">
+            app:titleTextColor="@android:color/white">
 
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/choiceList"
@@ -111,7 +111,9 @@
         app:fabCradleVerticalOffset="0dp"
         app:hideOnScroll="true"
         app:menu="@menu/bottom_app_bar"
-        app:navigationIcon="@drawable/ic_menu_black_24dp" />
+        app:navigationIcon="@drawable/ic_menu_black_24dp"
+        app:navigationIconTint="?attr/colorOnPrimary"
+        app:itemIconTint="?attr/colorOnPrimary" />
     <!-- app:backgroundTint="#85F1FF"-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

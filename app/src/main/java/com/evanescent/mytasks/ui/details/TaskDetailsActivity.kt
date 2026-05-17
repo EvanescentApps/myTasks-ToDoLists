@@ -38,9 +38,15 @@ import java.util.*
 import androidx.core.content.edit
 import com.evanescent.mytasks.ui.FlowActivity
 import com.evanescent.mytasks.ui.fragments.ChangeListFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class TaskDetailsActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var tasksRepository: TasksRepository
 
     //private lateinit var titreEditText: EditText
     //private lateinit var descriptionEditText: AppCompatEditText
@@ -70,9 +76,6 @@ class TaskDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        val tasksRepository = TasksRepository.getInstance(this.applicationContext)
-        tasksRepository.getDefaultList()
-
         delete = false
         isNewDone = false
         jsonTask = intent.getStringExtra("currentTask").toString()
@@ -93,21 +96,21 @@ class TaskDetailsActivity : AppCompatActivity() {
         b.description.setText(task.description)
 
         task.date?.let {
-            val dateText = timestampToDate(it)
+            val dateText = timestampToDate(it, this)
             if (dateText.isNotBlank()) b.setTime.text = dateText
-            else b.setTime.text = "Ajouter date/heure"
+            else b.setTime.text = getString(R.string.add_date_time)
         }
 
         task.duration?.let {
-            val durationText = timestampToDuration(it)
+            val durationText = timestampToDuration(it, this)
             if (durationText.isNotBlank()) b.setDuration.text = durationText
-            else b.setDuration.text = "Définir la durée"
+            else b.setDuration.text = getString(R.string.set_duration)
         }
 
         if (task.priority != Priority.NONE) {
-            b.setPriority.text = task.priority.first
+            b.setPriority.text = getString(task.getPriorityResourceId())
             b.setPriority.setTextColor(ContextCompat.getColor(this, task.priority.second))
-        } else b.setPriority.text = "Définir la priorité"
+        } else b.setPriority.text = getString(R.string.set_priority)
 
         try {
             b.description.apply {
@@ -161,8 +164,8 @@ class TaskDetailsActivity : AppCompatActivity() {
 
             builder.apply {
                 setView(viewInflated)
-                setTitle("Définir la Durée")
-                setMessage("Définissez une durée pour cette tâche")
+                setTitle(getString(R.string.set_duration_title))
+                setMessage(getString(R.string.set_duration_message))
                 setCancelable(false)
 
                 setPositiveButton(
@@ -276,7 +279,7 @@ class TaskDetailsActivity : AppCompatActivity() {
             val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
             builder.apply {
                 setView(viewInflated)
-                setTitle("Définir la Priorité")
+                setTitle(getString(R.string.set_priority_title))
                 setCancelable(false)
                 setPositiveButton(R.string.ok) { dialog, _ ->
                     dialog.dismiss()
@@ -292,7 +295,16 @@ class TaskDetailsActivity : AppCompatActivity() {
                     }
 
                     if (priorityVal != Priority.NONE)  {
-                        b.setPriority.text = priorityVal.first
+                        // Translate priority name for UI
+                        val translatedName = when(priorityVal) {
+                            Priority.VERY_HIGH -> getString(R.string.priority_very_high)
+                            Priority.HIGH -> getString(R.string.priority_high)
+                            Priority.URGENT -> getString(R.string.priority_urgent)
+                            Priority.NOT_URGENT -> getString(R.string.priority_not_urgent)
+                            Priority.FACULTATIVE -> getString(R.string.priority_optional)
+                            else -> getString(R.string.priority_none)
+                        }
+                        b.setPriority.text = translatedName
                         b.setPriority.setTextColor(ContextCompat.getColor(this.context, priorityVal.second))
                         task.setPriority(priorityVal)
                     }
@@ -363,13 +375,13 @@ class TaskDetailsActivity : AppCompatActivity() {
             val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
 
             builder.apply {
-                setTitle("Modifier ou Supprimer ?")
+                setTitle(getString(R.string.modify_or_delete_title))
 
-                setPositiveButton("MODIFIER") { dialog, _ ->
+                setPositiveButton(getString(R.string.modify_action)) { dialog, _ ->
                     dialog.dismiss()
                     modifyDialog()
                 }
-                setNegativeButton("SUPPRIMER") { dialog, _ ->
+                setNegativeButton(getString(R.string.delete_action)) { dialog, _ ->
                     dialog.dismiss()
                     deleteAction()
                 }
@@ -383,7 +395,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     { setDurationDialog() },
                     {
                         task.duration = null
-                        b.setDuration.text = "Définir la durée"
+                        b.setDuration.text = getString(R.string.set_duration)
                         b.setDuration.setTextColor(ContextCompat.getColor(this, R.color.textContent))
                     }
                 )
@@ -396,7 +408,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     { setTimeDialog() },
                     {
                         task.date = null
-                        b.setTime.text = "Ajouter date/heure"
+                        b.setTime.text = getString(R.string.add_date_time)
                         b.setTime.setTextColor(ContextCompat.getColor(this, R.color.textContent))
                     }
                 )
@@ -409,7 +421,7 @@ class TaskDetailsActivity : AppCompatActivity() {
                     { showPriorityDialog() },
                     {
                         task.setPriority(Priority.NONE)
-                        b.setPriority.text = "Définir la priorité"
+                        b.setPriority.text = getString(R.string.set_priority)
                         b.setPriority.setTextColor(ContextCompat.getColor(this, R.color.textContent))
                     }
                 )
@@ -435,10 +447,10 @@ class TaskDetailsActivity : AppCompatActivity() {
                     val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
 
                     builder.apply {
-                        setTitle("Fonctionnalité en cours de développement")
-                        setMessage("Le menu contextuel pas disponible pour l'instant, ce sera pour une prochaine mise à jour.")
+                        setTitle(getString(R.string.feature_dev_title))
+                        setMessage(getString(R.string.feature_dev_message))
                         setPositiveButton(
-                            "D'accord"
+                            getString(R.string.understood)
                         ) { dialog, _ ->
                             dialog.dismiss()
                         }

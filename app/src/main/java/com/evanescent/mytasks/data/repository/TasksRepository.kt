@@ -11,6 +11,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.Uri
 import android.util.DisplayMetrics
+import com.evanescent.mytasks.R
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit // Extension function for SharedPreferences
 import androidx.datastore.core.DataStore
@@ -23,6 +24,8 @@ import com.evanescent.mytasks.data.manager.FileManager
 import com.evanescent.mytasks.data.manager.ListManager
 import com.evanescent.mytasks.data.model.SerialListObject
 import com.evanescent.mytasks.data.model.Task
+import com.evanescent.mytasks.data.model.TaskList
+import com.evanescent.mytasks.data.model.Priority
 import com.evanescent.mytasks.data.db.AppDatabase
 import com.evanescent.mytasks.data.db.TaskDao
 import kotlinx.coroutines.flow.Flow
@@ -38,13 +41,11 @@ private val Context.dataStoreSettings: DataStore<Preferences> by preferencesData
 open class TasksRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val listManager: ListManager,
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val taskDao: TaskDao
 ) {
 
     private val applicationContext = context.applicationContext
-    private val database = AppDatabase.getDatabase(applicationContext)
-    private val taskDao = database.taskDao()
-
     private val json = Json { ignoreUnknownKeys = true }
 
 
@@ -170,7 +171,7 @@ open class TasksRepository @Inject constructor(
      * @param listId The ID of the list.
      * @return The title of the list, or null if not found.
      */
-    fun getListTitle(listId: String): String? {
+    suspend fun getListTitle(listId: String): String? {
         return listManager.getListTitle(listId)
     }
 
@@ -179,7 +180,7 @@ open class TasksRepository @Inject constructor(
      * @param listId The ID of the list.
      * @return The position of the list, or 0 if not found (or default).
      */
-    fun getListPosition(listId: String): Int {
+    suspend fun getListPosition(listId: String): Int {
         return listManager.getListPosition(listId)
     }
 
@@ -188,8 +189,8 @@ open class TasksRepository @Inject constructor(
      * @param name The title of the new list.
      * @return The unique ID of the newly created list.
      */
-    fun createList(name: String): String {
-        return listManager.createList(name) // Assuming ListManager.createList now returns the ID
+    suspend fun createList(name: String): String {
+        return listManager.createList(name)
     }
 
     /**
@@ -197,7 +198,7 @@ open class TasksRepository @Inject constructor(
      * @param newName The new title for the list.
      * @param listId The ID of the list to rename.
      */
-    fun renameList(newName: String, listId: String) {
+    suspend fun renameList(newName: String, listId: String) {
         listManager.renameList(newName, listId)
     }
 
@@ -205,10 +206,10 @@ open class TasksRepository @Inject constructor(
      * Deletes a list and its associated tasks.
      * @param listId The ID of the list to delete.
      */
-    fun deleteList(listId: String) {
-        // First, delete the SharedPreferences file for the tasks within this list
-        context.getSharedPreferences(listId, AppCompatActivity.MODE_PRIVATE).edit { clear() }
-        Timber.d("Cleared tasks from SharedPreferences for list ID: $listId")
+    suspend fun deleteList(listId: String) {
+        // Delete tasks belonging to this list from Room
+        taskDao.deleteTasksByListId(listId)
+        Timber.d("Deleted all tasks from Room for list ID: $listId")
 
         // Then, delete the list entry itself from the ListManager
         listManager.deleteList(listId)
@@ -219,15 +220,22 @@ open class TasksRepository @Inject constructor(
      * Retrieves all user-defined lists as a map of ID to Title.
      * @return A MutableMap where keys are list IDs and values are list titles.
      */
-    fun getAllLists(): MutableMap<String, String> {
-        return listManager.getAllListsAsMap() // Assuming ListManager has this method
+    suspend fun getAllLists(): MutableMap<String, String> {
+        return listManager.getAllListsAsMap()
+    }
+
+    /**
+     * Retrieves all user-defined lists as a list of TaskList objects.
+     */
+    suspend fun getAllListsObjects(): List<TaskList> {
+        return listManager.getAllLists()
     }
 
     /**
      * Saves the new order (positions) of lists after a drag-and-drop operation.
      * @param lists The reordered list of SerialListObject.
      */
-    fun saveListPositions(lists: List<SerialListObject>) {
+    suspend fun saveListPositions(lists: List<SerialListObject>) {
         listManager.saveListPositions(lists) // Delegate to ListManager
     }
 
@@ -248,8 +256,26 @@ open class TasksRepository @Inject constructor(
     /**
      * Ensures a default list exists and sets it as current if no other list is selected.
      */
-    fun getDefaultList() {
+    suspend fun getDefaultList() {
         listManager.getDefaultList()
+    }
+
+    /**
+     * Adds demonstration tasks to the current list.
+     */
+    suspend fun createDemoData() {
+        val currentListId = getCurrentListName()
+        
+        val demoTasks = listOf(
+            Task(title = context.getString(R.string.demo_task_1_title), description = context.getString(R.string.demo_task_1_desc), listId = currentListId, position = 0),
+            Task(title = context.getString(R.string.demo_task_2_title), description = context.getString(R.string.demo_task_2_desc), listId = currentListId, position = 1, priorityName = Priority.VERY_HIGH.first, priorityColor = Priority.VERY_HIGH.second),
+            Task(title = context.getString(R.string.demo_task_3_title), description = context.getString(R.string.demo_task_3_desc), listId = currentListId, position = 2, priorityName = Priority.HIGH.first, priorityColor = Priority.HIGH.second),
+            Task(title = context.getString(R.string.demo_task_4_title), description = context.getString(R.string.demo_task_4_desc), listId = currentListId, position = 3, date = System.currentTimeMillis() + 3600000),
+            Task(title = context.getString(R.string.demo_task_5_title), description = context.getString(R.string.demo_task_5_desc), listId = currentListId, position = 4, duration = 1500000),
+            Task(title = context.getString(R.string.demo_task_6_title), description = context.getString(R.string.demo_task_6_desc), listId = currentListId, position = 5, done = true)
+        )
+        
+        addTasksToList(currentListId, demoTasks)
     }
 
     // --- File Management Operations (Delegated to FileManager) ---
@@ -271,21 +297,6 @@ open class TasksRepository @Inject constructor(
     fun readTextContent(uri: Uri): String = fileManager.readTextContent(uri)
 
     companion object {
-        @Volatile
-        private var INSTANCE: TasksRepository? = null
-
-        fun getInstance(context: Context): TasksRepository {
-            return INSTANCE ?: synchronized(this) {
-                val instance = TasksRepository(
-                    context.applicationContext,
-                    ListManager(context.applicationContext),
-                    FileManager(context.applicationContext)
-                )
-                INSTANCE = instance
-                instance
-            }
-        }
-
         // DP extension property - kept for convenience, not directly related to repository logic
         @Suppress("unused")
         val Number.dp get() = toFloat() * (Resources.getSystem().displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)

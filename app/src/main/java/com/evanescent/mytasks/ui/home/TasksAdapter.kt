@@ -216,7 +216,7 @@ class TasksAdapter(
 
         val timestamp = task.date
         if (timestamp != null && timestamp != 0L) {
-            val dateText = timestampToDate(timestamp)
+            val dateText = timestampToDate(timestamp, context)
             viewHolder.dateChip.text = dateText
             viewHolder.dateChip.visibility = if (dateText.isNotBlank()) View.VISIBLE else View.GONE
         } else {
@@ -226,7 +226,7 @@ class TasksAdapter(
         if (task.priority != Priority.NONE) {
             viewHolder.priorityChip.apply {
                 visibility = View.VISIBLE
-                text = task.priority.first
+                text = context.getString(task.getPriorityResourceId())
                 setTextColor(ContextCompat.getColor(context, task.priority.second))
             }
         } else {
@@ -235,7 +235,7 @@ class TasksAdapter(
 
         val durationTimestamp = task.duration
         if (durationTimestamp != null && durationTimestamp != 0L) {
-            val durationText = timestampToDuration(durationTimestamp)
+            val durationText = timestampToDuration(durationTimestamp, context)
             viewHolder.durationChip.text = durationText
             viewHolder.durationChip.visibility = if (durationText.isNotBlank()) View.VISIBLE else View.GONE
         } else {

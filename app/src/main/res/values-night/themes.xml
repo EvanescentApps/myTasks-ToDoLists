@@ -31,10 +31,10 @@
         <item name="android:textColorSecondary">@color/md_theme_dark_onSurfaceVariant</item>
         <item name="android:textColor">@color/md_theme_dark_onSurface</item>
 
-        <item name="android:statusBarColor">@color/md_theme_dark_background</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:navigationBarColor">#C6C5FF</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
 

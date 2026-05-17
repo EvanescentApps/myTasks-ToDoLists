@@ -1,8 +1,6 @@
 package com.evanescent.mytasks.ui.login
 
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -16,9 +14,17 @@ import com.evanescent.mytasks.databinding.ActivityLoginBinding
 
 import com.evanescent.mytasks.R
 
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    private val loginViewModel: LoginViewModel by viewModels()
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,38 +38,40 @@ class LoginActivity : AppCompatActivity() {
         val login = binding.login
         val loading = binding.loading
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        // --- Observe Flows from ViewModel ---
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    loginViewModel.loginFormState.collect { loginState ->
+                        // disable login button unless both username / password is valid
+                        login.isEnabled = loginState.isDataValid
 
-        loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
-            val loginState = it ?: return@Observer
+                        if (loginState.usernameError != null) {
+                            username.error = getString(loginState.usernameError)
+                        }
+                        if (loginState.passwordError != null) {
+                            password.error = getString(loginState.passwordError)
+                        }
+                    }
+                }
 
-            // disable login button unless both username / password is valid
-            login.isEnabled = loginState.isDataValid
+                launch {
+                    loginViewModel.loginResult.collect { loginResult ->
+                        loading.visibility = View.GONE
+                        if (loginResult.error != null) {
+                            showLoginFailed(loginResult.error)
+                        }
+                        if (loginResult.success != null) {
+                            updateUiWithUser(loginResult.success)
+                        }
+                        setResult(Activity.RESULT_OK)
 
-            if (loginState.usernameError != null) {
-                username.error = getString(loginState.usernameError)
+                        //Complete and destroy login activity once successful
+                        finish()
+                    }
+                }
             }
-            if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
-            }
-        })
-
-        loginViewModel.loginResult.observe(this@LoginActivity, Observer {
-            val loginResult = it ?: return@Observer
-
-            loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
-            }
-            setResult(Activity.RESULT_OK)
-
-            //Complete and destroy login activity once successful
-            finish()
-        })
+        }
 
         username.afterTextChanged {
             loginViewModel.loginDataChanged(

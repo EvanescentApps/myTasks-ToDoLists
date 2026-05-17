@@ -4,6 +4,10 @@
 
 📖 [English version below](#english-version)
 
+## :camera_flash: Screenshots
+<!-- You can add more screenshots here if you like -->
+<img src="/screenshots/Screen1" width="260">&emsp;<img src="/screenshots/Screen2" width="260">&emsp;<img src="/screenshots/Screen3" width="260">
+&emsp;<img src="/screenshots/Screen4" width="260">
 ---
 
 ## Fonctionnalités

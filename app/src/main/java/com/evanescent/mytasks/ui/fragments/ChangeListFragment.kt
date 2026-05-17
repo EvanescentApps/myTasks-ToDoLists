@@ -14,7 +14,10 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.fragment.app.viewModels // For ViewModel delegation
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,19 +30,15 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
-// SerialListObject is correctly defined in data package, no need to redefine here
-// You might remove the ListObject data class if it's no longer used elsewhere for consistency.
-// @Keep and @Serializable are correctly on SerialListObject.
-
+@AndroidEntryPoint
 class ChangeListFragment : BottomSheetDialogFragment() {
 
-    // Use viewModels() delegate to get a ViewModel instance scoped to the owning Activity.
-    // This assumes TasksViewModel has a default constructor or is provided by a ViewModelFactory.
-    private val tasksViewModel: TasksViewModel by viewModels(
-        ownerProducer = { requireActivity() } // Scope to the parent Activity
-    )
+    // Use activityViewModels() delegate to get a ViewModel instance scoped to the owning Activity.
+    private val tasksViewModel: TasksViewModel by activityViewModels()
 
     private lateinit var listsAdapter: ListsAdapter // Renamed for clarity
     private lateinit var recyclerView: RecyclerView // Reference to RecyclerView
@@ -100,15 +99,19 @@ class ChangeListFragment : BottomSheetDialogFragment() {
             itemTouchHelper.attachToRecyclerView(this)
         }
 
-        // --- Observe LiveData from ViewModel ---
-        tasksViewModel.allLists.observe(viewLifecycleOwner) { lists: List<SerialListObject>? ->
-            if (lists.isNullOrEmpty()) {
-                Toast.makeText(requireContext(), "Aucune liste créée", Toast.LENGTH_SHORT).show()
-                dismissAllowingStateLoss() // Dismiss if no lists exist
-            } else {
-                // Update the adapter's data when ViewModel's allLists LiveData changes
-                listsAdapter.updateLists(lists)
-                Timber.d("ChangeListFragment: allLists observed, adapter updated with ${lists.size} items.")
+        // --- Observe Flows from ViewModel ---
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                tasksViewModel.allLists.collect { lists ->
+                    if (lists.isEmpty()) {
+                        Toast.makeText(requireContext(), getString(R.string.no_lists_created), Toast.LENGTH_SHORT).show()
+                        dismissAllowingStateLoss() // Dismiss if no lists exist
+                    } else {
+                        // Update the adapter's data when ViewModel's allLists Flow changes
+                        listsAdapter.updateLists(lists)
+                        Timber.d("ChangeListFragment: allLists observed, adapter updated with ${lists.size} items.")
+                    }
+                }
             }
         }
 
@@ -126,11 +129,11 @@ class ChangeListFragment : BottomSheetDialogFragment() {
      * Shows a dialog to confirm list deletion.
      */
     private fun showDeleteConfirmationDialog(listId: String) {
-        val listTitle = tasksViewModel.allLists.value?.firstOrNull { it.id == listId }?.title ?: "cette liste"
+        val listTitle = tasksViewModel.allLists.value?.firstOrNull { it.id == listId }?.title ?: ""
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
-            .setTitle("Supprimer la liste ?")
-            .setMessage("Voulez-vous vraiment supprimer '$listTitle' ? Toutes les tâches qu'elle contient seront également supprimées.")
-            .setPositiveButton("Supprimer") { dialog, _ ->
+            .setTitle(getString(R.string.delete_list_title))
+            .setMessage(getString(R.string.delete_list_confirmation_message, listTitle))
+            .setPositiveButton(getString(R.string.delete)) { dialog, _ ->
                 tasksViewModel.deleteList(listId) // Trigger deletion via ViewModel
                 dialog.dismiss()
             }
@@ -148,7 +151,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
     private fun showListOptionsDialog(listId: String) {
         val listTitle = tasksViewModel.allLists.value?.firstOrNull { it.id == listId }?.title ?: ""
 
-        val options = arrayOf("Renommer la liste", "Supprimer la liste")
+        val options = arrayOf(getString(R.string.rename_list_action), getString(R.string.delete_list_action))
 
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
             .setTitle(listTitle)
@@ -171,14 +174,14 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         input.setText(currentTitle) // Pre-fill with current title
 
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
-            .setTitle("Renommer la liste")
+            .setTitle(getString(R.string.rename_list_title))
             .setView(viewInflated)
             .setPositiveButton(R.string.ok) { dialog, _ ->
                 val newName = input.text.toString().trim()
                 if (newName.isNotBlank() && newName != currentTitle) {
                     tasksViewModel.renameList(listId, newName) // Call ViewModel to rename
                 } else if (newName.isBlank()) {
-                    Toast.makeText(requireContext(), "Le nom de la liste ne peut pas être vide", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.list_name_empty_error), Toast.LENGTH_SHORT).show()
                 }
                 dialog.dismiss()
             }
@@ -197,7 +200,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
         val input = viewInflated.findViewById<EditText>(R.id.input)
 
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
-            .setTitle("Créer une nouvelle liste")
+            .setTitle(getString(R.string.create_new_list_title))
             .setView(viewInflated)
             .setPositiveButton(R.string.ok) { dialog, _ ->
                 val newListTitle = input.text.toString().trim()
@@ -206,7 +209,7 @@ class ChangeListFragment : BottomSheetDialogFragment() {
                     // ViewModel will update allLists LiveData, which will update the adapter
                     dismiss() // Dismiss the dialog after creation
                 } else {
-                    Toast.makeText(requireContext(), "Le nom de la liste ne peut pas être vide", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.list_name_empty_error), Toast.LENGTH_SHORT).show()
                 }
                 dialog.dismiss()
             }
@@ -221,9 +224,9 @@ class ChangeListFragment : BottomSheetDialogFragment() {
      */
     private fun showSettingsComingSoonDialog() {
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
-            .setTitle("Fonctionnalité en cours de développement")
-            .setMessage("Les paramètres ne sont pas disponibles pour l'instant, ce sera pour une prochaine mise à jour.")
-            .setPositiveButton("D'accord") { dialog, _ ->
+            .setTitle(getString(R.string.settings_dev_title))
+            .setMessage(getString(R.string.settings_dev_message))
+            .setPositiveButton(getString(R.string.understood)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()

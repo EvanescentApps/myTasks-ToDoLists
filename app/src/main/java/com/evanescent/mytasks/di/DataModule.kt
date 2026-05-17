@@ -8,6 +8,7 @@ package com.evanescent.mytasks.di
 import android.content.Context
 import com.evanescent.mytasks.data.db.AppDatabase
 import com.evanescent.mytasks.data.db.TaskDao
+import com.evanescent.mytasks.data.db.TaskListDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,11 @@ object DataModule {
     @Provides
     fun provideTaskDao(appDatabase: AppDatabase): TaskDao {
         return appDatabase.taskDao()
+    }
+
+    @Provides
+    fun provideTaskListDao(appDatabase: AppDatabase): TaskListDao {
+        return appDatabase.taskListDao()
     }
 }
 

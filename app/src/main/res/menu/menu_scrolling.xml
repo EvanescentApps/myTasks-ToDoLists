@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.evanescent.mytasks.ui.home.TasksActivity">
     <item
+        android:id="@+id/action_language"
+        android:orderInCategory="95"
+        android:title="@string/action_language"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"

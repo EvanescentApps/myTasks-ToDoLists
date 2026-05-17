@@ -77,4 +77,107 @@
     <string name="error_context_menu_no_list">Impossible d\'ouvrir le menu contextuel sans liste sélectionnée.</string>
     <string name="error_export_no_list">Impossible d\'exporter: nom de liste introuvable.</string>
     <string name="undo">Annuler</string>
+    <string name="demo_mode">Mode Démonstration</string>
+    <string name="action_language">Langue</string>
+    <string name="my_tasks">Mes tâches</string>
+    <string name="options">Options</string>
+    <string name="done">Terminé</string>
+    <string name="delete">Supprimer</string>
+    <string name="important">Important</string>
+
+    <string name="rename_list_action">Renommer la liste</string>
+    <string name="delete_list_action">Supprimer la liste</string>
+    <string name="delete_all_done_tasks_action">Supprimer toutes les tâches terminées</string>
+    <string name="export_list_action">Exporter la liste</string>
+    <string name="import_list_action">Importer une liste</string>
+    <string name="create_list_action">Créer une nouvelle liste</string>
+
+    <string name="rename_list_title">Renommer une liste</string>
+    <string name="rename_button">Renommer</string>
+    <string name="delete_list_title">Supprimer la liste ?</string>
+    <string name="delete_list_message">Toutes les tâches de cette liste seront définitivement supprimées, continuer ?</string>
+    <string name="delete_all_done_tasks_title">Supprimer toutes les tâches terminées ?</string>
+    <string name="delete_all_done_tasks_message">Toutes les tâches terminées seront définitivement supprimées, continuer ?</string>
+    <string name="list_name_hint">Nom de la liste</string>
+    <string name="create_button">Créer</string>
+    <string name="export_info">Export de la liste au format texte (JSON)</string>
+    <string name="import_info">Importez une liste au format texte (JSON)</string>
+    <string name="no_list_selected">Aucune liste sélectionnée...</string>
+    <string name="enter_list_name">Veuillez définir un nom pour la liste</string>
+
+    <string name="add_date_time">Ajouter date/heure</string>
+    <string name="set_duration">Définir la durée</string>
+    <string name="set_priority">Définir la priorité</string>
+    <string name="start_flow">Démarrer un Flow !</string>
+    <string name="what_is_flow">Qu\'est-ce-que le Flow sur myTasks ?</string>
+    <string name="flow_description">Le flow te permet de te lancer dans une tâche, de rester concentré et motivé, avec un compte à rebours que tu définis, et une récompense visuelle à la fin !</string>
+    <string name="i_finished">J\'ai terminé !</string>
+
+    <string name="priority_very_high">Très important</string>
+    <string name="priority_high">Important</string>
+    <string name="priority_urgent">Très urgent !</string>
+    <string name="priority_optional">Facultatif</string>
+    <string name="priority_not_urgent">Pas urgent</string>
+    <string name="priority_none">Indéfini</string>
+
+    <string name="hours">Heures</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Secondes</string>
+
+    <string name="set_duration_title">Définir la Durée</string>
+    <string name="set_duration_message">Définissez une durée pour cette tâche</string>
+    <string name="set_priority_title">Définir la Priorité</string>
+    <string name="modify_or_delete_title">Modifier ou Supprimer ?</string>
+    <string name="modify_action">MODIFIER</string>
+    <string name="delete_action">SUPPRIMER</string>
+    <string name="feature_dev_title">Fonctionnalité en cours de développement</string>
+    <string name="feature_dev_message">Le menu contextuel pas disponible pour l\'instant, ce sera pour une prochaine mise à jour.</string>
+    <string name="understood">D\'accord</string>
+
+    <string name="day_before_yesterday">Avant-Hier</string>
+    <string name="yesterday">Hier</string>
+    <string name="today">Aujourd\'hui</string>
+    <string name="tomorrow">Demain</string>
+    <string name="day_after_tomorrow">Après-Demain</string>
+    <string name="at">à</string>
+    <string name="duration_hour">h</string>
+    <string name="duration_minute">min</string>
+    <string name="duration_second">s</string>
+
+    <string name="task_updated">Tâche mise à jour</string>
+    <string name="task_added">Tâche ajoutée</string>
+    <string name="done_tasks_deleted">Tâches terminées supprimées ✔</string>
+    <string name="error_export_file">Erreur lors de l\'exportation du fichier.</string>
+    <string name="error_import_file">Erreur lors de l\'importation du fichier.</string>
+    <string name="list_created">Liste \'%1$s\' créée.</string>
+    <string name="list_renamed">Liste renommée en \'%1$s\'.</string>
+    <string name="error_rename_list">Erreur lors du renommage de la liste.</string>
+    <string name="list_deleted">Liste supprimée.</string>
+    <string name="error_delete_list">Erreur lors de la suppression de la liste.</string>
+    <string name="demo_mode_activated">Mode Démonstration activé !</string>
+
+    <string name="no_lists_created">Aucune liste créée</string>
+    <string name="delete_list_confirmation_message">Voulez-vous vraiment supprimer \'%1$s\' ? Toutes les tâches qu\'elle contient seront également supprimées.</string>
+    <string name="list_name_empty_error">Le nom de la liste ne peut pas être vide</string>
+    <string name="settings_dev_title">Fonctionnalité en cours de développement</string>
+    <string name="settings_dev_message">Les paramètres ne sont pas disponibles pour l\'instant, ce sera pour une prochaine mise à jour.</string>
+    <string name="create_new_list_title">Créer une nouvelle liste</string>
+    <string name="init_demo_mode">Initialisation du mode démonstration...</string>
+
+    <string name="list_my_tasks">Mes tâches</string>
+    <string name="list_today">Aujourd\'hui</string>
+    <string name="list_tomorrow">Demain</string>
+
+    <string name="demo_task_1_title">Bienvenue dans myTasks !</string>
+    <string name="demo_task_1_desc">Ceci est une démonstration.</string>
+    <string name="demo_task_2_title">Organiser ma journée</string>
+    <string name="demo_task_2_desc">Planifier les priorités du matin</string>
+    <string name="demo_task_3_title">Apprendre le Kotlin</string>
+    <string name="demo_task_3_desc">Regarder une vidéo sur les Coroutines</string>
+    <string name="demo_task_4_title">Faire les courses</string>
+    <string name="demo_task_4_desc">Pain, lait, œufs</string>
+    <string name="demo_task_5_title">Démarrer un Flow</string>
+    <string name="demo_task_5_desc">Essayez le mode concentration sur cette tâche</string>
+    <string name="demo_task_6_title">Tâche terminée</string>
+    <string name="demo_task_6_desc">Bravo !</string>
 </resources>

@@ -5,32 +5,33 @@
 
 package com.evanescent.mytasks.data
 
+import android.content.Context
+import com.evanescent.mytasks.R
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-    fun timestampToDate(timestamp: Long): String {
+    fun timestampToDate(timestamp: Long, context: Context): String {
         val cal = Calendar.getInstance()
         cal.timeInMillis = timestamp
-
-        val daysOfWeek = listOf("Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi")
-        val monthsOfYear = listOf("Janvier", "Février", "Mars","Avril","Mai","Juin","Juillet", "Août", "Septembre", "Octobre","Novembre","Décembre")
 
         val currentCal = Calendar.getInstance()
         currentCal.timeInMillis = System.currentTimeMillis()
 
         val today = currentCal.get(Calendar.DAY_OF_YEAR)
         val day = when(cal.get(Calendar.DAY_OF_YEAR)) {
-            today - 2 -> "Avant-Hier"
-            today -1 -> "Hier"
-            today -> "Aujourd'hui"
-            today + 1 -> "Demain"
-            today + 2 -> "Après-Demain"
-            else -> "${daysOfWeek[cal.get(Calendar.DAY_OF_WEEK)-1].take(3)}. ${cal.get(Calendar.DAY_OF_MONTH)} ${monthsOfYear[cal.get(Calendar.MONTH)]}"
+            today - 2 -> context.getString(R.string.day_before_yesterday)
+            today - 1 -> context.getString(R.string.yesterday)
+            today -> context.getString(R.string.today)
+            today + 1 -> context.getString(R.string.tomorrow)
+            today + 2 -> context.getString(R.string.day_after_tomorrow)
+            else -> SimpleDateFormat("EEE. d MMM", Locale.getDefault()).format(cal.time)
         }
 
-        return "$day à ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)}"
+        val at = context.getString(R.string.at)
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(cal.time)
+        return "$day $at $time"
     }
 
     fun getDate(): String {
@@ -43,7 +44,7 @@ import java.util.Locale
     fun String.toSafeCase(): String = Normalizer.normalize(this.lowercase(), Normalizer.Form.NFD)
         .filter { it.isLetterOrDigit() or it.isWhitespace() }.replace(" ", "_")
 
-fun timestampToDuration(timestamp : Long): String {
+fun timestampToDuration(timestamp : Long, context: Context): String {
 
     val taskDurationSec = (timestamp/1000).toInt()
 
@@ -53,19 +54,19 @@ fun timestampToDuration(timestamp : Long): String {
 
     var durationText = ""
     if (hours != 0) {
-        durationText += "${hours}h"
+        durationText += "${hours}${context.getString(R.string.duration_hour)}"
     }
     if (minutes != 0) {
         var space = ""
         if (durationText.isNotEmpty()) space = " "
 
-        durationText += "${space}${minutes} min"
+        durationText += "${space}${minutes} ${context.getString(R.string.duration_minute)}"
     }
     if (seconds != 0) {
         var space = ""
         if (durationText.isNotEmpty()) space = " "
 
-        durationText += "${space}${seconds}s"
+        durationText += "${space}${seconds}${context.getString(R.string.duration_second)}"
     }
     return durationText
 }

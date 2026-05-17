@@ -69,4 +69,119 @@
     <string name="signinpage_title">Login (optional step)</string>
     <string name="passer">Skip</string>
     <string name="utilisateur">User</string>
+
+    <!-- Messages -->
+    <string name="file_saved_success">File saved successfully!</string>
+    <string name="export_cancelled">Export cancelled.</string>
+    <string name="file_imported_success">File imported successfully!</string>
+    <string name="import_cancelled">Import cancelled.</string>
+    <string name="task_completed">Task completed</string>
+    <string name="task_restored">Task restored</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="error_context_menu_no_list">Cannot open context menu without a selected list.</string>
+    <string name="error_export_no_list">Cannot export: list name not found.</string>
+    <string name="undo">Undo</string>
+    <string name="demo_mode">Demo Mode</string>
+    <string name="action_language">Language</string>
+    <string name="my_tasks">My Tasks</string>
+    <string name="options">Options</string>
+    <string name="done">Done</string>
+    <string name="delete">Delete</string>
+    <string name="important">Important</string>
+
+    <string name="rename_list_action">Rename list</string>
+    <string name="delete_list_action">Delete list</string>
+    <string name="delete_all_done_tasks_action">Delete all completed tasks</string>
+    <string name="export_list_action">Export list</string>
+    <string name="import_list_action">Import a list</string>
+    <string name="create_list_action">Create a new list</string>
+
+    <string name="rename_list_title">Rename a list</string>
+    <string name="rename_button">Rename</string>
+    <string name="delete_list_title">Delete list?</string>
+    <string name="delete_list_message">All tasks in this list will be permanently deleted, continue?</string>
+    <string name="delete_all_done_tasks_title">Delete all completed tasks?</string>
+    <string name="delete_all_done_tasks_message">All completed tasks will be permanently deleted, continue?</string>
+    <string name="list_name_hint">List name</string>
+    <string name="create_button">Create</string>
+    <string name="export_info">Export list to text format (JSON)</string>
+    <string name="import_info">Import a list in text format (JSON)</string>
+    <string name="no_list_selected">No list selected...</string>
+    <string name="enter_list_name">Please define a name for the list</string>
+
+    <string name="add_date_time">Add date/time</string>
+    <string name="set_duration">Set duration</string>
+    <string name="set_priority">Set priority</string>
+    <string name="start_flow">Start a Flow!</string>
+    <string name="what_is_flow">What is the Flow on myTasks?</string>
+    <string name="flow_description">The flow allows you to jump into a task, stay focused and motivated, with a countdown you define, and a visual reward at the end!</string>
+    <string name="i_finished">I\'ve finished!</string>
+
+    <string name="priority_very_high">Very important</string>
+    <string name="priority_high">Important</string>
+    <string name="priority_urgent">Very urgent!</string>
+    <string name="priority_optional">Optional</string>
+    <string name="priority_not_urgent">Not urgent</string>
+    <string name="priority_none">Undefined</string>
+
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Seconds</string>
+
+    <string name="set_duration_title">Set Duration</string>
+    <string name="set_duration_message">Set a duration for this task</string>
+    <string name="set_priority_title">Set Priority</string>
+    <string name="modify_or_delete_title">Modify or Delete?</string>
+    <string name="modify_action">MODIFY</string>
+    <string name="delete_action">DELETE</string>
+    <string name="feature_dev_title">Feature under development</string>
+    <string name="feature_dev_message">The context menu is not available yet, it will be in a future update.</string>
+    <string name="understood">Understood</string>
+
+    <string name="day_before_yesterday">Day before yesterday</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="day_after_tomorrow">Day after tomorrow</string>
+    <string name="at">at</string>
+    <string name="duration_hour">h</string>
+    <string name="duration_minute">min</string>
+    <string name="duration_second">s</string>
+
+    <string name="task_updated">Task updated</string>
+    <string name="task_added">Task added</string>
+    <string name="done_tasks_deleted">Completed tasks deleted ✔</string>
+    <string name="error_export_file">Error exporting file.</string>
+    <string name="error_import_file">Error importing file.</string>
+    <string name="list_created">List \'%1$s\' created.</string>
+    <string name="list_renamed">List renamed to \'%1$s\'.</string>
+    <string name="error_rename_list">Error renaming list.</string>
+    <string name="list_deleted">List deleted.</string>
+    <string name="error_delete_list">Error deleting list.</string>
+    <string name="demo_mode_activated">Demo Mode activated!</string>
+
+    <string name="no_lists_created">No lists created</string>
+    <string name="delete_list_confirmation_message">Do you really want to delete \'%1$s\'? All tasks it contains will also be deleted.</string>
+    <string name="list_name_empty_error">List name cannot be empty</string>
+    <string name="settings_dev_title">Feature under development</string>
+    <string name="settings_dev_message">Settings are not available yet, it will be for a future update.</string>
+    <string name="create_new_list_title">Create a new list</string>
+    <string name="init_demo_mode">Initializing demonstration mode...</string>
+
+    <string name="list_my_tasks">My tasks</string>
+    <string name="list_today">Today</string>
+    <string name="list_tomorrow">Tomorrow</string>
+
+    <string name="demo_task_1_title">Welcome to myTasks!</string>
+    <string name="demo_task_1_desc">This is a demonstration.</string>
+    <string name="demo_task_2_title">Organize my day</string>
+    <string name="demo_task_2_desc">Plan morning priorities</string>
+    <string name="demo_task_3_title">Learn Kotlin</string>
+    <string name="demo_task_3_desc">Watch a video on Coroutines</string>
+    <string name="demo_task_4_title">Go grocery shopping</string>
+    <string name="demo_task_4_desc">Bread, milk, eggs</string>
+    <string name="demo_task_5_title">Start a Flow</string>
+    <string name="demo_task_5_desc">Try focus mode on this task</string>
+    <string name="demo_task_6_title">Task completed</string>
+    <string name="demo_task_6_desc">Well done!</string>
 </resources>

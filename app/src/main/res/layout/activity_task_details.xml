@@ -32,7 +32,7 @@
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:popupTheme="@style/ThemeOverlay.App.PopupOverlay"
             app:title="Modifier une tâche"
-            app:titleTextColor="@color/iconTint" />
+            app:titleTextColor="@android:color/white" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -123,7 +123,7 @@
                             android:fontFamily="@font/lexend_semibold"
                             android:layout_marginStart="14dp"
                             android:layout_marginEnd="12dp"
-                            android:text="Ajouter date/heure"/>
+                            android:text="@string/add_date_time"/>
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/setDuration"
@@ -134,7 +134,7 @@
                             app:chipMinTouchTargetSize="30dp"
                             android:fontFamily="@font/lexend_semibold"
                             android:layout_marginEnd="12dp"
-                            android:text="Définir la durée"/>
+                            android:text="@string/set_duration"/>
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/setPriority"
@@ -146,7 +146,7 @@
                             android:fontFamily="@font/lexend_semibold"
                             app:chipMinTouchTargetSize="30dp"
 
-                            android:text="Définir la priorité"/>
+                            android:text="@string/set_priority"/>
 
 
 
@@ -191,7 +191,7 @@
                     android:layout_marginEnd="10dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:text="Démarrer un Flow !"
+                    android:text="@string/start_flow"
                     android:textColor="#4942A8"
                     android:textSize="20sp"
                     app:backgroundTint="#DBDCFF"
@@ -228,7 +228,7 @@
                             android:layout_marginStart="4dp"
                             android:textSize="16sp"
                             android:alpha="0.9"
-                            android:text="Qu'est-ce-que le Flow sur myTasks ?"/>
+                            android:text="@string/what_is_flow"/>
 
                     </LinearLayout>
 
@@ -239,7 +239,7 @@
                         android:paddingTop="1dp"
                         android:paddingStart="4dp"
                         android:paddingEnd="4dp"
-                        android:text="Le flow te permet de te lancer dans une tâche, de rester concentré et motivé, avec un compte à rebours que tu définis, et une récompense visuelle à la fin !"/>
+                        android:text="@string/flow_description"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -251,7 +251,7 @@
         android:layout_width="wrap_content"
         android:layout_height="52dp"
         android:layout_margin="@dimen/fab_margin"
-        android:text="J'ai terminé !"
+        android:text="@string/i_finished"
         android:fontFamily="@font/lexend_semibold"
         android:textAllCaps="false"
         android:textColor="@color/fabText"
@@ -260,7 +260,7 @@
         app:collapsedSize="55dp"
         app:icon="@drawable/ic_baseline_task_alt_24"
         app:iconPadding="8dp"
-        app:iconTint="#2A2B71"
+        app:iconTint="?attr/colorOnPrimary"
         app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="@color/purpleLight" />
@@ -304,6 +304,8 @@
 
             app:menu="@menu/bottom_tools_task"
             app:navigationIcon="@drawable/ic_menu_black_24dp"
+            app:navigationIconTint="?attr/colorOnPrimary"
+            app:itemIconTint="?attr/colorOnPrimary"
              />
 
         <!--app:navigationIcon="@drawable/ic_menu_black_24dp"-->

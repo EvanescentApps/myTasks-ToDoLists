@@ -21,6 +21,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
+import dagger.hilt.android.AndroidEntryPoint
+
 const val ARG_CURRENT_LIST = "currentList"
 
 // Define an interface for actions that the BottomFragment can request
@@ -31,6 +33,7 @@ interface BottomFragmentActions {
     fun onExportList(listId: String)
     fun onImportList()
     fun onCreateNewList(listTitle: String)
+    fun onChangeLanguage()
 }
 
 data class ListAction(
@@ -39,6 +42,7 @@ data class ListAction(
     val action: () -> Unit
 )
 
+@AndroidEntryPoint
 class BottomFragment : BottomSheetDialogFragment() {
 
     // A reference to the activity that implements BottomFragmentActions
@@ -86,31 +90,35 @@ class BottomFragment : BottomSheetDialogFragment() {
             recyclerList?.layoutManager = LinearLayoutManager(context)
             recyclerList?.adapter = ItemAdapter(arrayListOf(
 
-                ListAction("Renommer la liste", R.drawable.outline_drive_file_rename_outline_24) {
+                ListAction(getString(R.string.rename_list_action), R.drawable.outline_drive_file_rename_outline_24) {
                     showRenameListDialog(currentListId)
                 },
-                ListAction("Supprimer la liste", R.drawable.ic_baseline_delete_outline_24) {
+                ListAction(getString(R.string.delete_list_action), R.drawable.ic_baseline_delete_outline_24) {
                     showDeleteListDialog(currentListId)
                 },
-                ListAction("Supprimer toutes les tâches terminées", R.drawable.outline_delete_sweep_24) {
+                ListAction(getString(R.string.delete_all_done_tasks_action), R.drawable.outline_delete_sweep_24) {
                     showDeleteAllDoneTasksDialog()
                 },
-                ListAction("Exporter la liste", R.drawable.outline_file_upload_24) {
+                ListAction(getString(R.string.export_list_action), R.drawable.outline_file_upload_24) {
                     actionsListener?.onExportList(currentListId)
-                    Toast.makeText(requireActivity(), "Export de la liste au format texte (JSON)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(), getString(R.string.export_info), Toast.LENGTH_SHORT).show()
                     dismissAllowingStateLoss()
                 },
-                ListAction("Importer une liste", R.drawable.outline_file_download_24) {
+                ListAction(getString(R.string.import_list_action), R.drawable.outline_file_download_24) {
                     actionsListener?.onImportList()
-                    Toast.makeText(requireActivity(), "Importez une liste au format texte (JSON)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(), getString(R.string.import_info), Toast.LENGTH_SHORT).show()
                     dismissAllowingStateLoss()
                 },
-                ListAction("Créer une nouvelle liste", R.drawable.ic_add_black_48dp) {
+                ListAction(getString(R.string.action_language), R.drawable.ic_baseline_language_24) {
+                    actionsListener?.onChangeLanguage()
+                    dismissAllowingStateLoss()
+                },
+                ListAction(getString(R.string.create_list_action), R.drawable.ic_add_black_48dp) {
                     showCreateNewListDialog()
                 }
             ))
         } else {
-            Toast.makeText(requireActivity(), "Aucune liste sélectionnée...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity(), getString(R.string.no_list_selected), Toast.LENGTH_SHORT).show()
             dismissAllowingStateLoss()
         }
     }
@@ -121,15 +129,15 @@ class BottomFragment : BottomSheetDialogFragment() {
         val input = viewInflated.findViewById<EditText>(R.id.input)
 
         builder.apply {
-            setTitle("Renommer une liste")
+            setTitle(getString(R.string.rename_list_title))
             setView(viewInflated)
-            setPositiveButton("Renommer") { dialog, _ ->
+            setPositiveButton(getString(R.string.rename_button)) { dialog, _ ->
                 dialog.dismiss()
                 val newName = input.text.toString()
                 if (newName.isNotEmpty()) {
                     actionsListener?.onRenameList(listId, newName)
                 } else {
-                    Toast.makeText(context,"Veuillez définir un nom pour la liste",Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.enter_list_name), Toast.LENGTH_LONG).show()
                 }
                 dismissAllowingStateLoss()
             }
@@ -141,9 +149,9 @@ class BottomFragment : BottomSheetDialogFragment() {
     private fun showDeleteListDialog(listId: String) {
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
         builder.apply {
-            setTitle("Supprimer la liste ?")
-            setMessage("Toutes les tâches de cette liste seront définitivement supprimées, continuer ?")
-            setPositiveButton("Supprimer") { _, _ ->
+            setTitle(getString(R.string.delete_list_title))
+            setMessage(getString(R.string.delete_list_message))
+            setPositiveButton(getString(R.string.delete)) { _, _ ->
                 actionsListener?.onDeleteList(listId)
                 dismissAllowingStateLoss()
             }
@@ -157,9 +165,9 @@ class BottomFragment : BottomSheetDialogFragment() {
     private fun showDeleteAllDoneTasksDialog() {
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialog_rounded)
         builder.apply {
-            setTitle("Supprimer toutes les tâches terminées ?")
-            setMessage("Toutes les tâches terminées seront définitivement supprimées, continuer ?")
-            setPositiveButton("Supprimer") { _, _ ->
+            setTitle(getString(R.string.delete_all_done_tasks_title))
+            setMessage(getString(R.string.delete_all_done_tasks_message))
+            setPositiveButton(getString(R.string.delete)) { _, _ ->
                 actionsListener?.onDeleteAllDoneTasks()
                 dismissAllowingStateLoss()
             }
@@ -177,14 +185,14 @@ class BottomFragment : BottomSheetDialogFragment() {
 
         builder.apply {
             setView(viewInflated)
-            setTitle("Créer une liste")
-            setPositiveButton("Créer") { dialog, _ ->
+            setTitle(getString(R.string.create_list_action))
+            setPositiveButton(getString(R.string.create_button)) { dialog, _ ->
                 dialog.dismiss()
                 val mText = input.text.toString()
                 if (mText.isNotEmpty()) {
                     actionsListener?.onCreateNewList(mText)
                 } else {
-                    Toast.makeText(context, "Veuillez définir un nom pour la liste", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.enter_list_name), Toast.LENGTH_LONG).show()
                 }
                 dismissAllowingStateLoss()
             }

@@ -23,10 +23,13 @@ import com.evanescent.mytasks.fadeTo
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.random.Random
 
+import dagger.hilt.android.AndroidEntryPoint
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
+@AndroidEntryPoint
 class FlowActivity : AppCompatActivity() {
 
     private lateinit var b: ActivityFlowBinding

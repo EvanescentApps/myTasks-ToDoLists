@@ -25,7 +25,7 @@
                android:id="@+id/tres_important"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text=" Très Important"
+               android:text="@string/priority_very_high"
                android:tag="tres_important"
                android:gravity="center_vertical"
                android:textSize="22sp"
@@ -35,7 +35,7 @@
                android:id="@+id/important"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text=" Important"
+               android:text="@string/priority_high"
                android:gravity="center_vertical"
                android:textSize="22sp"
                android:textColor="@color/textContentPrimary" />
@@ -44,7 +44,7 @@
                android:id="@+id/tres_urgent"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text=" Très Urgent"
+               android:text="@string/priority_urgent"
                android:gravity="center_vertical"
                android:textSize="22sp"
                android:textColor="@color/textContentPrimary" />
@@ -53,7 +53,7 @@
                android:id="@+id/pas_urgent"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text=" Pas Urgent"
+               android:text="@string/priority_not_urgent"
                android:gravity="center_vertical"
                android:textSize="22sp"
                android:textColor="@color/textContentPrimary" />
@@ -62,7 +62,7 @@
                android:id="@+id/facultatif"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text=" Facultatif"
+               android:text="@string/priority_optional"
                android:gravity="center_vertical"
                android:textSize="22sp"
                android:textColor="@color/textContentPrimary" />

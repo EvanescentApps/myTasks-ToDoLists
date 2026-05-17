@@ -83,74 +83,75 @@ kotlin {
 dependencies {
 
     // Unit Testing (Local JVM Tests)
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito:mockito-core:5.20.0") // Or latest version
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0") // If using Kotlin for mocks
-    testImplementation("androidx.arch.core:core-testing:2.2.0") // For LiveData testing
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2") // For Coroutine testing
-    testImplementation("com.google.truth:truth:1.4.5") // Optional: More readable assertions
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core) // Or latest version
+    testImplementation(libs.mockito.kotlin) // If using Kotlin for mocks
+    testImplementation(libs.core.testing) // For LiveData testing
+    testImplementation(libs.kotlinx.coroutines.test) // For Coroutine testing
+    testImplementation(libs.truth) // Optional: More readable assertions
 
     // Instrumented Testing (On-device Tests)
-    androidTestImplementation("androidx.test.ext:junit:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation("androidx.test:runner:1.7.0")
-    androidTestImplementation("androidx.test:rules:1.7.0")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.7.0") // For RecyclerView testing
-    androidTestImplementation("org.mockito:mockito-android:5.20.0") // If need mocks in instrumented tests
-    androidTestImplementation("androidx.arch.core:core-testing:2.2.0") // For LiveData testing in instrumented tests
-    androidTestImplementation("com.google.truth:truth:1.4.5") // Optional: More readable assertions
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.runner)
+    androidTestImplementation(libs.rules)
+    androidTestImplementation(libs.espresso.contrib) // For RecyclerView testing
+    androidTestImplementation(libs.mockito.android) // If need mocks in instrumented tests
+    androidTestImplementation(libs.core.testing) // For LiveData testing in instrumented tests
+    androidTestImplementation(libs.truth) // Optional: More readable assertions
 
 
-    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx:22.5.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(libs.firebase.bom)
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.kotlinx.serialization.json)
 
-    implementation("at.connyduck.sparkbutton:sparkbutton:4.2.0")
-    implementation("com.airbnb.android:lottie:6.7.1")
-    implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation(libs.sparkbutton)
+    implementation(libs.lottie)
+    implementation(libs.timber)
 
-    implementation("androidx.core:core-ktx:1.17.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.6")
-    implementation("com.firebaseui:firebase-ui-auth:9.1.1")
-    implementation("com.google.firebase:firebase-auth-ktx:23.2.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.annotation:annotation:1.9.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
-    implementation("com.github.LelouBil:PronoteLib:0.4.2")
+    implementation(libs.core.ktx)
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.preference.ktx)
+    implementation(libs.swiperefreshlayout)
+    implementation(libs.recyclerview)
+    implementation(libs.datastore.preferences)
+    implementation(libs.firebase.ui.auth)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.constraintlayout)
+    implementation(libs.annotation)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.pronotelib)
 
     // Room
     val roomVersion = "2.8.4"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.59.2")
-    ksp("com.google.dagger:hilt-android-compiler:2.59.2")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
     // Jetpack Compose
-    implementation("androidx.activity:activity-compose:1.10.1")
-    implementation("androidx.compose.ui:ui:1.8.1")
-    implementation("androidx.compose.material3:material3:1.3.2")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.8.1")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.8.1")
+    implementation(libs.activity.compose)
+    implementation(libs.ui)
+    implementation(libs.material3)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
 
 
-    implementation("androidx.activity:activity-ktx:1.10.1") // for by viewModels()
-    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation(libs.activity.ktx) // for by viewModels()
+    implementation(libs.fragment.ktx)
+    implementation(libs.material3)
 /*
     implementation("androidx.compose.material3:material3-pullrefresh:1.2.0-alpha11")
 */
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }
 
 repositories {

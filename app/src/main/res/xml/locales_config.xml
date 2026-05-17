@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026. myTasks © 2021 by Evan Cocain is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International. (A Creative Commons License)
+  ~ Created and published by Evan Cocain (as Electro Inc.)
+  -->
+
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+   <locale android:name="fr"/>
+   <locale android:name="en"/>
+</locale-config>

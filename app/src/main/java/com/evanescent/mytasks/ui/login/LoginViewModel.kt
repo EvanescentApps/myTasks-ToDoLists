@@ -1,31 +1,43 @@
 package com.evanescent.mytasks.ui.login
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import android.util.Patterns
 import com.evanescent.mytasks.data.repository.LoginRepository
 import com.evanescent.mytasks.data.Result
 
 import com.evanescent.mytasks.R
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-    private val _loginForm = MutableLiveData<LoginFormState>()
-    val loginFormState: LiveData<LoginFormState> = _loginForm
+@HiltViewModel
+class LoginViewModel @Inject constructor(private val loginRepository: LoginRepository) : ViewModel() {
 
-    private val _loginResult = MutableLiveData<LoginResult>()
-    val loginResult: LiveData<LoginResult> = _loginResult
+    private val _loginForm = MutableStateFlow(LoginFormState())
+    val loginFormState: StateFlow<LoginFormState> = _loginForm.asStateFlow()
+
+    private val _loginResult = MutableSharedFlow<LoginResult>()
+    val loginResult: SharedFlow<LoginResult> = _loginResult.asSharedFlow()
 
     fun login(username: String, password: String) {
-        // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
+        viewModelScope.launch {
+            val result = loginRepository.login(username, password)
 
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
+            if (result is Result.Success) {
+                _loginResult.emit(
+                    LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
+                )
+            } else {
+                _loginResult.emit(LoginResult(error = R.string.login_failed))
+            }
         }
     }
 

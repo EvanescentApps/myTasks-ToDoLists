@@ -14,7 +14,11 @@ import com.evanescent.mytasks.data.model.LoggedInUser
  * maintains an in-memory cache of login status and user credentials information.
  */
 
-class LoginRepository(val dataSource: LoginDataSource) {
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class LoginRepository @Inject constructor(val dataSource: LoginDataSource) {
 
     // in-memory cache of the loggedInUser object
     var user: LoggedInUser? = null

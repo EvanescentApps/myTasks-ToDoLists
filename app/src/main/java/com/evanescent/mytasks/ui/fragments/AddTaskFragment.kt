@@ -17,31 +17,25 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.evanescent.mytasks.R
 import com.evanescent.mytasks.data.model.Task // Ensure Task data class is correctly imported
 import com.evanescent.mytasks.ui.home.TasksViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber // Using Timber for logging
 
 /**
  * A BottomSheetDialogFragment for adding new tasks.
  * It communicates with TasksViewModel to save new tasks.
  */
+@AndroidEntryPoint
 class AddTaskFragment : BottomSheetDialogFragment() {
 
-    // Use viewModels() delegate to get a ViewModel instance scoped to the owning Activity
-    // This assumes TasksViewModel has a default constructor or is provided by a ViewModelFactory
-    // if it has dependencies (like TasksRepository).
-    // In your case, since TasksViewModel takes TasksRepository, you'd likely use an Activity-scoped
-    // ViewModel provider or a Hilt/Koin injection setup. For simplicity, assuming default constructor for now.
-    // If using a ViewModelFactory, it would be:
-    // private val tasksViewModel: TasksViewModel by activityViewModels { YourViewModelFactory(requireContext()) }
-    private val tasksViewModel: TasksViewModel by viewModels(
-        ownerProducer = { requireActivity() } // Scope to the parent Activity
-    )
+    // Use activityViewModels() delegate to get a ViewModel instance scoped to the owning Activity
+    private val tasksViewModel: TasksViewModel by activityViewModels()
 
     private lateinit var taskTitleEditText: EditText
     private lateinit var descriptionEditText: EditText // Renamed for clarity

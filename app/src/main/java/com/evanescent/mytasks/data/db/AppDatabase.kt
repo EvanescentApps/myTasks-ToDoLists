@@ -10,10 +10,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.evanescent.mytasks.data.model.Task
+import com.evanescent.mytasks.data.model.TaskList
 
-@Database(entities = [Task::class], version = 1, exportSchema = false)
+@Database(entities = [Task::class, TaskList::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
+    abstract fun taskListDao(): TaskListDao
 
     companion object {
         @Volatile

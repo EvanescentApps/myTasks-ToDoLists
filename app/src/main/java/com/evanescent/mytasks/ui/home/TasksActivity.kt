@@ -5,70 +5,53 @@
 
 package com.evanescent.mytasks.ui.home
 
-import android.R.attr.data
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.format.Formatter.formatIpAddress
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts // Import for new Activity Result API
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.evanescent.mytasks.ItemTouchHelperCallback
 import com.evanescent.mytasks.R
 import com.evanescent.mytasks.data.model.Task
 import com.evanescent.mytasks.data.repository.TasksRepository
 import com.evanescent.mytasks.databinding.ActivityTasksBinding
+import com.evanescent.mytasks.ui.details.TaskDetailsActivity
 import com.evanescent.mytasks.ui.fragments.AddTaskFragment
 import com.evanescent.mytasks.ui.fragments.BottomFragment
 import com.evanescent.mytasks.ui.fragments.BottomFragmentActions
 import com.evanescent.mytasks.ui.fragments.ChangeListFragment
-import com.evanescent.mytasks.ui.details.TaskDetailsActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import java.io.BufferedInputStream
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.Executors
-import androidx.core.view.isVisible
-import androidx.datastore.core.DataStore
 
 // DataStore for settings (consider if this should be part of a SettingsViewModel/Repository)
 /*
 val Context.dataStoreSettings: DataStore<Preferences> by preferencesDataStore(name = "settings")
 */
 
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement the interface
 
     private lateinit var adapter: TasksAdapter
@@ -76,22 +59,18 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     private lateinit var itemTouchHelperCallback: ItemTouchHelperCallback
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-
-
-    val tasksViewModel: TasksViewModel by viewModels {
-        TasksViewModelFactory(TasksRepository.getInstance(this.applicationContext))
-    }
+    val tasksViewModel: TasksViewModel by viewModels()
 
     // New Activity Result Launcher for Export
     private val exportFileLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("text/*")) { uri: Uri? ->
         if (uri != null) {
-            Toast.makeText(this, "Fichier sauvegardé avec succès !", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.file_saved_success), Toast.LENGTH_LONG).show()
             // Persist URI permissions if you want to access it later without user prompt
             val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             contentResolver.takePersistableUriPermission(uri, takeFlags)
             tasksViewModel.exportTaskListToFile(uri)
         } else {
-            Toast.makeText(this, "Exportation annulée.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.export_cancelled), Toast.LENGTH_SHORT).show()
             Timber.tag("Tasks to file").i("File creation cancelled by user.")
         }
     }
@@ -99,10 +78,10 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     // New Activity Result Launcher for Import
     private val importFileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) {
-            Toast.makeText(this, "Fichier importé avec succès !", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.file_imported_success), Toast.LENGTH_LONG).show()
             tasksViewModel.importTaskListFromFile(uri)
         } else {
-            Toast.makeText(this, "Importation annulée.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.import_cancelled), Toast.LENGTH_SHORT).show()
             Timber.tag("Tasks from file").i("File opening cancelled by user.")
         }
     }
@@ -142,9 +121,9 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
 
                 // If task was marked done, show specific Snackbar (UI-specific)
                 if (updatedTask.done) {
-                    Snackbar.make(findViewById(R.id.activity), "Tâche terminée", Snackbar.LENGTH_LONG)
+                    Snackbar.make(findViewById(R.id.activity), getString(R.string.task_completed), Snackbar.LENGTH_LONG)
                         .setAnchorView(findViewById<FloatingActionButton>(R.id.fab))
-                        .setAction("Annuler") {
+                        .setAction(getString(R.string.undo)) {
                             tasksViewModel.setTaskDone(updatedTask, false) // Undo done state
                         }.show()
                 }
@@ -161,9 +140,9 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
 
     // This function will be called by the ItemTouchHelperCallback for swipe actions
     private fun showUndoSnackbar(deletedTask: Task, originalPosition: Int) { // Changed visibility to private
-        Snackbar.make(b.activity, "Tâche supprimée", Snackbar.LENGTH_LONG)
+        Snackbar.make(b.activity, getString(R.string.task_deleted), Snackbar.LENGTH_LONG)
             .setAnchorView(b.fab)
-            .setAction("Annuler") {
+            .setAction(getString(R.string.undo)) {
                 // User wants to undo: tell ViewModel to restore
                 tasksViewModel.restoreItem(deletedTask, originalPosition) // ViewModel handles restoring to original position
             }
@@ -262,24 +241,37 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(b.includeRecycler.tasksRecyclerview)
 
-        // --- Observe LiveData from ViewModel ---
-        // Observe the list of tasks
-        tasksViewModel.tasks.observe(this) { newTasks ->
-            adapter.updateTasks(newTasks) // Update adapter with new data
-        }
+        // --- Observe Flows from ViewModel ---
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    tasksViewModel.tasks.collect { newTasks ->
+                        adapter.updateTasks(newTasks)
+                    }
+                }
 
-        // Observe the current list name (for toolbar title)
-        tasksViewModel.currentListName.observe(this) { name ->
-            updateListName(name) // Update toolbar title
-        }
+                launch {
+                    tasksViewModel.currentListName.collect { name ->
+                        updateListName(name)
+                    }
+                }
 
-        // Observe Snackbar messages from ViewModel
-        tasksViewModel.snackbarEvent.observe(this) { message ->
-            Snackbar.make(b.activity, message, Snackbar.LENGTH_LONG)
-                .setAnchorView(b.fab)
-                .show()
+                launch {
+                    tasksViewModel.snackbarEvent.collect { message ->
+                        Snackbar.make(b.activity, message, Snackbar.LENGTH_LONG)
+                            .setAnchorView(b.fab)
+                            .show()
+                    }
+                }
+
+                launch {
+                    tasksViewModel.counter.collect { count ->
+                        Timber.tag("INT").e("Counter from ViewModel: $count")
+                    }
+                }
+            }
         }
-        // --- End LiveData Observation ---
+        // --- End Flow Observation ---
 
         b.swipeRefresh.isEnabled = false // Disable swipe refresh initially
         b.swipeRefresh.setOnRefreshListener {
@@ -307,13 +299,19 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 .show(supportFragmentManager, "dialog")
         }
 
-        // Context menu item (BottomFragment)
-        findViewById<View>(R.id.contextItem).setOnClickListener {
-            // Pass the current list ID to the BottomFragment
-            tasksViewModel.currentListId.value?.let { listId ->
-                BottomFragment.newInstance(listId).show(supportFragmentManager, "dialog")
-            } ?: run {
-                Toast.makeText(this, "Impossible d'ouvrir le menu contextuel sans liste sélectionnée.", Toast.LENGTH_SHORT).show()
+        // Bottom App Bar Menu handling
+        b.bottomAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.contextItem -> {
+                    // Pass the current list ID to the BottomFragment
+                    tasksViewModel.currentListId.value?.let { listId ->
+                        BottomFragment.newInstance(listId).show(supportFragmentManager, "dialog")
+                    } ?: run {
+                        Toast.makeText(this, getString(R.string.error_context_menu_no_list), Toast.LENGTH_SHORT).show()
+                    }
+                    true
+                }
+                else -> false
             }
         }
 
@@ -323,16 +321,21 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
                 .show(supportFragmentManager, "dialog")
         }
 
-        tasksViewModel.counter.observe(this) { count ->
-            // L'Activity ne fait que mettre à jour l'UI
-            Timber.tag("INT").e("Counter from ViewModel: $count")
-        }
-
         // Click listeners for showing the ChangeListFragment
         b.bottomAppBar.setNavigationOnClickListener { showListsBottomSheet() }
         b.toolbarLayout.setOnClickListener { showListsBottomSheet() }
         b.appBar.setOnClickListener { showListsBottomSheet() }
         b.toolbar.setOnClickListener { showListsBottomSheet() }
+
+        // Hidden Demo Mode: Long click on the toolbar area
+        val demoLongClickListener = View.OnLongClickListener {
+            Toast.makeText(this, getString(R.string.init_demo_mode), Toast.LENGTH_SHORT).show()
+            tasksViewModel.startDemoMode()
+            true
+        }
+        b.toolbar.setOnLongClickListener(demoLongClickListener)
+        b.toolbarLayout.setOnLongClickListener(demoLongClickListener)
+        b.appBar.setOnLongClickListener(demoLongClickListener)
 
         // Touch listener to show bottom app bar (if hidden)
         b.includeRecycler.parentRecyclerV.setOnTouchListener { _, _ ->
@@ -368,7 +371,7 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
         tasksViewModel.currentListName.value?.let { name ->
             exportFileLauncher.launch(name.replace(" ", "_")) // Sanitize for file name
         } ?: run {
-            Toast.makeText(this, "Impossible d'exporter: nom de liste introuvable.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_export_no_list), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -379,6 +382,10 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
 
     override fun onCreateNewList(listTitle: String) {
         tasksViewModel.createNewList(listTitle, emptyList(),true) // Pass 'true' if the new list should be selected immediately
+    }
+
+    override fun onChangeLanguage() {
+        showLanguageDialog()
     }
     // --- End BottomFragmentActions Implementation ---
 
@@ -400,19 +407,18 @@ class TasksActivity : AppCompatActivity(), BottomFragmentActions { // Implement 
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_scrolling, menu)
-        return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                // Handle settings action, e.g., startActivity(Intent(this, SettingsActivity::class.java))
-                true
+    private fun showLanguageDialog() {
+        val languages = arrayOf("Français", "English")
+        val languageCodes = arrayOf("fr", "en")
+        
+        MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
+            .setTitle(R.string.action_language)
+            .setItems(languages) { _, which: Int ->
+                val locale = androidx.core.os.LocaleListCompat.forLanguageTags(languageCodes[which])
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(locale)
             }
-            else -> super.onOptionsItemSelected(item)
-        }
+            .show()
     }
 
     private fun logIpAddresses() {
