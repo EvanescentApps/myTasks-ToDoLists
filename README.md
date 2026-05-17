@@ -5,8 +5,7 @@
 📖 [English version below](#english-version)
 
 ## :camera_flash: Screenshots
-<img src="/screenshots/Screen1.png" width="260">&emsp;<img src="/screenshots/Screen2.png" width="260">&emsp;<img src="/screenshots/Screen3.png" width="260">
-&emsp;<img src="/screenshots/Screen4.png" width="260">
+<img src="/screenshots/Screen1.png" width="260">&emsp;<img src="/screenshots/Screen2.png" width="260">&emsp;<img src="/screenshots/Screen4.png" width="260">
 ---
 
 ## Fonctionnalités
